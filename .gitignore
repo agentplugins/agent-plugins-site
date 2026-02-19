@@ -1,0 +1,15 @@
+# macOS
+.DS_Store
+
+# IDEs
+.idea/
+.vscode/
+
+# Node
+node_modules/
+dist/
+*.tgz
+
+# Environment
+.env
+.env.local
