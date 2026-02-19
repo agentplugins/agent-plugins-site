@@ -1,0 +1,12 @@
+---
+description: Always handle errors explicitly. No empty catch blocks.
+alwaysApply: true
+---
+
+Error handling rules:
+
+- Never use empty `catch` blocks. At minimum, log the error.
+- Always handle promise rejections — use `try/catch` with `await` or `.catch()`.
+- Throw specific error types, not generic `Error("something went wrong")`.
+- Include context in error messages: what operation failed and relevant IDs/values.
+- Don't catch errors you can't handle — let them propagate to a handler that can.
