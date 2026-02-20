@@ -2,9 +2,29 @@
 
 An open format for packaging agent extensions. Supported by [Claude Code](https://code.claude.com), [Cursor](https://cursor.com), and [OpenCode](https://opencode.ai).
 
-A plugin is a folder. Put skills, agents, hooks, rules, MCP servers, or LSP servers inside it. Agent tools discover and run them automatically.
+A plugin is a folder with skills, agents, hooks, rules, MCP servers, or LSP servers inside it. Plugins are distributed through **marketplaces** — git repos with a `marketplace.json` that indexes the plugins inside.
 
-## Make a plugin in 60 seconds
+## How it works
+
+```
+my-marketplace/                      # A git repo
+├── marketplace.json                 # Lists the plugins in this repo
+├── my-plugin/                       # A plugin
+│   ├── .plugin/plugin.json          #   Plugin manifest
+│   └── skills/hello/SKILL.md        #   A skill
+└── another-plugin/                  # Another plugin
+    └── ...
+```
+
+Users install plugins from a marketplace:
+
+```bash
+claude plugin install my-plugin@my-marketplace
+```
+
+## Make a plugin
+
+### 1. Create the plugin
 
 ```bash
 mkdir -p my-plugin/.plugin
@@ -32,61 +52,9 @@ description: Greet the user warmly.
 Greet the user and ask how you can help them today.
 ```
 
-Test it:
+### 2. Create a marketplace
 
-```bash
-# Claude Code
-claude --plugin-dir ./my-plugin
-
-# Then run your skill
-/my-plugin:hello
-```
-
-That's it. You have a working plugin.
-
-## What can go in a plugin
-
-| Component | Directory | Format | What it does |
-|---|---|---|---|
-| **Skills** | `skills/` | Folders with `SKILL.md` | Give agents new capabilities |
-| **Commands** | `commands/` | `.md` files | Slash commands users can invoke |
-| **Agents** | `agents/` | `.md` files | Specialized sub-agents |
-| **Rules** | `rules/` | `.mdc` files | Persistent AI guidance and coding standards |
-| **Hooks** | `hooks/` | `hooks.json` | Scripts that run on events (file edits, session start, etc.) |
-| **MCP Servers** | `.mcp.json` | JSON config | Connect agents to external tools via [MCP](https://modelcontextprotocol.io/) |
-| **LSP Servers** | `.lsp.json` | JSON config | Real-time code intelligence (diagnostics, go-to-definition) |
-
-Everything is optional. A plugin with just one skill works. A plugin with all seven component types works.
-
-## Plugin structure
-
-```
-my-plugin/
-├── .plugin/
-│   └── plugin.json          # Name, version, description
-├── skills/                   # Agent skills (SKILL.md in subdirs)
-├── commands/                 # Slash commands (.md files)
-├── agents/                   # Sub-agents (.md files)
-├── rules/                    # AI rules (.mdc files)
-├── hooks/
-│   └── hooks.json            # Event-driven automation
-├── scripts/                  # Scripts used by hooks
-├── .mcp.json                 # MCP server configs
-└── .lsp.json                 # LSP server configs
-```
-
-Drop files into the right directories and they're discovered automatically. No config needed beyond the manifest.
-
-## Examples
-
-See [`examples/`](examples/) for complete working plugins:
-
-- [`minimal-plugin`](examples/minimal-plugin/) — One skill, nothing else. The simplest possible plugin.
-- [`full-plugin`](examples/full-plugin/) — Every component type. A reference for what's possible.
-
-## Distribute your plugin
-
-Put your plugin in a git repo. Create a `marketplace.json` to index one or more plugins:
+Add a `marketplace.json` at the root of your repo:
 
 ```json
 {
@@ -102,7 +70,40 @@ Put your plugin in a git repo. Create a `marketplace.json` to index one or more 
 }
 ```
 
-Users install from the marketplace using their tool's plugin install command.
+### 3. Test it
+
+```bash
+# Test the plugin directly during development
+claude --plugin-dir ./my-plugin
+
+# Run your skill
+/my-plugin:hello
+```
+
+Push the repo to GitHub and users can install from it as a marketplace.
+
+## What can go in a plugin
+
+| Component | Directory | Format | What it does |
+|---|---|---|---|
+| **Skills** | `skills/` | Folders with `SKILL.md` | Give agents new capabilities |
+| **Commands** | `commands/` | `.md` files | Slash commands users can invoke |
+| **Agents** | `agents/` | `.md` files | Specialized sub-agents |
+| **Rules** | `rules/` | `.mdc` files | Persistent AI guidance and coding standards |
+| **Hooks** | `hooks/` | `hooks.json` | Scripts that run on events (file edits, session start, etc.) |
+| **MCP Servers** | `.mcp.json` | JSON config | Connect agents to external tools via [MCP](https://modelcontextprotocol.io/) |
+| **LSP Servers** | `.lsp.json` | JSON config | Real-time code intelligence (diagnostics, go-to-definition) |
+
+Everything is optional. A plugin with just one skill works. A plugin with all seven component types works.
+
+## Examples
+
+The [`examples/`](examples/) directory is a working marketplace with `marketplace.json` and two plugins:
+
+- [`minimal-plugin`](examples/minimal-plugin/) — One skill, nothing else. The simplest possible plugin.
+- [`full-plugin`](examples/full-plugin/) — Every component type. A reference for what's possible.
+
+See [`examples/marketplace.json`](examples/marketplace.json) for the marketplace index.
 
 ## Specification
 
