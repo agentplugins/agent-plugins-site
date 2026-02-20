@@ -109,12 +109,17 @@ Everything is optional. A plugin with just one skill works. A plugin with all se
 
 ## Examples
 
-The [`examples/`](examples/) directory is a working marketplace with `marketplace.json` and two plugins:
+This repo is itself a working marketplace. The [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) at the repo root indexes two example plugins in [`examples/`](examples/):
 
 - [`minimal-plugin`](examples/minimal-plugin/) — One skill, nothing else. The simplest possible plugin.
 - [`full-plugin`](examples/full-plugin/) — Every component type. A reference for what's possible.
 
-See [`examples/marketplace.json`](examples/marketplace.json) for the marketplace index.
+Try it:
+
+```bash
+/plugin marketplace add vercel-labs/open-plugin
+/plugin install minimal-plugin@open-plugin-examples
+```
 
 ## Specification
 
