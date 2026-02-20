@@ -2,23 +2,33 @@
 
 > This is a non-normative guide. For the formal specification, see [spec/specification.md](../spec/specification.md).
 
-This guide walks you through creating a plugin from scratch, testing it locally, and preparing it for distribution.
+This guide walks you through creating a plugin, packaging it in a marketplace, and distributing it.
 
 ## Prerequisites
 
-- A conformant plugin host tool installed (e.g., [Claude Code](https://code.claude.com), [OpenCode](https://opencode.ai))
+- A conformant plugin host tool installed (e.g., [Claude Code](https://code.claude.com), [Cursor](https://cursor.com), [OpenCode](https://opencode.ai))
 
-## Create your first plugin
+## Overview
 
-### 1. Create the plugin directory
+The workflow is:
+
+1. **Create a plugin** — a directory with a manifest and components
+2. **Create a marketplace** — a `marketplace.json` that indexes your plugin(s)
+3. **Test** — load the plugin directly during development
+4. **Distribute** — push the marketplace repo to GitHub; users install from it
+
+## Step 1: Create a plugin
+
+### Create the directory structure
 
 ```bash
-mkdir -p my-plugin/.plugin
+mkdir -p my-marketplace/my-plugin/.plugin
+mkdir -p my-marketplace/my-plugin/skills/hello
 ```
 
-### 2. Create the manifest
+### Write the manifest
 
-Create `my-plugin/.plugin/plugin.json`:
+Create `my-marketplace/my-plugin/.plugin/plugin.json`:
 
 ```json
 {
@@ -31,38 +41,77 @@ Create `my-plugin/.plugin/plugin.json`:
 }
 ```
 
-### 3. Add a skill
+### Add a skill
 
-Create a skill directory and `SKILL.md`:
-
-```bash
-mkdir -p my-plugin/skills/hello
-```
-
-Create `my-plugin/skills/hello/SKILL.md`:
+Create `my-marketplace/my-plugin/skills/hello/SKILL.md`:
 
 ```markdown
 ---
 name: hello
-description: Greet the user with a friendly message
+description: Greet the user with a friendly message.
 ---
 
 Greet the user warmly and ask how you can help them today.
 ```
 
-### 4. Test it
+## Step 2: Create a marketplace
 
-Load the plugin directly using your tool's development flag:
+Plugins are distributed through marketplaces. A marketplace is a `marketplace.json` file that indexes the plugins in the repo.
+
+Create `my-marketplace/marketplace.json`:
+
+```json
+{
+  "name": "my-marketplace",
+  "plugins": [
+    {
+      "name": "my-plugin",
+      "description": "My first plugin",
+      "version": "1.0.0",
+      "source": "./my-plugin"
+    }
+  ]
+}
+```
+
+Your repo now looks like this:
+
+```
+my-marketplace/
+├── marketplace.json             # Marketplace index (required)
+└── my-plugin/                   # Your plugin
+    ├── .plugin/
+    │   └── plugin.json          # Plugin manifest
+    └── skills/
+        └── hello/
+            └── SKILL.md         # A skill
+```
+
+This is a complete, distributable marketplace.
+
+## Step 3: Test it
+
+During development, load the plugin directly without going through the marketplace:
 
 ```bash
-# Claude Code
-claude --plugin-dir ./my-plugin
+claude --plugin-dir ./my-marketplace/my-plugin
 
 # Then invoke the skill
 /my-plugin:hello
 ```
 
+## Step 4: Distribute
+
+Push to GitHub. Users configure your repo as a marketplace and install plugins from it:
+
+```bash
+# Install from your marketplace
+claude plugin install my-plugin@my-marketplace
+```
+
 ## Add more components
+
+Once your basic plugin works, you can add more component types.
 
 ### Add an agent
 
@@ -81,6 +130,21 @@ You are a thorough code reviewer. When reviewing changes:
 3. Look for performance issues
 4. Ensure naming and style are consistent
 5. Suggest specific improvements with examples
+```
+
+### Add a rule
+
+Create `my-plugin/rules/prefer-const.mdc`:
+
+```markdown
+---
+description: Prefer const over let. Never use var.
+alwaysApply: true
+globs: "**/*.{js,ts,jsx,tsx}"
+---
+
+Always use `const` for variables that are never reassigned.
+Use `let` only when reassignment is necessary. Never use `var`.
 ```
 
 ### Add a hook
@@ -111,11 +175,9 @@ Create the script:
 mkdir -p my-plugin/scripts
 cat > my-plugin/scripts/lint.sh << 'EOF'
 #!/bin/bash
-# Read the tool input from stdin
 FILE=$(jq -r '.tool_input.file_path // empty')
 if [ -n "$FILE" ] && [ -f "$FILE" ]; then
   echo "Linting $FILE..." >&2
-  # Run your linter here
 fi
 EOF
 chmod +x my-plugin/scripts/lint.sh
@@ -137,9 +199,9 @@ Create `my-plugin/.mcp.json`:
 }
 ```
 
-## Plugin structure review
+## Full plugin structure
 
-After adding all components, your plugin looks like this:
+After adding all components:
 
 ```
 my-plugin/
@@ -150,61 +212,53 @@ my-plugin/
 │       └── SKILL.md         # Agent skill
 ├── agents/
 │   └── reviewer.md          # Sub-agent
+├── rules/
+│   └── prefer-const.mdc     # Coding standard
 ├── hooks/
 │   └── hooks.json           # Event hooks
 ├── scripts/
 │   └── lint.sh              # Hook script
 ├── .mcp.json                # MCP servers
-└── README.md                # Documentation (optional)
+└── README.md                # Documentation
 ```
 
-## Prepare for distribution
+Remember to update `marketplace.json` when you bump the version.
 
-### 1. Version your plugin
+## Multi-plugin marketplaces
 
-Update the `version` in `.plugin/plugin.json` whenever you make changes:
+A single marketplace can contain many plugins. Just add more entries:
 
 ```json
 {
-  "version": "1.1.0"
-}
-```
-
-### 2. Add a README
-
-Document what your plugin does, what components it includes, and any setup required.
-
-### 3. Add a license
-
-Include a `LICENSE` file.
-
-### 4. Create or join a marketplace
-
-To distribute your plugin, add it to a [marketplace](../spec/marketplaces.md). A marketplace is a directory (usually a git repo) with a `marketplace.json` index.
-
-```json
-{
-  "name": "my-marketplace",
+  "name": "my-org-plugins",
   "plugins": [
     {
-      "name": "my-plugin",
-      "description": "My first plugin",
+      "name": "formatter",
+      "description": "Auto-format on save",
       "version": "1.0.0",
-      "source": "./my-plugin"
+      "source": "./formatter"
+    },
+    {
+      "name": "linter",
+      "description": "Lint on save",
+      "version": "1.2.0",
+      "source": "./linter"
+    },
+    {
+      "name": "security-scanner",
+      "description": "Security audit tools",
+      "version": "2.0.0",
+      "source": "./security-scanner"
     }
   ]
 }
 ```
 
-Users can then install your plugin:
-
-```bash
-# Tool-specific install command
-<tool> plugin install my-plugin@my-marketplace
-```
+See [`examples/`](../examples/) for a working multi-plugin marketplace.
 
 ## Next steps
 
 - [Specification](../spec/specification.md) — Full spec for all fields and behaviors
 - [Component specs](../spec/specification.md#component-specifications) — Deep dive into each component type
 - [Marketplaces](../spec/marketplaces.md) — Distribution format details
+- [Examples](../examples/) — Working marketplace with two plugins
