@@ -1,60 +1,51 @@
-# Example Marketplace
+# Example Plugins
 
-This directory is a working **marketplace** — a collection of plugins indexed by a marketplace config.
-
-This is exactly how you'd structure a real marketplace repository for distribution.
+This directory contains two example plugins. The marketplace index is at the **repo root** in [`.claude-plugin/marketplace.json`](../.claude-plugin/marketplace.json) — that's where Claude Code looks for it.
 
 ## Structure
 
 ```
-examples/
+open-plugin/                             # Repo root
 ├── .claude-plugin/
-│   └── marketplace.json          # Marketplace index (Claude Code)
-├── marketplace.json              # Marketplace index (vendor-neutral)
-├── minimal-plugin/               # A simple plugin (one skill)
-│   ├── .claude-plugin/plugin.json
-│   ├── .plugin/plugin.json
-│   └── skills/greet/SKILL.md
-└── full-plugin/                  # A full-featured plugin (every component type)
-    ├── .claude-plugin/plugin.json
-    ├── .plugin/plugin.json
-    ├── skills/
-    ├── commands/
-    ├── agents/
-    ├── rules/
-    ├── hooks/
-    ├── .mcp.json
-    ├── .lsp.json
-    └── assets/logo.svg
+│   └── marketplace.json                 # Marketplace index (at repo root)
+├── examples/
+│   ├── minimal-plugin/                  # A simple plugin (one skill)
+│   │   ├── .claude-plugin/plugin.json
+│   │   └── skills/greet/SKILL.md
+│   └── full-plugin/                     # Every component type
+│       ├── .claude-plugin/plugin.json
+│       ├── skills/
+│       ├── commands/
+│       ├── agents/
+│       ├── rules/
+│       ├── hooks/
+│       ├── .mcp.json
+│       ├── .lsp.json
+│       └── assets/logo.svg
+└── ...
 ```
 
-## Cross-tool compatibility
+The marketplace.json `source` fields point to these directories:
 
-This example includes both vendor-neutral and Claude Code-specific paths:
-
-| File | Purpose |
-|---|---|
-| `.claude-plugin/marketplace.json` | Marketplace index for Claude Code |
-| `.plugin/plugin.json` | Plugin manifest (vendor-neutral) |
-| `.claude-plugin/plugin.json` | Plugin manifest (Claude Code) |
-| `marketplace.json` | Marketplace index (vendor-neutral fallback) |
-
-In practice, you only need the paths for the tools you're targeting. If you only target Claude Code, you only need the `.claude-plugin/` files.
+```json
+"source": "./examples/minimal-plugin"
+"source": "./examples/full-plugin"
+```
 
 ## Try it
 
-### With Claude Code
+### Install from the marketplace
 
 ```bash
-# Add this directory as a marketplace
-/plugin marketplace add ./examples
+# Add this repo as a marketplace
+/plugin marketplace add vercel-labs/open-plugin
 
 # Install a plugin
 /plugin install minimal-plugin@open-plugin-examples
 /plugin install devtools@open-plugin-examples
 ```
 
-### Development mode (any tool)
+### Development mode
 
 ```bash
 # Load a single plugin directly without a marketplace:
