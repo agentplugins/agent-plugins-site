@@ -36,14 +36,32 @@ my-plugin/
 
 ### Directory Rules
 
-1. The `.plugin/` directory MUST contain only `plugin.json`. All component directories (commands, agents, skills, rules, hooks) MUST be at the plugin root, not inside `.plugin/`.
+1. The metadata directory MUST contain only `plugin.json`. All component directories (commands, agents, skills, rules, hooks) MUST be at the plugin root, not inside the metadata directory.
 2. All paths within a plugin MUST be relative to the plugin root.
 3. All relative paths MUST start with `./`.
 4. A plugin MUST NOT reference files outside its own directory tree via `../` traversal.
 
 ## Plugin Manifest
 
-The manifest file at `.plugin/plugin.json` defines a plugin's metadata and configuration.
+The manifest file is a `plugin.json` inside a metadata directory at the plugin root. It defines the plugin's metadata and configuration.
+
+### Manifest Location
+
+Tools MUST check for the manifest in a metadata directory named with the pattern `.<tool-name>-plugin/plugin.json` or `.plugin/plugin.json`. The vendor-neutral path `.plugin/plugin.json` is RECOMMENDED for new plugins targeting multiple tools.
+
+For cross-tool compatibility, plugin authors MAY provide the manifest in multiple locations:
+
+| Path | Tool |
+|---|---|
+| `.plugin/plugin.json` | Vendor-neutral (recommended) |
+| `.claude-plugin/plugin.json` | Claude Code |
+| `.cursor-plugin/plugin.json` | Cursor |
+
+When multiple manifest locations exist, the tool SHOULD prefer its own vendor-prefixed directory, then fall back to `.plugin/plugin.json`.
+
+The manifest content is identical regardless of which directory it is in. Plugin authors who want to support multiple tools can either:
+- Use `.plugin/plugin.json` (if all target tools support it)
+- Duplicate `plugin.json` into each tool's directory (guaranteed compatibility)
 
 ### Manifest Presence
 
@@ -173,21 +191,29 @@ Tools SHOULD display the full namespaced name in user-facing interfaces.
 
 ## Environment Variables
 
-The following environment variables MUST be available to plugin scripts, hook commands, and MCP/LSP server configurations:
+Tools MUST provide an environment variable containing the absolute path to the plugin's root directory. Tools MAY use a vendor-prefixed name:
 
-| Variable | Description |
+| Variable | Tool |
 |---|---|
-| `PLUGIN_ROOT` | Absolute path to the plugin's root directory. |
+| `PLUGIN_ROOT` | Vendor-neutral |
+| `CLAUDE_PLUGIN_ROOT` | Claude Code |
 
-Tools MAY provide additional environment variables. The `PLUGIN_ROOT` variable MUST be the canonical way to reference files within the plugin.
+In configuration files (hook configs, MCP configs), the corresponding placeholder MUST be expanded to the plugin root path at load time:
 
-In configuration files (manifest, hook configs, MCP configs), the placeholder `${PLUGIN_ROOT}` MUST be expanded to the plugin root path at load time.
+| Placeholder | Tool |
+|---|---|
+| `${PLUGIN_ROOT}` | Vendor-neutral |
+| `${CLAUDE_PLUGIN_ROOT}` | Claude Code |
+
+For cross-tool compatibility, tools SHOULD expand both `${PLUGIN_ROOT}` and their vendor-specific placeholder. Plugin authors targeting a single tool MAY use that tool's placeholder. Plugin authors targeting multiple tools SHOULD use `${PLUGIN_ROOT}` or provide both:
 
 ```json
 {
   "command": "${PLUGIN_ROOT}/scripts/format.sh"
 }
 ```
+
+Tools MAY provide additional environment variables beyond the plugin root.
 
 ## Version Management
 

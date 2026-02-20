@@ -7,19 +7,21 @@ A plugin is a folder with skills, agents, hooks, rules, MCP servers, or LSP serv
 ## How it works
 
 ```
-my-marketplace/                      # A git repo
-├── marketplace.json                 # Lists the plugins in this repo
-├── my-plugin/                       # A plugin
-│   ├── .plugin/plugin.json          #   Plugin manifest
-│   └── skills/hello/SKILL.md        #   A skill
-└── another-plugin/                  # Another plugin
+my-marketplace/                          # A git repo
+├── .claude-plugin/
+│   └── marketplace.json                 # Marketplace index
+├── my-plugin/                           # A plugin
+│   ├── .claude-plugin/plugin.json       #   Plugin manifest
+│   └── skills/hello/SKILL.md            #   A skill
+└── another-plugin/                      # Another plugin
     └── ...
 ```
 
 Users install plugins from a marketplace:
 
 ```bash
-claude plugin install my-plugin@my-marketplace
+/plugin marketplace add owner/my-marketplace
+/plugin install my-plugin@my-marketplace
 ```
 
 ## Make a plugin
@@ -27,11 +29,12 @@ claude plugin install my-plugin@my-marketplace
 ### 1. Create the plugin
 
 ```bash
-mkdir -p my-plugin/.plugin
-mkdir -p my-plugin/skills/hello
+mkdir -p my-marketplace/.claude-plugin
+mkdir -p my-marketplace/my-plugin/.claude-plugin
+mkdir -p my-marketplace/my-plugin/skills/hello
 ```
 
-Write the manifest — `my-plugin/.plugin/plugin.json`:
+Write the plugin manifest — `my-marketplace/my-plugin/.claude-plugin/plugin.json`:
 
 ```json
 {
@@ -41,7 +44,7 @@ Write the manifest — `my-plugin/.plugin/plugin.json`:
 }
 ```
 
-Write a skill — `my-plugin/skills/hello/SKILL.md`:
+Write a skill — `my-marketplace/my-plugin/skills/hello/SKILL.md`:
 
 ```markdown
 ---
@@ -52,13 +55,16 @@ description: Greet the user warmly.
 Greet the user and ask how you can help them today.
 ```
 
-### 2. Create a marketplace
+### 2. Create the marketplace
 
-Add a `marketplace.json` at the root of your repo:
+Write the marketplace index — `my-marketplace/.claude-plugin/marketplace.json`:
 
 ```json
 {
   "name": "my-marketplace",
+  "owner": {
+    "name": "Your Name"
+  },
   "plugins": [
     {
       "name": "my-plugin",
@@ -74,13 +80,18 @@ Add a `marketplace.json` at the root of your repo:
 
 ```bash
 # Test the plugin directly during development
-claude --plugin-dir ./my-plugin
+claude --plugin-dir ./my-marketplace/my-plugin
 
-# Run your skill
-/my-plugin:hello
+# Or add the marketplace and install
+/plugin marketplace add ./my-marketplace
+/plugin install my-plugin@my-marketplace
 ```
 
-Push the repo to GitHub and users can install from it as a marketplace.
+Push the repo to GitHub and users can install from it:
+
+```bash
+/plugin marketplace add owner/my-marketplace
+```
 
 ## What can go in a plugin
 

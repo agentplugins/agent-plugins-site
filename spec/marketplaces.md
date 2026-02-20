@@ -23,11 +23,22 @@ my-marketplace/
 
 ## Marketplace Index Location
 
-Tools MUST check for `marketplace.json` at the repository root.
+The marketplace index is a `marketplace.json` file. Tools check for it in a metadata directory, following the same pattern as plugin manifests.
 
-Tools MAY additionally check `.plugin/marketplace.json` at the repository root. This allows tool-specific marketplace directories (e.g., `.cursor-plugin/marketplace.json`, `.claude-plugin/marketplace.json`) to coexist in a single repository.
+Tools MUST check for the marketplace index at one or more of these locations:
 
-When both locations exist, `marketplace.json` at the root takes precedence.
+| Path | Tool |
+|---|---|
+| `.plugin/marketplace.json` | Vendor-neutral |
+| `.claude-plugin/marketplace.json` | Claude Code |
+| `.cursor-plugin/marketplace.json` | Cursor |
+| `marketplace.json` (at repo root) | Fallback |
+
+Tools SHOULD prefer their own vendor-prefixed directory, then fall back to `.plugin/marketplace.json`, then `marketplace.json` at the root.
+
+For cross-tool compatibility, marketplace authors MAY provide the index in multiple locations. The content is identical regardless of location. Marketplace authors who want to support multiple tools can either:
+- Use the vendor-neutral path and each tool's vendor-prefixed path
+- Use `marketplace.json` at the root (if all target tools support it)
 
 ## `marketplace.json` Schema
 
