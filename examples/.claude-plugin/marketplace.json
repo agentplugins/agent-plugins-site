@@ -1,0 +1,23 @@
+{
+  "name": "open-plugin-examples",
+  "owner": {
+    "name": "Open Plugin"
+  },
+  "metadata": {
+    "description": "Example plugins demonstrating the Open Plugin format."
+  },
+  "plugins": [
+    {
+      "name": "minimal-plugin",
+      "description": "The simplest possible plugin — one skill, nothing else.",
+      "version": "1.0.0",
+      "source": "./minimal-plugin"
+    },
+    {
+      "name": "devtools",
+      "description": "Full-featured development toolkit with code review, linting, security scanning, and database tools.",
+      "version": "2.0.0",
+      "source": "./full-plugin"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "name": "minimal-plugin",
+  "description": "The simplest possible plugin — one skill, nothing else.",
+  "version": "1.0.0"
+}
