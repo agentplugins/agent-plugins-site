@@ -1,54 +1,30 @@
 # Example Plugins
 
-This directory contains two example plugins. The marketplace index is at the **repo root** in [`.claude-plugin/marketplace.json`](../.claude-plugin/marketplace.json) — that's where Claude Code looks for it.
+This directory contains two example plugins demonstrating the Open Plugin format.
 
 ## Structure
 
 ```
-open-plugin/                             # Repo root
-├── .claude-plugin/
-│   └── marketplace.json                 # Marketplace index (at repo root)
-├── examples/
-│   ├── minimal-plugin/                  # A simple plugin (one skill)
-│   │   ├── .claude-plugin/plugin.json
-│   │   └── skills/greet/SKILL.md
-│   └── full-plugin/                     # Every component type
-│       ├── .claude-plugin/plugin.json
-│       ├── skills/
-│       ├── commands/
-│       ├── agents/
-│       ├── rules/
-│       ├── hooks/
-│       ├── .mcp.json
-│       ├── .lsp.json
-│       └── assets/logo.svg
-└── ...
-```
-
-The marketplace.json `source` fields point to these directories:
-
-```json
-"source": "./examples/minimal-plugin"
-"source": "./examples/full-plugin"
+examples/
+├── minimal-plugin/                  # A simple plugin (one skill)
+│   ├── .claude-plugin/plugin.json
+│   └── skills/greet/SKILL.md
+└── full-plugin/                     # Every component type
+    ├── .claude-plugin/plugin.json
+    ├── skills/
+    ├── commands/
+    ├── agents/
+    ├── rules/
+    ├── hooks/
+    ├── .mcp.json
+    ├── .lsp.json
+    └── assets/logo.svg
 ```
 
 ## Try it
 
-### Install from the marketplace
-
 ```bash
-# Add this repo as a marketplace
-/plugin marketplace add vercel-labs/open-plugin
-
-# Install a plugin
-/plugin install minimal-plugin@open-plugin-examples
-/plugin install devtools@open-plugin-examples
-```
-
-### Development mode
-
-```bash
-# Load a single plugin directly without a marketplace:
+# Load a plugin directly:
 claude --plugin-dir ./examples/minimal-plugin
 claude --plugin-dir ./examples/full-plugin
 ```

@@ -35,26 +35,26 @@ Each scope stores its plugin configuration in a settings file. The relevant sect
 ```json
 {
   "enabledPlugins": [
-    "plugin-name@marketplace-name",
-    "another-plugin@another-marketplace"
+    "plugin-name",
+    "another-plugin"
   ],
   "disabledPlugins": [
-    "disabled-plugin@marketplace-name"
+    "disabled-plugin"
   ]
 }
 ```
 
-The exact settings file location and name are tool-defined. The `enabledPlugins` and `disabledPlugins` arrays MUST use the format `plugin-name` or `plugin-name@marketplace-name`.
+The exact settings file location and name are tool-defined. The `enabledPlugins` and `disabledPlugins` arrays MUST use the plugin name.
 
 ## Plugin Caching
 
-For security and stability, tools SHOULD copy marketplace plugins to a local **plugin cache** rather than using them in-place from their source directory.
+For security and stability, tools SHOULD copy installed plugins to a local **plugin cache** rather than using them in-place from their source directory.
 
 ### Cache Behavior
 
-1. When a plugin is installed from a marketplace, the tool copies the plugin directory to the cache.
+1. When a plugin is installed, the tool copies the plugin directory to the cache.
 2. Subsequent loads use the cached copy.
-3. The `version` field in the manifest (or marketplace entry) is used to determine whether the cache is stale.
+3. The `version` field in the manifest is used to determine whether the cache is stale.
 4. If the plugin version has not changed, the tool MAY serve the cached copy without checking the source.
 
 ### Cache Location
@@ -81,7 +81,7 @@ When loading plugins, tools resolve them in this order:
 
 1. **Direct directory** (`--plugin-dir` flag or equivalent): Load the plugin directly from the specified directory. No caching. Used for development.
 2. **Cache**: Load from the plugin cache if a cached version exists and is up-to-date.
-3. **Marketplace source**: Copy from the marketplace source directory to the cache, then load from cache.
+3. **Source**: Copy from the source directory to the cache, then load from cache.
 
 ## Enabling and Disabling
 
@@ -91,7 +91,7 @@ When loading plugins, tools resolve them in this order:
 
 ## Development Mode
 
-Tools SHOULD support loading plugins directly from a directory for development purposes, bypassing the marketplace and cache system entirely.
+Tools SHOULD support loading plugins directly from a directory for development purposes, bypassing the cache system entirely.
 
 ```bash
 # Example: load a plugin in development
@@ -114,7 +114,7 @@ When a plugin is uninstalled:
 ## Update Flow
 
 When updating a plugin:
-1. The tool checks the marketplace source for a newer version (comparing `version` fields).
+1. The tool checks the source for a newer version (comparing `version` fields).
 2. If a newer version exists, the cache is refreshed with the new copy.
 3. Running servers from the plugin MAY need to be restarted.
 

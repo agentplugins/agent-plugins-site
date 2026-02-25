@@ -2,7 +2,7 @@
 
 > This is a non-normative guide. For the formal specification, see [spec/specification.md](../spec/specification.md).
 
-This guide walks you through creating a plugin, packaging it in a marketplace, and distributing it.
+This guide walks you through creating a plugin and testing it.
 
 ## Prerequisites
 
@@ -13,22 +13,21 @@ This guide walks you through creating a plugin, packaging it in a marketplace, a
 The workflow is:
 
 1. **Create a plugin** — a directory with a manifest and components
-2. **Create a marketplace** — a `marketplace.json` that indexes your plugin(s)
-3. **Test** — load the plugin directly during development
-4. **Distribute** — push the marketplace repo to GitHub; users install from it
+2. **Test** — load the plugin directly during development
+3. **Distribute** — push the plugin repo to GitHub; users install from it
 
 ## Step 1: Create a plugin
 
 ### Create the directory structure
 
 ```bash
-mkdir -p my-marketplace/my-plugin/.plugin
-mkdir -p my-marketplace/my-plugin/skills/hello
+mkdir -p my-plugin/.plugin
+mkdir -p my-plugin/skills/hello
 ```
 
 ### Write the manifest
 
-Create `my-marketplace/my-plugin/.plugin/plugin.json`:
+Create `my-plugin/.plugin/plugin.json`:
 
 ```json
 {
@@ -43,7 +42,7 @@ Create `my-marketplace/my-plugin/.plugin/plugin.json`:
 
 ### Add a skill
 
-Create `my-marketplace/my-plugin/skills/hello/SKILL.md`:
+Create `my-plugin/skills/hello/SKILL.md`:
 
 ```markdown
 ---
@@ -54,60 +53,20 @@ description: Greet the user with a friendly message.
 Greet the user warmly and ask how you can help them today.
 ```
 
-## Step 2: Create a marketplace
+## Step 2: Test it
 
-Plugins are distributed through marketplaces. A marketplace is a `marketplace.json` file that indexes the plugins in the repo.
-
-Create `my-marketplace/marketplace.json`:
-
-```json
-{
-  "name": "my-marketplace",
-  "plugins": [
-    {
-      "name": "my-plugin",
-      "description": "My first plugin",
-      "version": "1.0.0",
-      "source": "./my-plugin"
-    }
-  ]
-}
-```
-
-Your repo now looks like this:
-
-```
-my-marketplace/
-├── marketplace.json             # Marketplace index (required)
-└── my-plugin/                   # Your plugin
-    ├── .plugin/
-    │   └── plugin.json          # Plugin manifest
-    └── skills/
-        └── hello/
-            └── SKILL.md         # A skill
-```
-
-This is a complete, distributable marketplace.
-
-## Step 3: Test it
-
-During development, load the plugin directly without going through the marketplace:
+During development, load the plugin directly:
 
 ```bash
-claude --plugin-dir ./my-marketplace/my-plugin
+claude --plugin-dir ./my-plugin
 
 # Then invoke the skill
 /my-plugin:hello
 ```
 
-## Step 4: Distribute
+## Step 3: Distribute
 
-Push to GitHub. Users configure your repo as a marketplace and install plugins from it:
-
-```bash
-# Install from your marketplace
-claude plugin install my-plugin@my-marketplace
-```
+Push your plugin to GitHub. Users can then install it through their tool's plugin installation mechanism.
 
 ## Add more components
 
@@ -222,43 +181,8 @@ my-plugin/
 └── README.md                # Documentation
 ```
 
-Remember to update `marketplace.json` when you bump the version.
-
-## Multi-plugin marketplaces
-
-A single marketplace can contain many plugins. Just add more entries:
-
-```json
-{
-  "name": "my-org-plugins",
-  "plugins": [
-    {
-      "name": "formatter",
-      "description": "Auto-format on save",
-      "version": "1.0.0",
-      "source": "./formatter"
-    },
-    {
-      "name": "linter",
-      "description": "Lint on save",
-      "version": "1.2.0",
-      "source": "./linter"
-    },
-    {
-      "name": "security-scanner",
-      "description": "Security audit tools",
-      "version": "2.0.0",
-      "source": "./security-scanner"
-    }
-  ]
-}
-```
-
-See [`examples/`](../examples/) for a working multi-plugin marketplace.
-
 ## Next steps
 
 - [Specification](../spec/specification.md) — Full spec for all fields and behaviors
 - [Component specs](../spec/specification.md#component-specifications) — Deep dive into each component type
-- [Marketplaces](../spec/marketplaces.md) — Distribution format details
-- [Examples](../examples/) — Working marketplace with two plugins
+- [Examples](../examples/) — Working example plugins

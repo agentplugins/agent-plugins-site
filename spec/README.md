@@ -16,7 +16,6 @@ This directory contains the normative specification for the Open Plugin format.
 | [components/mcp-servers.md](components/mcp-servers.md) | MCP server bundling |
 | [components/lsp-servers.md](components/lsp-servers.md) | LSP server bundling |
 | [installation.md](installation.md) | Installation scopes, caching, resolution |
-| [marketplaces.md](marketplaces.md) | Marketplace format for distribution |
 
 ## Versioning
 

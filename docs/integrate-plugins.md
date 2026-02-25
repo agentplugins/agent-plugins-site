@@ -33,7 +33,7 @@ Plugins can come from two sources:
 
 **Direct directory**: A path specified by the user (e.g., `--plugin-dir ./my-plugin`). Used for development.
 
-**Marketplace**: A configured marketplace directory containing `marketplace.json`. Plugins are copied to a local cache.
+**Installed plugin**: A plugin installed and copied to a local cache.
 
 ```
 function discoverPlugin(pluginPath):
@@ -141,19 +141,17 @@ How you register components depends on your tool's architecture:
 
 ### 6. Plugin caching
 
-For marketplace plugins, copy to a local cache:
+For installed plugins, copy to a local cache:
 
 ```
-function installPlugin(marketplaceEntry, marketplace):
-    sourcePath = resolve(marketplace.path, marketplaceEntry.source)
-    cachePath = getCachePath(marketplaceEntry.name)
+function installPlugin(pluginName, sourcePath):
+    cachePath = getCachePath(pluginName)
     
     // Copy plugin directory to cache (follow symlinks)
     copyDirectory(sourcePath, cachePath, followSymlinks=true)
     
     // Add to enabled plugins
-    addToSettings("enabledPlugins", 
-        marketplaceEntry.name + "@" + marketplace.name)
+    addToSettings("enabledPlugins", pluginName)
 ```
 
 ## Security considerations

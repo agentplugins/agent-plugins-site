@@ -254,4 +254,3 @@ Each component type has its own specification:
 ## See Also
 
 - [Installation](installation.md) — Scopes, caching, and resolution
-- [Marketplaces](marketplaces.md) — Distribution format
