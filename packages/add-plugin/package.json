@@ -1,0 +1,17 @@
+{
+  "name": "add-plugin",
+  "module": "index.ts",
+  "type": "module",
+  "bin": {
+    "add-plugin": "index.ts"
+  },
+  "scripts": {
+    "start": "bun run index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
