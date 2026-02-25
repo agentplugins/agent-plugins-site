@@ -2,26 +2,20 @@
 
 An open format for packaging agent extensions. Supported by [Claude Code](https://code.claude.com), [Cursor](https://cursor.com), and [OpenCode](https://opencode.ai).
 
-A plugin is a folder with skills, agents, hooks, rules, MCP servers, or LSP servers inside it. Plugins are distributed through **marketplaces** — git repos with a `marketplace.json` that indexes the plugins inside.
+A plugin is a folder with skills, agents, hooks, rules, MCP servers, or LSP servers inside it.
 
 ## How it works
 
 ```
-my-marketplace/                          # A git repo
-├── .claude-plugin/
-│   └── marketplace.json                 # Marketplace index
-├── my-plugin/                           # A plugin
-│   ├── .claude-plugin/plugin.json       #   Plugin manifest
-│   └── skills/hello/SKILL.md            #   A skill
-└── another-plugin/                      # Another plugin
-    └── ...
-```
-
-Users install plugins from a marketplace:
-
-```bash
-/plugin marketplace add owner/my-marketplace
-/plugin install my-plugin@my-marketplace
+my-plugin/
+├── .plugin/
+│   └── plugin.json               # Plugin manifest
+├── skills/hello/SKILL.md          # A skill
+├── agents/reviewer.md             # An agent
+├── rules/prefer-const.mdc         # A rule
+├── hooks/hooks.json               # Event hooks
+├── .mcp.json                      # MCP servers
+└── .lsp.json                      # LSP servers
 ```
 
 ## Make a plugin
@@ -29,12 +23,11 @@ Users install plugins from a marketplace:
 ### 1. Create the plugin
 
 ```bash
-mkdir -p my-marketplace/.claude-plugin
-mkdir -p my-marketplace/my-plugin/.claude-plugin
-mkdir -p my-marketplace/my-plugin/skills/hello
+mkdir -p my-plugin/.plugin
+mkdir -p my-plugin/skills/hello
 ```
 
-Write the plugin manifest — `my-marketplace/my-plugin/.claude-plugin/plugin.json`:
+Write the plugin manifest — `my-plugin/.plugin/plugin.json`:
 
 ```json
 {
@@ -44,7 +37,7 @@ Write the plugin manifest — `my-marketplace/my-plugin/.claude-plugin/plugin.js
 }
 ```
 
-Write a skill — `my-marketplace/my-plugin/skills/hello/SKILL.md`:
+Write a skill — `my-plugin/skills/hello/SKILL.md`:
 
 ```markdown
 ---
@@ -55,42 +48,11 @@ description: Greet the user warmly.
 Greet the user and ask how you can help them today.
 ```
 
-### 2. Create the marketplace
-
-Write the marketplace index — `my-marketplace/.claude-plugin/marketplace.json`:
-
-```json
-{
-  "name": "my-marketplace",
-  "owner": {
-    "name": "Your Name"
-  },
-  "plugins": [
-    {
-      "name": "my-plugin",
-      "description": "My first plugin",
-      "version": "1.0.0",
-      "source": "./my-plugin"
-    }
-  ]
-}
-```
-
-### 3. Test it
+### 2. Test it
 
 ```bash
-# Test the plugin directly during development
-claude --plugin-dir ./my-marketplace/my-plugin
-
-# Or add the marketplace and install
-/plugin marketplace add ./my-marketplace
-/plugin install my-plugin@my-marketplace
-```
-
-Push the repo to GitHub and users can install from it:
-
-```bash
-/plugin marketplace add owner/my-marketplace
+# Load the plugin directly during development
+claude --plugin-dir ./my-plugin
 ```
 
 ## What can go in a plugin
@@ -109,7 +71,7 @@ Everything is optional. A plugin with just one skill works. A plugin with all se
 
 ## Examples
 
-This repo is itself a working marketplace. The [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) at the repo root indexes two example plugins in [`examples/`](examples/):
+The [`examples/`](examples/) directory contains two example plugins:
 
 - [`minimal-plugin`](examples/minimal-plugin/) — One skill, nothing else. The simplest possible plugin.
 - [`full-plugin`](examples/full-plugin/) — Every component type. A reference for what's possible.
@@ -117,8 +79,7 @@ This repo is itself a working marketplace. The [`.claude-plugin/marketplace.json
 Try it:
 
 ```bash
-/plugin marketplace add vercel-labs/open-plugin
-/plugin install minimal-plugin@open-plugin-examples
+claude --plugin-dir ./examples/minimal-plugin
 ```
 
 ## Specification
@@ -133,7 +94,6 @@ The full spec lives in [`spec/`](spec/):
 - [MCP Servers](spec/components/mcp-servers.md) — External tool integration
 - [LSP Servers](spec/components/lsp-servers.md) — Code intelligence
 - [Installation](spec/installation.md) — Scopes, caching, resolution
-- [Marketplaces](spec/marketplaces.md) — Distribution format
 
 Guides for plugin authors and tool implementers are in [`docs/`](docs/).
 

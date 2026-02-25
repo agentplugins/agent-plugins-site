@@ -164,36 +164,4 @@ export interface ValidationProblem {
   path?: string;
 }
 
-/** Marketplace index (marketplace.json) */
-export interface MarketplaceIndex {
-  name: string;
-  owner?: {
-    name?: string;
-    email?: string;
-  };
-  metadata?: {
-    description?: string;
-    version?: string;
-    pluginRoot?: string;
-  };
-  plugins: MarketplaceEntry[];
-}
 
-export interface MarketplaceEntry {
-  name: string;
-  description: string;
-  version?: string;
-  source: string;
-  logo?: string;
-  category?: string;
-  tags?: string[];
-  author?: {
-    name?: string;
-    email?: string;
-    url?: string;
-  };
-  homepage?: string;
-  repository?: string;
-  license?: string;
-  keywords?: string[];
-}

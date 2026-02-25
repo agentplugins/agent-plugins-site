@@ -31,7 +31,7 @@ A single plugin can include any combination of these components:
 
 ## How plugins work
 
-1. **Install**: A user installs a plugin from a marketplace or loads it from a directory. The plugin is cached locally.
+1. **Install**: A user installs a plugin or loads it from a directory. The plugin is cached locally.
 2. **Discover**: The host tool scans the plugin directory, discovers components in their default locations, and registers them.
 3. **Namespace**: All components are prefixed with the plugin name (e.g., `/deploy-tools:status`) to prevent conflicts between plugins.
 4. **Activate**: Components are loaded and activated — skills become available, hooks start listening, servers start running.
@@ -53,7 +53,7 @@ The [Agent Skills](https://agentskills.io) specification defines a format for in
 
 - **Packaging**: Bundle skills with agents, hooks, servers, and metadata
 - **Namespacing**: Prevent conflicts when multiple plugins provide skills
-- **Distribution**: Install and update through marketplaces
+- **Distribution**: Install and update as versioned packages
 - **Lifecycle**: Manage enabled/disabled state, caching, and scoping
 
 Think of it this way: Agent Skills defines the skill format. Open Plugin defines the packaging format.

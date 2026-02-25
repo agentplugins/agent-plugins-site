@@ -36,6 +36,4 @@ export type {
   DiscoveredAgent,
   DiscoveredRule,
   ValidationProblem,
-  MarketplaceIndex,
-  MarketplaceEntry,
 } from "./types.js";
