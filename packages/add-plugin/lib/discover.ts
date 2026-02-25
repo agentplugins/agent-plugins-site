@@ -8,6 +8,8 @@
  */
 
 import { join } from "path";
+import { readFile, readdir, stat } from "fs/promises";
+import { existsSync } from "fs";
 
 export interface DiscoveredPlugin {
   /** Plugin name from manifest or marketplace entry */
@@ -69,6 +71,7 @@ export async function discover(repoPath: string): Promise<DiscoveredPlugin[]> {
     join(repoPath, "marketplace.json"),
     join(repoPath, ".plugin", "marketplace.json"),
     join(repoPath, ".claude-plugin", "marketplace.json"),
+    join(repoPath, ".cursor-plugin", "marketplace.json"),
   ];
 
   for (const mp of marketplacePaths) {
@@ -136,7 +139,7 @@ async function discoverFromMarketplace(
         const resolvedPath = join(repoPath, root, skillPath.replace(/^\.\//, ""));
         const skillMd = join(resolvedPath, "SKILL.md");
         if (await fileExists(skillMd)) {
-          const content = await Bun.file(skillMd).text();
+          const content = await readFile(skillMd, "utf-8");
           const fm = parseFrontmatter(content);
           skills.push({
             name: (fm.name as string) ?? dirName(resolvedPath),
@@ -150,7 +153,7 @@ async function discoverFromMarketplace(
 
     // Try to load plugin manifest from the source dir
     let manifest: Record<string, unknown> | null = null;
-    for (const manifestDir of [".plugin", ".claude-plugin"]) {
+    for (const manifestDir of [".plugin", ".claude-plugin", ".cursor-plugin"]) {
       const manifestPath = join(sourcePath, manifestDir, "plugin.json");
       if (await fileExists(manifestPath)) {
         manifest = await readJson(manifestPath);
@@ -199,6 +202,7 @@ async function isPluginDir(dirPath: string): Promise<boolean> {
   const checks = [
     join(dirPath, ".plugin", "plugin.json"),
     join(dirPath, ".claude-plugin", "plugin.json"),
+    join(dirPath, ".cursor-plugin", "plugin.json"),
     join(dirPath, "skills"),
     join(dirPath, "commands"),
     join(dirPath, "agents"),
@@ -216,7 +220,7 @@ async function isPluginDir(dirPath: string): Promise<boolean> {
  */
 async function inspectPlugin(pluginPath: string): Promise<DiscoveredPlugin | null> {
   let manifest: Record<string, unknown> | null = null;
-  for (const manifestDir of [".plugin", ".claude-plugin"]) {
+  for (const manifestDir of [".plugin", ".claude-plugin", ".cursor-plugin"]) {
     const manifestPath = join(pluginPath, manifestDir, "plugin.json");
     if (await fileExists(manifestPath)) {
       manifest = await readJson(manifestPath);
@@ -266,7 +270,7 @@ async function discoverSkills(pluginPath: string): Promise<{ name: string; descr
     if (!entry.isDirectory()) continue;
     const skillMd = join(skillsDir, entry.name, "SKILL.md");
     if (await fileExists(skillMd)) {
-      const content = await Bun.file(skillMd).text();
+      const content = await readFile(skillMd, "utf-8");
       const fm = parseFrontmatter(content);
       skills.push({
         name: (fm.name as string) ?? entry.name,
@@ -279,7 +283,7 @@ async function discoverSkills(pluginPath: string): Promise<{ name: string; descr
   if (skills.length === 0) {
     const rootSkill = join(pluginPath, "SKILL.md");
     if (await fileExists(rootSkill)) {
-      const content = await Bun.file(rootSkill).text();
+      const content = await readFile(rootSkill, "utf-8");
       const fm = parseFrontmatter(content);
       skills.push({
         name: (fm.name as string) ?? dirName(pluginPath),
@@ -299,7 +303,7 @@ async function discoverCommands(pluginPath: string): Promise<{ name: string; des
   for (const entry of entries) {
     if (!entry.isFile() || !entry.name.match(/\.(md|mdc|markdown)$/)) continue;
     const filePath = join(commandsDir, entry.name);
-    const content = await Bun.file(filePath).text();
+    const content = await readFile(filePath, "utf-8");
     const fm = parseFrontmatter(content);
     commands.push({
       name: entry.name.replace(/\.(md|mdc|markdown)$/, ""),
@@ -318,7 +322,7 @@ async function discoverAgents(pluginPath: string): Promise<{ name: string; descr
   for (const entry of entries) {
     if (!entry.isFile() || !entry.name.match(/\.(md|mdc|markdown)$/)) continue;
     const filePath = join(agentsDir, entry.name);
-    const content = await Bun.file(filePath).text();
+    const content = await readFile(filePath, "utf-8");
     const fm = parseFrontmatter(content);
     if (fm.name && fm.description) {
       agents.push({
@@ -339,7 +343,7 @@ async function discoverRules(pluginPath: string): Promise<{ name: string; descri
   for (const entry of entries) {
     if (!entry.isFile() || !entry.name.match(/\.(mdc|md|markdown)$/)) continue;
     const filePath = join(rulesDir, entry.name);
-    const content = await Bun.file(filePath).text();
+    const content = await readFile(filePath, "utf-8");
     const fm = parseFrontmatter(content);
     rules.push({
       name: entry.name.replace(/\.(mdc|md|markdown)$/, ""),
@@ -381,27 +385,31 @@ function dirName(p: string): string {
 }
 
 async function fileExists(path: string): Promise<boolean> {
-  return Bun.file(path).exists();
-}
-
-async function dirExists(dirPath: string): Promise<boolean> {
-  const { exitCode } = await Bun.$`test -d ${dirPath}`.quiet().nothrow();
-  return exitCode === 0;
-}
-
-async function pathExists(p: string): Promise<boolean> {
   try {
-    if (await Bun.file(p).exists()) return true;
-    const { exitCode } = await Bun.$`test -e ${p}`.quiet().nothrow();
-    return exitCode === 0;
+    const s = await stat(path);
+    return s.isFile();
   } catch {
     return false;
   }
 }
 
+async function dirExists(dirPath: string): Promise<boolean> {
+  try {
+    const s = await stat(dirPath);
+    return s.isDirectory();
+  } catch {
+    return false;
+  }
+}
+
+async function pathExists(p: string): Promise<boolean> {
+  return existsSync(p);
+}
+
 async function readJson(path: string): Promise<Record<string, unknown> | null> {
   try {
-    return await Bun.file(path).json();
+    const content = await readFile(path, "utf-8");
+    return JSON.parse(content);
   } catch {
     return null;
   }
@@ -409,7 +417,6 @@ async function readJson(path: string): Promise<Record<string, unknown> | null> {
 
 async function readDirSafe(dirPath: string) {
   try {
-    const { readdir } = await import("node:fs/promises");
     return await readdir(dirPath, { withFileTypes: true });
   } catch {
     return [];

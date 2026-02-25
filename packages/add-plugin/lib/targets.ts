@@ -7,6 +7,7 @@
 
 import { join } from "path";
 import { homedir } from "os";
+import { execSync } from "child_process";
 
 export interface Target {
   id: string;
@@ -27,13 +28,13 @@ const TARGET_DEFS: Omit<Target, "detected">[] = [
     description: "Anthropic's CLI coding agent",
     configPath: join(HOME, ".claude"),
   },
+  {
+    id: "cursor",
+    name: "Cursor",
+    description: "AI-powered code editor",
+    configPath: join(HOME, ".cursor"),
+  },
   // Future targets can be added here:
-  // {
-  //   id: "cursor",
-  //   name: "Cursor",
-  //   description: "AI-powered code editor",
-  //   configPath: join(HOME, ".cursor"),
-  // },
   // {
   //   id: "opencode",
   //   name: "OpenCode",
@@ -49,24 +50,29 @@ export async function getTargets(): Promise<Target[]> {
   const targets: Target[] = [];
 
   for (const def of TARGET_DEFS) {
-    const detected = await detectTarget(def);
+    const detected = detectTarget(def);
     targets.push({ ...def, detected });
   }
 
   return targets;
 }
 
-async function detectTarget(def: Omit<Target, "detected">): Promise<boolean> {
+function detectTarget(def: Omit<Target, "detected">): boolean {
   switch (def.id) {
     case "claude-code":
-      return detectClaudeCode();
+      return detectBinary("claude");
+    case "cursor":
+      return detectBinary("cursor");
     default:
       return false;
   }
 }
 
-async function detectClaudeCode(): Promise<boolean> {
-  // Check if `claude` binary is available in PATH
-  const { exitCode } = await Bun.$`which claude`.quiet().nothrow();
-  return exitCode === 0;
+function detectBinary(name: string): boolean {
+  try {
+    execSync(`which ${name}`, { stdio: "pipe" });
+    return true;
+  } catch {
+    return false;
+  }
 }

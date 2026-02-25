@@ -1,0 +1,14 @@
+{
+  "name": "minimal-plugin",
+  "owner": {
+    "name": "add-plugin"
+  },
+  "plugins": [
+    {
+      "name": "minimal-plugin",
+      "source": "./",
+      "description": "The simplest possible plugin — one skill, nothing else.",
+      "version": "1.0.0"
+    }
+  ]
+}

@@ -1,13 +1,14 @@
-#!/usr/bin/env bun
-
 import { parseArgs } from "util";
-import { resolve, join, basename } from "path";
-import { discover, type DiscoveredPlugin } from "./lib/discover";
-import { getTargets, type Target } from "./lib/targets";
-import { installPlugins } from "./lib/install";
+import { resolve, join } from "path";
+import { execSync } from "child_process";
+import { existsSync, rmSync, mkdirSync } from "fs";
+import { createInterface } from "readline";
+import { discover, type DiscoveredPlugin } from "./lib/discover.js";
+import { getTargets, type Target } from "./lib/targets.js";
+import { installPlugins } from "./lib/install.js";
 
 const { values, positionals } = parseArgs({
-  args: Bun.argv.slice(2),
+  args: process.argv.slice(2),
   options: {
     help: { type: "boolean", short: "h" },
     target: { type: "string", short: "t" },
@@ -64,7 +65,7 @@ async function cmdDiscover(source?: string) {
     process.exit(1);
   }
 
-  const repoPath = await resolveSource(source);
+  const repoPath = resolveSource(source);
   const plugins = await discover(repoPath);
 
   if (plugins.length === 0) {
@@ -100,7 +101,7 @@ async function cmdInstall(source: string | undefined, opts: typeof values) {
     process.exit(1);
   }
 
-  const repoPath = await resolveSource(source);
+  const repoPath = resolveSource(source);
   const plugins = await discover(repoPath);
 
   if (plugins.length === 0) {
@@ -108,11 +109,11 @@ async function cmdInstall(source: string | undefined, opts: typeof values) {
     return;
   }
 
-  // Resolve target
+  // Resolve targets — install to all detected targets unless --target is specified
   const targets = await getTargets();
   const detectedTargets = targets.filter((t) => t.detected);
 
-  let target: Target;
+  let installTargets: Target[];
   if (opts.target) {
     const found = targets.find((t) => t.id === opts.target);
     if (!found) {
@@ -120,17 +121,12 @@ async function cmdInstall(source: string | undefined, opts: typeof values) {
       console.error(`Available: ${targets.map((t) => t.id).join(", ")}`);
       process.exit(1);
     }
-    target = found;
-  } else if (detectedTargets.length === 1) {
-    target = detectedTargets[0]!;
+    installTargets = [found];
   } else if (detectedTargets.length === 0) {
     console.error("No supported targets detected. Use --target to specify one.");
     process.exit(1);
   } else {
-    // Multiple targets detected, pick first for now
-    console.log(`Multiple targets detected: ${detectedTargets.map((t) => t.id).join(", ")}`);
-    console.log(`Using: ${detectedTargets[0]!.id} (use --target to override)\n`);
-    target = detectedTargets[0]!;
+    installTargets = detectedTargets;
   }
 
   console.log(`Found ${plugins.length} plugin(s):\n`);
@@ -138,12 +134,11 @@ async function cmdInstall(source: string | undefined, opts: typeof values) {
     printPlugin(p);
   }
 
-  console.log(`Target: ${target.name}`);
+  console.log(`Targets: ${installTargets.map((t) => t.name).join(", ")}`);
   console.log(`Scope: ${opts.scope ?? "user"}\n`);
 
   if (!opts.yes) {
-    process.stdout.write("Install? [y/N] ");
-    const response = await readLine();
+    const response = await readLine("Install? [y/N] ");
     if (response.trim().toLowerCase() !== "y") {
       console.log("Aborted.");
       return;
@@ -151,9 +146,11 @@ async function cmdInstall(source: string | undefined, opts: typeof values) {
   }
 
   const scope = opts.scope ?? "user";
-  await installPlugins(plugins, target, scope, repoPath, source);
+  for (const target of installTargets) {
+    await installPlugins(plugins, target, scope, repoPath, source);
+  }
 
-  console.log("\nDone. Restart your agent tool to load the plugins.");
+  console.log("\nDone. Restart your agent tools to load the plugins.");
 }
 
 function printPlugin(p: DiscoveredPlugin) {
@@ -171,28 +168,28 @@ function printPlugin(p: DiscoveredPlugin) {
   console.log();
 }
 
-async function resolveSource(source: string): Promise<string> {
+function resolveSource(source: string): string {
   // GitHub URL - clone to temp dir
   if (source.startsWith("https://") || source.startsWith("git@") || source.match(/^[\w-]+\/[\w.-]+$/)) {
     const url = source.match(/^[\w-]+\/[\w.-]+$/) ? `https://github.com/${source}` : source;
-    const tmpDir = join(
-      await Bun.file(join(process.env.HOME ?? "~", ".cache", "add-plugin", ".keep")).exists()
-        ? join(process.env.HOME ?? "~", ".cache", "add-plugin")
-        : await (async () => {
-            const dir = join(process.env.HOME ?? "~", ".cache", "add-plugin");
-            await Bun.$`mkdir -p ${dir}`;
-            return dir;
-          })(),
-      encodeURIComponent(url),
-    );
+    const cacheDir = join(process.env.HOME ?? "~", ".cache", "add-plugin");
+    mkdirSync(cacheDir, { recursive: true });
+    // Derive a filesystem-safe directory name from the URL
+    // e.g. "https://github.com/vercel-labs/open-plugin" -> "vercel-labs-open-plugin"
+    const slug = url
+      .replace(/^https?:\/\//, "")
+      .replace(/\.git$/, "")
+      .replace(/[^a-zA-Z0-9._-]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    const tmpDir = join(cacheDir, slug);
 
     // Always do a fresh shallow clone — previous runs may have modified the tree
     // (e.g. generated .claude-plugin/), and shallow clones don't pull cleanly.
-    if (await Bun.file(join(tmpDir, ".git", "HEAD")).exists()) {
-      await Bun.$`rm -rf ${tmpDir}`.quiet();
+    if (existsSync(join(tmpDir, ".git", "HEAD"))) {
+      rmSync(tmpDir, { recursive: true, force: true });
     }
     console.log(`Cloning ${url}...`);
-    await Bun.$`git clone --depth 1 -q ${url} ${tmpDir}`;
+    execSync(`git clone --depth 1 -q ${url} ${tmpDir}`, { stdio: "inherit" });
     return tmpDir;
   }
 
@@ -200,10 +197,12 @@ async function resolveSource(source: string): Promise<string> {
   return resolve(source);
 }
 
-async function readLine(): Promise<string> {
-  const buf = Buffer.alloc(256);
-  const fd = Bun.stdin.stream().getReader();
-  const { value } = await fd.read();
-  fd.releaseLock();
-  return new TextDecoder().decode(value ?? buf);
+function readLine(prompt: string): Promise<string> {
+  const rl = createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise((resolve) => {
+    rl.question(prompt, (answer) => {
+      rl.close();
+      resolve(answer);
+    });
+  });
 }

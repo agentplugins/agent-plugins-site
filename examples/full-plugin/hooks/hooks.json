@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${PLUGIN_ROOT}/scripts/auto-lint.sh"
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/auto-lint.sh"
           }
         ]
       }
@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${PLUGIN_ROOT}/scripts/check-env.sh"
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-env.sh"
           }
         ]
       }
