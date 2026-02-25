@@ -1,17 +1,20 @@
 {
   "name": "add-plugin",
-  "module": "index.ts",
+  "version": "0.0.2",
+  "description": "Install open-plugin format plugins into agent tools",
   "type": "module",
   "bin": {
-    "add-plugin": "index.ts"
+    "add-plugin": "dist/index.js"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "start": "bun run index.ts"
+    "build": "tsup",
+    "start": "node dist/index.js"
   },
   "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
+    "tsup": "^8",
     "typescript": "^5"
   }
 }
