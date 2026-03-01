@@ -59,8 +59,8 @@ claude --plugin-dir ./my-plugin
 
 | Component | Directory | Format | What it does |
 |---|---|---|---|
-| **Skills** | `skills/` | Folders with `SKILL.md` | Give agents new capabilities |
-| **Commands** | `commands/` | `.md` files | Slash commands users can invoke |
+| **Skills** | `skills/` | Folders with `SKILL.md` | Give agents new capabilities (with bundled scripts, references) |
+| **Commands** | `commands/` | `.md` files | Same as skills, simpler format for standalone slash commands |
 | **Agents** | `agents/` | `.md` files | Specialized sub-agents |
 | **Rules** | `rules/` | `.mdc` files | Persistent AI guidance and coding standards |
 | **Hooks** | `hooks/` | `hooks.json` | Scripts that run on events (file edits, session start, etc.) |

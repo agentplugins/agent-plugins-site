@@ -46,6 +46,19 @@ Each scope stores its plugin configuration in a settings file. The relevant sect
 
 The exact settings file location and name are tool-defined. The `enabledPlugins` and `disabledPlugins` arrays MUST use the plugin name.
 
+## Recommended Storage Paths
+
+Installed plugins SHOULD be stored in `.agents/plugins/` at the appropriate scope level. This convention aligns with the broader `.agents/` ecosystem where agent extensions (skills, rules, etc.) are stored.
+
+| Scope | Recommended Path |
+|---|---|
+| User | `~/.agents/plugins/<plugin-name>/` |
+| Project | `<project-root>/.agents/plugins/<plugin-name>/` |
+
+The `.agents/plugins/` convention provides a predictable location for plugins across tools. Tools that predate this convention MAY continue using their own storage paths (e.g., `~/.config/<tool>/plugins/`) but SHOULD support `.agents/plugins/` as a discovery location.
+
+When both `.agents/plugins/` and a tool-specific path contain the same plugin, the tool-specific path takes precedence.
+
 ## Plugin Caching
 
 For security and stability, tools SHOULD copy installed plugins to a local **plugin cache** rather than using them in-place from their source directory.
@@ -59,7 +72,7 @@ For security and stability, tools SHOULD copy installed plugins to a local **plu
 
 ### Cache Location
 
-The cache location is tool-defined. A RECOMMENDED location is:
+Tools SHOULD use `.agents/plugins/` as the cache location (see [Recommended Storage Paths](#recommended-storage-paths) above). Tools MAY use a tool-specific cache location:
 
 ```
 ~/.config/<tool>/plugins/cache/<plugin-name>/

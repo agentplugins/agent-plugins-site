@@ -1,24 +1,23 @@
 # Example Plugins
 
-This directory contains two example plugins demonstrating the Open Plugin format.
+This directory contains example plugins demonstrating the Open Plugin format.
 
 ## Structure
 
 ```
 examples/
 ├── minimal-plugin/                  # A simple plugin (one skill)
-│   ├── .claude-plugin/plugin.json
+│   ├── .plugin/plugin.json
 │   └── skills/greet/SKILL.md
-└── full-plugin/                     # Every component type
-    ├── .claude-plugin/plugin.json
+└── full-plugin/                     # Every component type (reference)
+    ├── .plugin/plugin.json
     ├── skills/
     ├── commands/
     ├── agents/
     ├── rules/
     ├── hooks/
     ├── .mcp.json
-    ├── .lsp.json
-    └── assets/logo.svg
+    └── .lsp.json
 ```
 
 ## Try it
@@ -37,4 +36,4 @@ One skill, nothing else. The simplest possible plugin. See [minimal-plugin/READM
 
 ### devtools (full-plugin)
 
-Every component type — skills, commands, agents, rules, hooks, MCP server, LSP server. See [full-plugin/README.md](full-plugin/README.md).
+Every component type — skills, commands, agents, rules, hooks, MCP server, LSP server. A reference for what's possible. See [full-plugin/README.md](full-plugin/README.md).
