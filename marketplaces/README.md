@@ -1,13 +1,29 @@
 # Marketplaces
 
-Plugin distribution is handled by each tool's own marketplace. This spec focuses on the plugin format itself — how plugins are structured, discovered, and loaded — not on how they are distributed.
+A marketplace is a named collection of one or more plugins. The `marketplace.json` format is defined in the [Marketplace specification](../spec/marketplace.md).
 
-## Tool Marketplaces
+## How it works
 
-Each adopter has its own marketplace for distributing plugins:
+A `marketplace.json` at the root of a repository or directory declares the plugins it contains:
+
+```json
+{
+  "name": "my-org-plugins",
+  "plugins": [
+    { "name": "code-quality", "source": "./code-quality/", "description": "Linting and review." },
+    { "name": "deployment", "source": "./deployment/", "description": "Deploy workflows." }
+  ]
+}
+```
+
+Tools use this index to discover and install plugins from the collection.
+
+## Tool-Specific Registries
+
+Each adopter may also operate its own registry for distributing plugins:
 
 - **Claude Code** — [Claude Code plugins](https://docs.anthropic.com/en/docs/claude-code)
 - **Cursor** — [Cursor plugin marketplace](https://cursor.com)
 - **OpenCode** — [OpenCode plugins](https://opencode.ai)
 
-Consult each tool's documentation for how to publish and install plugins through their marketplace.
+The `marketplace.json` format is the interchange format. Tool-specific registries may build additional discovery, search, and publishing features on top of it.

@@ -4,6 +4,8 @@
 
 Skills provide slash-command shortcuts and agent-invocable capabilities within a plugin.
 
+Both skill formats described below are fundamentally the same mechanism: markdown instructions loaded into the agent's context when invoked. The two formats differ only in packaging complexity — command skills are flat markdown files, while agent skills are directories that can bundle supporting scripts, references, and assets alongside their instructions.
+
 ## Relationship to Agent Skills
 
 The skill file format follows the [Agent Skills](https://agentskills.io) specification. This document describes how skills are discovered, namespaced, and loaded within the plugin context. For the `SKILL.md` file format itself — frontmatter fields, body content, optional directories — refer to the [Agent Skills Specification](https://agentskills.io/specification).
@@ -14,7 +16,7 @@ Plugins support two skill formats:
 
 ### Agent Skills (`skills/` directory)
 
-Agent Skills are directories containing a `SKILL.md` file following the [Agent Skills](https://agentskills.io) format. These are the RECOMMENDED format for new skills.
+Agent Skills are directories containing a `SKILL.md` file following the [Agent Skills](https://agentskills.io) format. These are the RECOMMENDED format for new skills. Use this format when a skill needs supporting files (scripts, references, assets) or richer metadata.
 
 ```
 my-plugin/
@@ -32,7 +34,7 @@ Each subdirectory of `skills/` that contains a `SKILL.md` file is treated as a s
 
 ### Command Skills (`commands/` directory)
 
-Command skills are simple markdown files that define slash commands. These are a simpler, flatter format. New plugins SHOULD prefer Agent Skills in `skills/`.
+Command skills are simple markdown files that define slash commands. They are the same mechanism as agent skills — markdown loaded into context — in a simpler, flatter format suitable for commands that don't need supporting files. New plugins SHOULD prefer Agent Skills in `skills/` when the skill needs bundled resources.
 
 ```
 my-plugin/

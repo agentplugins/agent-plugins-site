@@ -34,6 +34,15 @@ my-plugin/
 └── CHANGELOG.md              # Version history
 ```
 
+### Installed Plugin Location
+
+When plugins are installed, they are stored in `.agents/plugins/`. See [Installation — Recommended Storage Paths](installation.md#recommended-storage-paths) for details.
+
+```
+~/.agents/plugins/            # User-scope installed plugins
+<project>/.agents/plugins/    # Project-scope installed plugins
+```
+
 ### Directory Rules
 
 1. The metadata directory MUST contain only `plugin.json`. All component directories (commands, agents, skills, rules, hooks) MUST be at the plugin root, not inside the metadata directory.
@@ -253,4 +262,5 @@ Each component type has its own specification:
 
 ## See Also
 
+- [Marketplace](marketplace.md) — Grouping multiple plugins into a collection
 - [Installation](installation.md) — Scopes, caching, and resolution
