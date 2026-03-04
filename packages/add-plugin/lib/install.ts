@@ -228,6 +228,27 @@ async function preparePluginDirForVendor(
 
   if (hasOpenPlugin && !hasVendorPlugin) {
     await cp(openPluginDir, vendorPluginDir, { recursive: true });
+
+    // Strip open-plugin component path fields that vendor validators may reject.
+    // Vendors discover skills/commands/agents/rules from the filesystem; these
+    // path overrides are only meaningful to the open-plugin spec.
+    const vendorManifestPath = join(vendorPluginDir, "plugin.json");
+    if (existsSync(vendorManifestPath)) {
+      const raw = await readFile(vendorManifestPath, "utf-8");
+      const manifest = JSON.parse(raw);
+      const componentFields = ["skills", "commands", "agents", "rules", "hooks", "mcpServers", "lspServers", "outputStyles"];
+      let stripped = false;
+      for (const field of componentFields) {
+        if (field in manifest) {
+          delete manifest[field];
+          stripped = true;
+        }
+      }
+      if (stripped) {
+        await writeFile(vendorManifestPath, JSON.stringify(manifest, null, 2));
+      }
+    }
+
     console.log(`  ${plugin.name}: translated .plugin/ -> ${vendorDir}/`);
   }
 
