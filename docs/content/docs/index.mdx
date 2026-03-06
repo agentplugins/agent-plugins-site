@@ -1,0 +1,63 @@
+---
+title: Open Plugin
+description: A standard for packaging agent extensions into distributable plugins.
+---
+
+Open Plugin is a standard for packaging agent extensions into distributable plugins that any conformant tool can install and run.
+
+## What are plugins?
+
+AI coding agents are extensible through skills, hooks, and tool servers — but each is configured separately, with no standard way to package, share, or version them together.
+
+A plugin is a directory that bundles related extensions into a single installable unit:
+
+```
+my-plugin/
+├── .plugin/
+│   └── plugin.json       # Manifest: name, version, metadata
+├── skills/                # Agent Skills (SKILL.md format)
+├── agents/                # Specialized sub-agents
+├── hooks/                 # Event-driven automation
+├── rules/                 # Coding standards (.mdc files)
+├── .mcp.json              # MCP tool servers
+└── .lsp.json              # Language server configs
+```
+
+A single plugin can include any combination of these components:
+
+A single plugin can include any combination of these components:
+
+**[Skills](/agent-builders/components/skills)** give agents new capabilities — from processing PDFs to reviewing code. Skills follow the [Agent Skills](https://agentskills.io) format and are loaded on demand based on task context.
+
+**[Agents](/agent-builders/components/agents)** are specialized sub-agents with focused expertise. A security reviewer, a performance tester, a documentation writer. The host tool can invoke them automatically or users can call them directly.
+
+**[Hooks](/agent-builders/components/hooks)** automate responses to events. Format code after every edit. Run a linter when files are written. Enforce policies before commits.
+
+**[MCP Servers](/agent-builders/components/mcp-servers)** connect agents to external tools and data via the [Model Context Protocol](https://modelcontextprotocol.io/).
+
+**[LSP Servers](/agent-builders/components/lsp-servers)** provide real-time code intelligence — diagnostics, go-to-definition, find references.
+
+## How plugins work
+
+1. **Install**: A user installs a plugin or loads it from a directory.
+2. **Discover**: The host tool scans the plugin directory, discovers components in their default locations, and registers them.
+3. **Namespace**: All components are prefixed with the plugin name (e.g., `/deploy-tools:status`) to prevent conflicts.
+4. **Activate**: Skills become available, hooks start listening, servers start running.
+
+## When to use plugins
+
+- **Share functionality** with teammates or the community
+- **Reuse the same extensions** across multiple projects
+- **Distribute versioned releases** that can be updated
+- **Bundle related components** that work together (e.g., a skill + hook + MCP server)
+
+For personal, project-specific customizations that don't need sharing, you can configure skills and hooks directly in your project without a plugin.
+
+## Get started
+
+<Cards>
+  <Card title="Supported Agents" href="/supported-agents" />
+  <Card title="Build a Plugin" href="/plugin-builders" />
+  <Card title="Add Plugin Support to Your Tool" href="/agent-builders" />
+  <Card title="Specification" href="/plugin-builders/specification" />
+</Cards>
