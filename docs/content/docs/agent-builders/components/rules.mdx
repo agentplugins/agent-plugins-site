@@ -1,0 +1,58 @@
+---
+title: Rules
+description: Persistent AI guidance — coding standards, best practices, and constraints.
+---
+
+Rules provide persistent AI guidance — coding standards, best practices, and constraints that the agent follows throughout a session. Unlike skills (which activate on demand), rules are always present in the agent's context.
+
+## File Format
+
+Rule files are markdown with YAML frontmatter, using the `.mdc` extension.
+
+```markdown
+---
+description: Prefer const over let. Never use var.
+alwaysApply: true
+globs: "**/*.{js,ts,jsx,tsx}"
+---
+
+Always use `const` for variables that are never reassigned.
+Use `let` only when reassignment is necessary. Never use `var`.
+```
+
+## Frontmatter Schema
+
+| Field | Required | Type | Description |
+|---|---|---|---|
+| `description` | Yes | string | What the rule enforces. |
+| `alwaysApply` | No | boolean | If `true`, always active. Defaults to `false`. |
+| `globs` | No | string \| string[] | File patterns the rule applies to. |
+
+### Activation Modes
+
+| `alwaysApply` | `globs` | Behavior |
+|---|---|---|
+| `true` | not set | Always active for everything |
+| `true` | set | Always active for matching files |
+| `false` / omitted | not set | Available; agent or user decides |
+| `false` / omitted | set | Available for matching files; agent or user decides |
+
+## Body Content
+
+The body is injected into context when the rule is active. Keep rule bodies under 500 tokens — they may be present for the entire session.
+
+## Location and Discovery
+
+Rule files go in `rules/` at the plugin root (`.mdc` files).
+
+## Namespacing
+
+| Plugin Name | Rule File | Namespaced Name |
+|---|---|---|
+| `code-standards` | `rules/prefer-const.mdc` | `code-standards:prefer-const` |
+
+## Integration Behavior
+
+- Rules with `alwaysApply: true` SHOULD be loaded automatically.
+- When `globs` is specified, rules SHOULD only be active for matching files.
+- Tools that do not support rules MUST ignore the `rules/` directory.

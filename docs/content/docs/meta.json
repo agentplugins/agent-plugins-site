@@ -1,0 +1,10 @@
+{
+  "pages": [
+    "index",
+    "supported-agents",
+    "---For Plugin Builders---",
+    "plugin-builders",
+    "---For Agent Builders---",
+    "agent-builders"
+  ]
+}

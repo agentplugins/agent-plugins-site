@@ -1,0 +1,11 @@
+{
+  "title": "Components",
+  "pages": [
+    "skills",
+    "agents",
+    "rules",
+    "hooks",
+    "mcp-servers",
+    "lsp-servers"
+  ]
+}
