@@ -4,8 +4,9 @@
  * For Claude Code: prepares a local marketplace directory that Claude Code
  * understands, then shells out to `claude plugin marketplace add` + `claude plugin install`.
  *
- * For Cursor: copies plugin directories into ~/.cursor/plugins/cache/<marketplace>/<plugin>/<sha>/
- * where Cursor discovers them automatically.
+ * For Cursor: also installs via the Claude Code CLI. Cursor discovers "Imported"
+ * plugins by reading from the Claude Code plugin cache (~/.claude/plugins/cache/),
+ * so both targets use the same underlying installation mechanism.
  */
 
 import { join, relative } from "path";
@@ -13,7 +14,6 @@ import { mkdir, cp, readFile, writeFile } from "fs/promises";
 import { existsSync } from "fs";
 import { execSync } from "child_process";
 import { homedir } from "os";
-import { createHash } from "crypto";
 import type { DiscoveredPlugin } from "./discover.js";
 import type { Target } from "./targets.js";
 
@@ -29,10 +29,12 @@ export async function installPlugins(
 ): Promise<void> {
   switch (target.id) {
     case "claude-code":
-      await installToClaudeCode(plugins, scope, repoPath, source);
-      break;
     case "cursor":
-      await installToCursor(plugins, repoPath, source);
+      // Both Claude Code and Cursor use the Claude Code plugin system.
+      // Cursor discovers "Imported" plugins by reading from the Claude Code
+      // plugin cache (~/.claude/plugins/cache/), so both targets install
+      // through the Claude Code CLI.
+      await installToClaudeCode(plugins, scope, repoPath, source);
       break;
     default:
       throw new Error(`Unsupported target: ${target.id}`);
@@ -148,62 +150,6 @@ async function prepareForClaudeCode(
 }
 
 // ---------------------------------------------------------------------------
-// Cursor installer
-// ---------------------------------------------------------------------------
-//
-// Cursor discovers installed plugins by scanning:
-//   ~/.cursor/plugins/cache/<marketplace>/<plugin-name>/<commit-sha>/
-//
-// Each plugin directory must contain .cursor-plugin/plugin.json.
-// There is no CLI command for plugin installation — Cursor reads from the
-// filesystem directly.
-//
-// So we:
-// 1. Prepare each plugin (ensure .cursor-plugin/plugin.json, translate env vars)
-// 2. Copy the plugin directory into the Cursor cache at the expected path
-
-async function installToCursor(
-  plugins: DiscoveredPlugin[],
-  repoPath: string,
-  source: string,
-): Promise<void> {
-  const marketplaceName = plugins[0]?.marketplace ?? deriveMarketplaceName(source);
-  const cursorCacheDir = join(homedir(), ".cursor", "plugins", "cache", marketplaceName);
-
-  console.log("\nPreparing plugins for Cursor...");
-
-  for (const plugin of plugins) {
-    // 1. Compute a stable hash for the cache directory name.
-    //    Cursor uses git commit SHAs. We derive one from source + plugin name
-    //    so that re-installs overwrite the same directory.
-    const sha = computePluginHash(source, plugin.name);
-
-    // 2. Copy into Cursor's plugin cache first, then prepare the copy.
-    //    This avoids mutating the shared source directory (which Claude Code's
-    //    installer may have already modified with its own env vars).
-    const destDir = join(cursorCacheDir, plugin.name, sha);
-    await mkdir(destDir, { recursive: true });
-    await cp(plugin.path, destDir, { recursive: true });
-
-    // 3. Prepare the copied plugin (vendor dir, env vars) on the destination
-    const destPlugin = { ...plugin, path: destDir };
-    await preparePluginDirForVendor(destPlugin, ".cursor-plugin", "CURSOR_PLUGIN_ROOT");
-
-    console.log(`  ${plugin.name}: installed to ${destDir}`);
-  }
-}
-
-/**
- * Compute a stable hash for a plugin installation.
- * Cursor uses git commit SHAs for versioning in its cache path.
- * We derive a deterministic hash from the source + plugin name so that
- * repeated installs from the same source overwrite cleanly.
- */
-function computePluginHash(source: string, pluginName: string): string {
-  return createHash("sha1").update(`${source}:${pluginName}`).digest("hex");
-}
-
-// ---------------------------------------------------------------------------
 // Shared helpers
 // ---------------------------------------------------------------------------
 
@@ -310,7 +256,7 @@ async function translateEnvVars(
 /**
  * Derive the marketplace name from the source string.
  *
- * Claude Code and Cursor both use marketplace names derived from the repo owner/name.
+ * Derive the marketplace name from the repo owner/name.
  */
 function deriveMarketplaceName(source: string): string {
   // GitHub shorthand: owner/repo
