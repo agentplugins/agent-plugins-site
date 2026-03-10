@@ -1,0 +1,91 @@
+---
+title: Skills
+description: Slash-command shortcuts and agent-invocable capabilities within a plugin.
+---
+
+Skills provide slash-command shortcuts and agent-invocable capabilities within a plugin.
+
+Both skill formats described below are fundamentally the same mechanism: markdown instructions loaded into the agent's context when invoked. The two formats differ only in packaging complexity — command skills are flat markdown files, while agent skills are directories that can bundle supporting scripts, references, and assets alongside their instructions.
+
+## Relationship to Agent Skills
+
+The skill file format follows the [Agent Skills](https://agentskills.io) specification. This document describes how skills are discovered, namespaced, and loaded within the plugin context. For the `SKILL.md` file format itself — frontmatter fields, body content, optional directories — refer to the [Agent Skills Specification](https://agentskills.io/specification).
+
+## Skill Types
+
+### Agent Skills (`skills/` directory)
+
+Agent Skills are directories containing a `SKILL.md` file following the [Agent Skills](https://agentskills.io) format. These are the RECOMMENDED format for new skills.
+
+```
+my-plugin/
+└── skills/
+    ├── code-review/
+    │   ├── SKILL.md
+    │   ├── scripts/        # Optional
+    │   └── references/     # Optional
+    └── pdf-processor/
+        ├── SKILL.md
+        └── scripts/
+```
+
+Each subdirectory of `skills/` that contains a `SKILL.md` file is treated as a skill. The directory name MUST match the `name` field in the `SKILL.md` frontmatter.
+
+### Command Skills (`commands/` directory)
+
+Command skills are simple markdown files that define slash commands — a flatter format for commands that don't need supporting files.
+
+```
+my-plugin/
+└── commands/
+    ├── deploy.md
+    └── status.md
+```
+
+#### Command File Format
+
+```markdown
+---
+description: Deploy the current project to staging
+---
+
+Deploy the project to the staging environment. Use "$ARGUMENTS" as the deployment target if provided.
+```
+
+| Frontmatter Field | Required | Description |
+|---|---|---|
+| `description` | RECOMMENDED | Short description for help text and auto-invocation matching. |
+| `disable-model-invocation` | No | If `true`, only the user can invoke this command. Defaults to `false`. |
+
+The placeholder `$ARGUMENTS` is replaced with any text after the command name (e.g., `/my-plugin:deploy production`).
+
+## Discovery
+
+Tools MUST discover skills in:
+
+1. `skills/` at the plugin root — each subdirectory containing `SKILL.md`
+2. `commands/` at the plugin root — each `.md` file
+3. Any additional paths declared in the manifest
+
+## Namespacing
+
+| Plugin Name | Skill Directory/File | User-Facing Name |
+|---|---|---|
+| `deploy-tools` | `skills/deploy/` | `/deploy-tools:deploy` |
+| `deploy-tools` | `commands/status.md` | `/deploy-tools:status` |
+
+## Progressive Disclosure
+
+1. **Metadata** (~100 tokens): `name` and `description` loaded at startup for matching.
+2. **Instructions** (recommended &lt; 5000 tokens): Full body loaded when activated.
+3. **Resources** (as needed): Supporting files loaded during execution.
+
+## Root SKILL.md
+
+If a plugin has no `skills/` directory and no `skills` field in the manifest, tools MAY treat a `SKILL.md` at the plugin root as a single-skill plugin.
+
+## Integration Behavior
+
+- Skills MUST be automatically discovered when the plugin is installed.
+- Tools SHOULD present skills to the agent for automatic invocation based on task context.
+- Skills MAY include supporting files alongside `SKILL.md`.
