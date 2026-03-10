@@ -62,7 +62,9 @@ function detectTarget(def: Omit<Target, "detected">): boolean {
     case "claude-code":
       return detectBinary("claude");
     case "cursor":
-      return detectBinary("cursor");
+      // Cursor reads "Imported" plugins from the Claude Code plugin cache,
+      // so both the cursor binary and the claude CLI are required.
+      return detectBinary("cursor") && detectBinary("claude");
     default:
       return false;
   }
