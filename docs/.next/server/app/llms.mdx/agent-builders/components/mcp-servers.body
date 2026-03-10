@@ -1,0 +1,55 @@
+# MCP Servers
+
+
+
+Plugins can bundle [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) servers to provide the agent with additional tools and data sources.
+
+Configuration Format [#configuration-format]
+
+MCP servers are configured in `.mcp.json` at the plugin root.
+
+```json
+{
+  "mcpServers": {
+    "plugin-database": {
+      "command": "${PLUGIN_ROOT}/servers/db-server",
+      "args": ["--config", "${PLUGIN_ROOT}/config.json"],
+      "env": {
+        "DB_PATH": "${PLUGIN_ROOT}/data"
+      }
+    },
+    "plugin-api": {
+      "command": "npx",
+      "args": ["@company/mcp-server", "--plugin-mode"],
+      "cwd": "${PLUGIN_ROOT}"
+    }
+  }
+}
+```
+
+Server Configuration Schema [#server-configuration-schema]
+
+| Field     | Required | Type      | Description                                             |
+| --------- | -------- | --------- | ------------------------------------------------------- |
+| `command` | Yes      | string    | The executable to run. Supports `${PLUGIN_ROOT}`.       |
+| `args`    | No       | string\[] | Command-line arguments. `${PLUGIN_ROOT}` is expanded.   |
+| `env`     | No       | object    | Environment variables. Values support `${PLUGIN_ROOT}`. |
+| `cwd`     | No       | string    | Working directory. Supports `${PLUGIN_ROOT}`.           |
+
+Lifecycle [#lifecycle]
+
+* MCP servers MUST start automatically when the plugin is enabled.
+* MCP servers MUST stop when the plugin is disabled or the session ends.
+* If a server fails to start, the tool SHOULD log the error and continue.
+
+Discovery [#discovery]
+
+Tools MUST discover MCP server configurations in:
+
+1. `.mcp.json` at the plugin root
+2. Inline in the manifest's `mcpServers` field
+3. Any additional paths declared in the manifest
+
+Compatibility [#compatibility]
+
+This spec does not redefine the MCP protocol. Plugin MCP servers MUST implement the [Model Context Protocol](https://modelcontextprotocol.io/) as specified by that project.

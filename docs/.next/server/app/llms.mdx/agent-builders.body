@@ -1,0 +1,201 @@
+# Integrate Plugins Into Your Tool
+
+
+
+This guide explains how to add Open Plugin support to an AI agent or development tool.
+
+Overview [#overview]
+
+A plugin-compatible tool needs to:
+
+1. **Discover** plugins in configured locations
+2. **Parse** the manifest and discover components
+3. **Register** components (skills, agents, hooks, servers)
+4. **Namespace** components to prevent conflicts
+5. **Manage** plugin lifecycle (enable, disable, update, cache)
+
+Minimal implementation [#minimal-implementation]
+
+You don't need to support every component type. A minimal conformant implementation needs to:
+
+1. Load a plugin from a directory
+2. Parse `.plugin/plugin.json` if present
+3. Discover components in default locations
+4. Expand `${PLUGIN_ROOT}` in configuration values
+5. Namespace components with the plugin name
+6. Support at least one component type
+
+Step-by-step integration [#step-by-step-integration]
+
+1. Plugin discovery [#1-plugin-discovery]
+
+Plugins can come from two sources:
+
+**Direct directory**: A path specified by the user (e.g., `--plugin-dir ./my-plugin`). Used for development.
+
+**Installed plugin**: A plugin installed and copied to a local cache.
+
+```
+function discoverPlugin(pluginPath):
+    manifest = null
+
+    // Try to load manifest
+    manifestPath = pluginPath + "/.plugin/plugin.json"
+    if exists(manifestPath):
+        manifest = parseJSON(readFile(manifestPath))
+
+    // Derive name from manifest or directory name
+    name = manifest?.name ?? basename(pluginPath)
+
+    return { name, manifest, path: pluginPath }
+```
+
+2. Component discovery [#2-component-discovery]
+
+Scan default locations for each component type:
+
+```
+function discoverComponents(pluginPath, manifest):
+    components = {}
+
+    // Skills (Agent Skills format)
+    skillsDir = pluginPath + "/skills"
+    if exists(skillsDir):
+        for dir in subdirectories(skillsDir):
+            if exists(dir + "/SKILL.md"):
+                components.skills.push(parseSkill(dir))
+
+    // Commands (flat markdown files)
+    commandsDir = pluginPath + "/commands"
+    if exists(commandsDir):
+        for file in glob(commandsDir + "/*.md"):
+            components.commands.push(parseCommand(file))
+
+    // Agents
+    agentsDir = pluginPath + "/agents"
+    if exists(agentsDir):
+        for file in glob(agentsDir + "/*.md"):
+            components.agents.push(parseAgent(file))
+
+    // Hooks
+    hooksFile = pluginPath + "/hooks/hooks.json"
+    if exists(hooksFile):
+        components.hooks = parseJSON(readFile(hooksFile))
+
+    // MCP servers
+    mcpFile = pluginPath + "/.mcp.json"
+    if exists(mcpFile):
+        components.mcpServers = parseJSON(readFile(mcpFile))
+
+    // LSP servers
+    lspFile = pluginPath + "/.lsp.json"
+    if exists(lspFile):
+        components.lspServers = parseJSON(readFile(lspFile))
+
+    // Also load from custom paths in manifest
+    if manifest?.commands:
+        // Load additional commands from manifest paths
+    // ... same for other component types
+
+    return components
+```
+
+3. Path expansion [#3-path-expansion]
+
+All configuration values that may contain `${PLUGIN_ROOT}` must be expanded:
+
+```
+function expandPaths(config, pluginRoot):
+    return deepReplace(config, "${PLUGIN_ROOT}", pluginRoot)
+```
+
+This applies to:
+
+* Hook command strings
+* MCP server `command`, `args`, `env`, and `cwd` fields
+* LSP server configuration fields
+
+4. Namespacing [#4-namespacing]
+
+All user-facing component names must be prefixed:
+
+```
+function namespace(pluginName, componentName):
+    return pluginName + ":" + componentName
+```
+
+This produces names like `/deploy-tools:status` for skills and `deploy-tools:security-reviewer` for agents.
+
+5. Component registration [#5-component-registration]
+
+How you register components depends on your tool's architecture:
+
+**Skills**: Add to the list of available skills/commands. Include metadata (name, description) in the agent's system prompt for auto-invocation.
+
+**Agents**: Add to the agent registry. Make available for both auto-invocation (based on description matching) and manual invocation.
+
+**Hooks**: Register event listeners for each hook rule. When an event fires, check matchers and execute matching hook actions.
+
+**MCP servers**: Start server processes and connect to them via the MCP protocol. Register their tools alongside built-in tools.
+
+**LSP servers**: Start language server processes for matching file types. Connect via stdio or socket transport.
+
+6. Plugin caching [#6-plugin-caching]
+
+For installed plugins, copy to a local cache:
+
+```
+function installPlugin(pluginName, sourcePath):
+    cachePath = getCachePath(pluginName)
+
+    // Copy plugin directory to cache (follow symlinks)
+    copyDirectory(sourcePath, cachePath, followSymlinks=true)
+
+    // Add to enabled plugins
+    addToSettings("enabledPlugins", pluginName)
+```
+
+Security considerations [#security-considerations]
+
+Script execution [#script-execution]
+
+Hook scripts and MCP server commands run with the user's permissions. Consider:
+
+* **Sandboxing**: Run scripts in isolated environments where possible
+* **Allowlisting**: Only execute scripts from trusted/installed plugins
+* **Confirmation**: Ask users before enabling plugins with hooks
+* **Logging**: Record all script executions for auditing
+
+Plugin review [#plugin-review]
+
+Before installing plugins, tools SHOULD:
+
+* Display the plugin's components (especially hooks and MCP servers)
+* Warn about plugins that include executable hooks
+* Allow users to review plugin contents before enabling
+
+Path restrictions [#path-restrictions]
+
+* Reject any paths containing `../` that escape the plugin root
+* Validate that `${PLUGIN_ROOT}` expansion produces paths within the plugin directory
+* Cached plugins must be self-contained
+
+Testing your integration [#testing-your-integration]
+
+Use the reference library to validate plugins:
+
+```bash
+# Validate a plugin's structure
+npx plugin-ref validate ./test-plugin
+
+# Inspect discovered components
+npx plugin-ref inspect ./test-plugin
+```
+
+Create test plugins that exercise each component type and edge case:
+
+* Plugin with no manifest (convention-only discovery)
+* Plugin with custom component paths in manifest
+* Plugin with all component types
+* Plugin with invalid manifest (should fail gracefully)
+* Plugin with hooks that reference `${PLUGIN_ROOT}`

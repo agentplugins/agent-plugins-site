@@ -1,0 +1,8 @@
+[00:00:01.317] Server  LOG     [MDX] generated files in 5.530499999999847ms
+[00:00:01.323] Server  LOG     [MDX] started dev server
+[00:00:01.536] Server  LOG     ✓ Ready in 1316ms
+[00:00:05.841] Server  WARN    ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+[00:00:27.463] Server  LOG     ✓ Compiled in 21.3s
+[00:01:11.607] Server  LOG     ✓ Compiled in 44.1s
+[00:01:27.986] Server  LOG     ✓ Compiled in 16.3s
+[00:02:00.968] Server  LOG     ✓ Compiled in 23.6s

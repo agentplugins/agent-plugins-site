@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///Users/qua/projects/open-plugin/docs/lib/layout.shared.tsx"],"sourcesContent":["import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';\n\nexport const gitConfig = {\n  user: 'nichochar',\n  repo: 'open-plugin',\n  branch: 'main',\n};\n\nexport function baseOptions(): BaseLayoutProps {\n  return {\n    nav: {\n      title: 'Open Plugin',\n    },\n    githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,\n  };\n}\n"],"names":[],"mappings":";;;;;;AAEO,MAAM,YAAY;IACvB,MAAM;IACN,MAAM;IACN,QAAQ;AACV;AAEO,SAAS;IACd,OAAO;QACL,KAAK;YACH,OAAO;QACT;QACA,WAAW,CAAC,mBAAmB,EAAE,UAAU,IAAI,CAAC,CAAC,EAAE,UAAU,IAAI,EAAE;IACrE;AACF"}},
+    {"offset": {"line": 27, "column": 0}, "map": {"version":3,"sources":["file:///Users/qua/projects/open-plugin/docs/app/%28home%29/layout.tsx"],"sourcesContent":["import { HomeLayout } from 'fumadocs-ui/layouts/home';\nimport { baseOptions } from '@/lib/layout.shared';\n\nexport default function Layout({ children }: LayoutProps<'/'>) {\n  return <HomeLayout {...baseOptions()}>{children}</HomeLayout>;\n}\n"],"names":[],"mappings":";;;;;AAAA;AACA;;;;AAEe,SAAS,OAAO,EAAE,QAAQ,EAAoB;IAC3D,qBAAO,mZAAC,2aAAU;QAAE,GAAG,IAAA,6KAAW,GAAE;kBAAG;;;;;;AACzC"}}]
+}

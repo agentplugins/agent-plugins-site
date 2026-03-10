@@ -1,0 +1,56 @@
+# Agents
+
+
+
+Agents are specialized sub-agents that a plugin provides for specific tasks. The host tool can invoke them automatically based on task context, or users can invoke them manually.
+
+File Format [#file-format]
+
+Agent definitions are markdown files with YAML frontmatter.
+
+```markdown
+---
+name: security-reviewer
+description: Reviews code for security vulnerabilities, OWASP issues, and unsafe patterns.
+---
+
+You are a security review specialist. When reviewing code:
+
+1. Check for injection vulnerabilities (SQL, XSS, command injection)
+2. Review authentication and authorization logic
+3. Identify insecure data handling (hardcoded secrets, unencrypted storage)
+4. Check dependency versions against known CVE databases
+5. Flag unsafe deserialization or file operations
+
+Always provide specific line references and severity ratings (critical, high, medium, low).
+```
+
+Frontmatter Schema [#frontmatter-schema]
+
+| Field         | Required | Type   | Constraints             | Description                                          |
+| ------------- | -------- | ------ | ----------------------- | ---------------------------------------------------- |
+| `name`        | Yes      | string | 1-64 chars, kebab-case. | Agent identifier. Must be unique within the plugin.  |
+| `description` | Yes      | string | Max 1024 chars.         | What the agent specializes in and when to invoke it. |
+
+The `description` field serves two purposes: **discovery** (displayed when browsing agents) and **auto-invocation** (used to match tasks to agents). Include specific task keywords.
+
+Body Content [#body-content]
+
+The markdown body is the agent's **system prompt**, injected into context when invoked. Include role description, methodology, output format, and edge cases.
+
+Location and Discovery [#location-and-discovery]
+
+Agent files go in `agents/` at the plugin root. Each `.md` file with valid frontmatter is registered.
+
+Namespacing [#namespacing]
+
+| Plugin Name    | Agent File                    | Namespaced Name                  |
+| -------------- | ----------------------------- | -------------------------------- |
+| `code-quality` | `agents/security-reviewer.md` | `code-quality:security-reviewer` |
+
+Integration Behavior [#integration-behavior]
+
+* Tools SHOULD present available agents to users.
+* Tools SHOULD allow automatic invocation when task context matches.
+* Tools SHOULD allow manual invocation.
+* When invoked, the tool SHOULD create a sub-agent context using the body as the system prompt.

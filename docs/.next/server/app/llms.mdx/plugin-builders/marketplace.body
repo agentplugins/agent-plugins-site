@@ -1,0 +1,130 @@
+# Marketplace
+
+
+
+A **marketplace** is a named collection of one or more plugins. It acts as an index: it declares which plugins are available, where they live, and basic metadata about each one.
+
+Marketplaces solve the multi-plugin distribution problem. A single GitHub repository can contain multiple plugins. The marketplace index tells tools what's inside without scanning the filesystem.
+
+Marketplace Index [#marketplace-index]
+
+The marketplace index is a `marketplace.json` file.
+
+Location [#location]
+
+Tools MUST check for the marketplace index in this order:
+
+| Path                                   | Priority                                |
+| -------------------------------------- | --------------------------------------- |
+| `marketplace.json`                     | First (root of repository or directory) |
+| `.plugin/marketplace.json`             | Second                                  |
+| `.<tool-name>-plugin/marketplace.json` | Third (vendor-specific)                 |
+
+Schema [#schema]
+
+```json
+{
+  "name": "my-marketplace",
+  "owner": {
+    "name": "Author or Organization"
+  },
+  "metadata": {
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "plugin-one",
+      "source": "./plugin-one/",
+      "description": "First plugin in the collection.",
+      "version": "1.0.0"
+    },
+    {
+      "name": "plugin-two",
+      "source": "./plugin-two/",
+      "description": "Second plugin in the collection.",
+      "version": "2.1.0"
+    }
+  ]
+}
+```
+
+Required Fields [#required-fields]
+
+| Field     | Type   | Description                                              |
+| --------- | ------ | -------------------------------------------------------- |
+| `name`    | string | Name of the marketplace.                                 |
+| `plugins` | array  | List of plugin entries. Must contain at least one entry. |
+
+Optional Fields [#optional-fields]
+
+| Field                 | Type   | Description                                                       |
+| --------------------- | ------ | ----------------------------------------------------------------- |
+| `owner`               | object | Author or organization (`name`, `email`, `url`).                  |
+| `metadata.pluginRoot` | string | Base path for resolving plugin `source` paths. Defaults to `"."`. |
+
+Plugin Entry Fields [#plugin-entry-fields]
+
+| Field         | Required | Type      | Description                                                                                |
+| ------------- | -------- | --------- | ------------------------------------------------------------------------------------------ |
+| `name`        | Yes      | string    | Plugin name (follows [name constraints](/plugin-builders/specification#name-constraints)). |
+| `source`      | Yes      | string    | Relative path to the plugin directory. Must start with `./`.                               |
+| `description` | No       | string    | Brief description. Overrides the plugin manifest's description for display.                |
+| `version`     | No       | string    | Semantic version. Overrides the manifest's version for update checks.                      |
+| `author`      | No       | object    | Author information.                                                                        |
+| `license`     | No       | string    | SPDX license identifier.                                                                   |
+| `keywords`    | No       | string\[] | Tags for discovery and search.                                                             |
+
+Multi-Plugin Repositories [#multi-plugin-repositories]
+
+```
+my-org-plugins/
+├── marketplace.json
+├── code-quality/
+│   ├── .plugin/plugin.json
+│   ├── skills/
+│   └── rules/
+├── deployment/
+│   ├── .plugin/plugin.json
+│   ├── skills/
+│   └── hooks/
+└── documentation/
+    ├── .plugin/plugin.json
+    ├── agents/
+    └── skills/
+```
+
+```json
+{
+  "name": "my-org-plugins",
+  "owner": { "name": "My Organization" },
+  "plugins": [
+    { "name": "code-quality", "source": "./code-quality/", "description": "Linting, review, and code standards." },
+    { "name": "deployment", "source": "./deployment/", "description": "Deploy workflows and automation." },
+    { "name": "documentation", "source": "./documentation/", "description": "Doc generation and maintenance." }
+  ]
+}
+```
+
+Using pluginRoot [#using-pluginroot]
+
+For repositories where plugins are nested under a subdirectory, use `metadata.pluginRoot`:
+
+```json
+{
+  "name": "my-repo",
+  "metadata": { "pluginRoot": "./plugins" },
+  "plugins": [
+    { "name": "plugin-a", "source": "./plugin-a/" },
+    { "name": "plugin-b", "source": "./plugin-b/" }
+  ]
+}
+```
+
+The `source` paths are resolved relative to `pluginRoot`, so `plugin-a` resolves to `./plugins/plugin-a/`.
+
+Discovery Without a Marketplace Index [#discovery-without-a-marketplace-index]
+
+If no `marketplace.json` is found, tools SHOULD fall back to filesystem-based discovery:
+
+1. Check if the root directory itself is a plugin.
+2. Scan immediate subdirectories (up to 2 levels deep) for plugin directories.

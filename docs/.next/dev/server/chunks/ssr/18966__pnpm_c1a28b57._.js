@@ -1,0 +1,12379 @@
+module.exports = [
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/dequal@2.0.3/node_modules/dequal/dist/index.mjs [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "dequal",
+    ()=>dequal
+]);
+var has = Object.prototype.hasOwnProperty;
+function find(iter, tar, key) {
+    for (key of iter.keys()){
+        if (dequal(key, tar)) return key;
+    }
+}
+function dequal(foo, bar) {
+    var ctor, len, tmp;
+    if (foo === bar) return true;
+    if (foo && bar && (ctor = foo.constructor) === bar.constructor) {
+        if (ctor === Date) return foo.getTime() === bar.getTime();
+        if (ctor === RegExp) return foo.toString() === bar.toString();
+        if (ctor === Array) {
+            if ((len = foo.length) === bar.length) {
+                while(len-- && dequal(foo[len], bar[len]));
+            }
+            return len === -1;
+        }
+        if (ctor === Set) {
+            if (foo.size !== bar.size) {
+                return false;
+            }
+            for (len of foo){
+                tmp = len;
+                if (tmp && typeof tmp === 'object') {
+                    tmp = find(bar, tmp);
+                    if (!tmp) return false;
+                }
+                if (!bar.has(tmp)) return false;
+            }
+            return true;
+        }
+        if (ctor === Map) {
+            if (foo.size !== bar.size) {
+                return false;
+            }
+            for (len of foo){
+                tmp = len[0];
+                if (tmp && typeof tmp === 'object') {
+                    tmp = find(bar, tmp);
+                    if (!tmp) return false;
+                }
+                if (!dequal(len[1], bar.get(tmp))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        if (ctor === ArrayBuffer) {
+            foo = new Uint8Array(foo);
+            bar = new Uint8Array(bar);
+        } else if (ctor === DataView) {
+            if ((len = foo.byteLength) === bar.byteLength) {
+                while(len-- && foo.getInt8(len) === bar.getInt8(len));
+            }
+            return len === -1;
+        }
+        if (ArrayBuffer.isView(foo)) {
+            if ((len = foo.byteLength) === bar.byteLength) {
+                while(len-- && foo[len] === bar[len]);
+            }
+            return len === -1;
+        }
+        if (!ctor || typeof foo === 'object') {
+            len = 0;
+            for(ctor in foo){
+                if (has.call(foo, ctor) && ++len && !has.call(bar, ctor)) return false;
+                if (!(ctor in bar) || !dequal(foo[ctor], bar[ctor])) return false;
+            }
+            return Object.keys(bar).length === len;
+        }
+    }
+    return foo !== foo && bar !== bar;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/devlop@1.1.0/node_modules/devlop/lib/development.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "deprecate",
+    ()=>deprecate,
+    "equal",
+    ()=>equal,
+    "ok",
+    ()=>ok,
+    "unreachable",
+    ()=>unreachable
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$dequal$40$2$2e$0$2e$3$2f$node_modules$2f$dequal$2f$dist$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/dequal@2.0.3/node_modules/dequal/dist/index.mjs [app-ssr] (ecmascript)");
+;
+/**
+ * @type {Set<string>}
+ */ const codesWarned = new Set();
+class AssertionError extends Error {
+    name = 'Assertion';
+    code = 'ERR_ASSERTION';
+    /**
+   * Create an assertion error.
+   *
+   * @param {string} message
+   *   Message explaining error.
+   * @param {unknown} actual
+   *   Value.
+   * @param {unknown} expected
+   *   Baseline.
+   * @param {string} operator
+   *   Name of equality operation.
+   * @param {boolean} generated
+   *   Whether `message` is a custom message or not
+   * @returns
+   *   Instance.
+   */ // eslint-disable-next-line max-params
+    constructor(message, actual, expected, operator, generated){
+        super(message);
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, this.constructor);
+        }
+        /**
+     * @type {unknown}
+     */ this.actual = actual;
+        /**
+     * @type {unknown}
+     */ this.expected = expected;
+        /**
+     * @type {boolean}
+     */ this.generated = generated;
+        /**
+     * @type {string}
+     */ this.operator = operator;
+    }
+}
+class DeprecationError extends Error {
+    name = 'DeprecationWarning';
+    /**
+   * Create a deprecation message.
+   *
+   * @param {string} message
+   *   Message explaining deprecation.
+   * @param {string | undefined} code
+   *   Deprecation identifier; deprecation messages will be generated only once per code.
+   * @returns
+   *   Instance.
+   */ constructor(message, code){
+        super(message);
+        /**
+     * @type {string | undefined}
+     */ this.code = code;
+    }
+}
+function deprecate(fn, message, code) {
+    let warned = false;
+    // The wrapper will keep the same prototype as fn to maintain prototype chain
+    Object.setPrototypeOf(deprecated, fn);
+    // @ts-expect-error: it’s perfect, typescript…
+    return deprecated;
+    //TURBOPACK unreachable
+    ;
+    /**
+   * @this {unknown}
+   * @param  {...Array<unknown>} args
+   * @returns {unknown}
+   */ function deprecated(...args) {
+        if (!warned) {
+            warned = true;
+            if (typeof code === 'string' && codesWarned.has(code)) {
+            // Empty.
+            } else {
+                console.error(new DeprecationError(message, code || undefined));
+                if (typeof code === 'string') codesWarned.add(code);
+            }
+        }
+        return new.target ? Reflect.construct(fn, args, new.target) : Reflect.apply(fn, this, args);
+    }
+}
+function equal(actual, expected, message) {
+    assert((0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$dequal$40$2$2e$0$2e$3$2f$node_modules$2f$dequal$2f$dist$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["dequal"])(actual, expected), actual, expected, 'equal', 'Expected values to be deeply equal', message);
+}
+function ok(value, message) {
+    assert(Boolean(value), false, true, 'ok', 'Expected value to be truthy', message);
+}
+function unreachable(message) {
+    assert(false, false, true, 'ok', 'Unreachable', message);
+}
+/**
+ * @param {boolean} bool
+ *   Whether to skip this operation.
+ * @param {unknown} actual
+ *   Actual value.
+ * @param {unknown} expected
+ *   Expected value.
+ * @param {string} operator
+ *   Operator.
+ * @param {string} defaultMessage
+ *   Default message for operation.
+ * @param {Error | string | null | undefined} userMessage
+ *   User-provided message.
+ * @returns {asserts bool}
+ *   Nothing; throws when falsey.
+ */ // eslint-disable-next-line max-params
+function assert(bool, actual, expected, operator, defaultMessage, userMessage) {
+    if (!bool) {
+        throw userMessage instanceof Error ? userMessage : new AssertionError(userMessage || defaultMessage, actual, expected, operator, !userMessage);
+    }
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-string@4.0.0/node_modules/mdast-util-to-string/lib/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "toString",
+    ()=>toString
+]);
+/**
+ * @typedef {import('mdast').Nodes} Nodes
+ *
+ * @typedef Options
+ *   Configuration (optional).
+ * @property {boolean | null | undefined} [includeImageAlt=true]
+ *   Whether to use `alt` for `image`s (default: `true`).
+ * @property {boolean | null | undefined} [includeHtml=true]
+ *   Whether to use `value` of HTML (default: `true`).
+ */ /** @type {Options} */ const emptyOptions = {};
+function toString(value, options) {
+    const settings = options || emptyOptions;
+    const includeImageAlt = typeof settings.includeImageAlt === 'boolean' ? settings.includeImageAlt : true;
+    const includeHtml = typeof settings.includeHtml === 'boolean' ? settings.includeHtml : true;
+    return one(value, includeImageAlt, includeHtml);
+}
+/**
+ * One node or several nodes.
+ *
+ * @param {unknown} value
+ *   Thing to serialize.
+ * @param {boolean} includeImageAlt
+ *   Include image `alt`s.
+ * @param {boolean} includeHtml
+ *   Include HTML.
+ * @returns {string}
+ *   Serialized node.
+ */ function one(value, includeImageAlt, includeHtml) {
+    if (node(value)) {
+        if ('value' in value) {
+            return value.type === 'html' && !includeHtml ? '' : value.value;
+        }
+        if (includeImageAlt && 'alt' in value && value.alt) {
+            return value.alt;
+        }
+        if ('children' in value) {
+            return all(value.children, includeImageAlt, includeHtml);
+        }
+    }
+    if (Array.isArray(value)) {
+        return all(value, includeImageAlt, includeHtml);
+    }
+    return '';
+}
+/**
+ * Serialize a list of nodes.
+ *
+ * @param {Array<unknown>} values
+ *   Thing to serialize.
+ * @param {boolean} includeImageAlt
+ *   Include image `alt`s.
+ * @param {boolean} includeHtml
+ *   Include HTML.
+ * @returns {string}
+ *   Serialized nodes.
+ */ function all(values, includeImageAlt, includeHtml) {
+    /** @type {Array<string>} */ const result = [];
+    let index = -1;
+    while(++index < values.length){
+        result[index] = one(values[index], includeImageAlt, includeHtml);
+    }
+    return result.join('');
+}
+/**
+ * Check if `value` looks like a node.
+ *
+ * @param {unknown} value
+ *   Thing.
+ * @returns {value is Nodes}
+ *   Whether `value` is a node.
+ */ function node(value) {
+    return Boolean(value && typeof value === 'object');
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/constants.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * This module is compiled away!
+ *
+ * Parsing markdown comes with a couple of constants, such as minimum or maximum
+ * sizes of certain sequences.
+ * Additionally, there are a couple symbols used inside micromark.
+ * These are all defined here, but compiled away by scripts.
+ */ __turbopack_context__.s([
+    "constants",
+    ()=>constants
+]);
+const constants = {
+    attentionSideAfter: 2,
+    attentionSideBefore: 1,
+    atxHeadingOpeningFenceSizeMax: 6,
+    autolinkDomainSizeMax: 63,
+    autolinkSchemeSizeMax: 32,
+    cdataOpeningString: 'CDATA[',
+    characterGroupPunctuation: 2,
+    characterGroupWhitespace: 1,
+    characterReferenceDecimalSizeMax: 7,
+    characterReferenceHexadecimalSizeMax: 6,
+    characterReferenceNamedSizeMax: 31,
+    codeFencedSequenceSizeMin: 3,
+    contentTypeContent: 'content',
+    contentTypeDocument: 'document',
+    contentTypeFlow: 'flow',
+    contentTypeString: 'string',
+    contentTypeText: 'text',
+    hardBreakPrefixSizeMin: 2,
+    htmlBasic: 6,
+    htmlCdata: 5,
+    htmlComment: 2,
+    htmlComplete: 7,
+    htmlDeclaration: 4,
+    htmlInstruction: 3,
+    htmlRawSizeMax: 8,
+    htmlRaw: 1,
+    linkResourceDestinationBalanceMax: 32,
+    linkReferenceSizeMax: 999,
+    listItemValueSizeMax: 10,
+    numericBaseDecimal: 10,
+    numericBaseHexadecimal: 0x10,
+    tabSize: 4,
+    thematicBreakMarkerCountMin: 3,
+    v8MaxSafeChunkSize: 10_000 // V8 (and potentially others) have problems injecting giant arrays into other arrays, hence we operate in chunks.
+};
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/codes.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * Character codes.
+ *
+ * This module is compiled away!
+ *
+ * micromark works based on character codes.
+ * This module contains constants for the ASCII block and the replacement
+ * character.
+ * A couple of them are handled in a special way, such as the line endings
+ * (CR, LF, and CR+LF, commonly known as end-of-line: EOLs), the tab (horizontal
+ * tab) and its expansion based on what column it’s at (virtual space),
+ * and the end-of-file (eof) character.
+ * As values are preprocessed before handling them, the actual characters LF,
+ * CR, HT, and NUL (which is present as the replacement character), are
+ * guaranteed to not exist.
+ *
+ * Unicode basic latin block.
+ */ __turbopack_context__.s([
+    "codes",
+    ()=>codes
+]);
+const codes = {
+    carriageReturn: -5,
+    lineFeed: -4,
+    carriageReturnLineFeed: -3,
+    horizontalTab: -2,
+    virtualSpace: -1,
+    eof: null,
+    nul: 0,
+    soh: 1,
+    stx: 2,
+    etx: 3,
+    eot: 4,
+    enq: 5,
+    ack: 6,
+    bel: 7,
+    bs: 8,
+    ht: 9,
+    lf: 10,
+    vt: 11,
+    ff: 12,
+    cr: 13,
+    so: 14,
+    si: 15,
+    dle: 16,
+    dc1: 17,
+    dc2: 18,
+    dc3: 19,
+    dc4: 20,
+    nak: 21,
+    syn: 22,
+    etb: 23,
+    can: 24,
+    em: 25,
+    sub: 26,
+    esc: 27,
+    fs: 28,
+    gs: 29,
+    rs: 30,
+    us: 31,
+    space: 32,
+    exclamationMark: 33,
+    quotationMark: 34,
+    numberSign: 35,
+    dollarSign: 36,
+    percentSign: 37,
+    ampersand: 38,
+    apostrophe: 39,
+    leftParenthesis: 40,
+    rightParenthesis: 41,
+    asterisk: 42,
+    plusSign: 43,
+    comma: 44,
+    dash: 45,
+    dot: 46,
+    slash: 47,
+    digit0: 48,
+    digit1: 49,
+    digit2: 50,
+    digit3: 51,
+    digit4: 52,
+    digit5: 53,
+    digit6: 54,
+    digit7: 55,
+    digit8: 56,
+    digit9: 57,
+    colon: 58,
+    semicolon: 59,
+    lessThan: 60,
+    equalsTo: 61,
+    greaterThan: 62,
+    questionMark: 63,
+    atSign: 64,
+    uppercaseA: 65,
+    uppercaseB: 66,
+    uppercaseC: 67,
+    uppercaseD: 68,
+    uppercaseE: 69,
+    uppercaseF: 70,
+    uppercaseG: 71,
+    uppercaseH: 72,
+    uppercaseI: 73,
+    uppercaseJ: 74,
+    uppercaseK: 75,
+    uppercaseL: 76,
+    uppercaseM: 77,
+    uppercaseN: 78,
+    uppercaseO: 79,
+    uppercaseP: 80,
+    uppercaseQ: 81,
+    uppercaseR: 82,
+    uppercaseS: 83,
+    uppercaseT: 84,
+    uppercaseU: 85,
+    uppercaseV: 86,
+    uppercaseW: 87,
+    uppercaseX: 88,
+    uppercaseY: 89,
+    uppercaseZ: 90,
+    leftSquareBracket: 91,
+    backslash: 92,
+    rightSquareBracket: 93,
+    caret: 94,
+    underscore: 95,
+    graveAccent: 96,
+    lowercaseA: 97,
+    lowercaseB: 98,
+    lowercaseC: 99,
+    lowercaseD: 100,
+    lowercaseE: 101,
+    lowercaseF: 102,
+    lowercaseG: 103,
+    lowercaseH: 104,
+    lowercaseI: 105,
+    lowercaseJ: 106,
+    lowercaseK: 107,
+    lowercaseL: 108,
+    lowercaseM: 109,
+    lowercaseN: 110,
+    lowercaseO: 111,
+    lowercaseP: 112,
+    lowercaseQ: 113,
+    lowercaseR: 114,
+    lowercaseS: 115,
+    lowercaseT: 116,
+    lowercaseU: 117,
+    lowercaseV: 118,
+    lowercaseW: 119,
+    lowercaseX: 120,
+    lowercaseY: 121,
+    lowercaseZ: 122,
+    leftCurlyBrace: 123,
+    verticalBar: 124,
+    rightCurlyBrace: 125,
+    tilde: 126,
+    del: 127,
+    // Unicode Specials block.
+    byteOrderMarker: 65_279,
+    // Unicode Specials block.
+    replacementCharacter: 65_533 // `�`
+};
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/types.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * This module is compiled away!
+ *
+ * Here is the list of all types of tokens exposed by micromark, with a short
+ * explanation of what they include and where they are found.
+ * In picking names, generally, the rule is to be as explicit as possible
+ * instead of reusing names.
+ * For example, there is a `definitionDestination` and a `resourceDestination`,
+ * instead of one shared name.
+ */ // Note: when changing the next record, you must also change `TokenTypeMap`
+// in `micromark-util-types/index.d.ts`.
+__turbopack_context__.s([
+    "types",
+    ()=>types
+]);
+const types = {
+    // Generic type for data, such as in a title, a destination, etc.
+    data: 'data',
+    // Generic type for syntactic whitespace (tabs, virtual spaces, spaces).
+    // Such as, between a fenced code fence and an info string.
+    whitespace: 'whitespace',
+    // Generic type for line endings (line feed, carriage return, carriage return +
+    // line feed).
+    lineEnding: 'lineEnding',
+    // A line ending, but ending a blank line.
+    lineEndingBlank: 'lineEndingBlank',
+    // Generic type for whitespace (tabs, virtual spaces, spaces) at the start of a
+    // line.
+    linePrefix: 'linePrefix',
+    // Generic type for whitespace (tabs, virtual spaces, spaces) at the end of a
+    // line.
+    lineSuffix: 'lineSuffix',
+    // Whole ATX heading:
+    //
+    // ```markdown
+    // #
+    // ## Alpha
+    // ### Bravo ###
+    // ```
+    //
+    // Includes `atxHeadingSequence`, `whitespace`, `atxHeadingText`.
+    atxHeading: 'atxHeading',
+    // Sequence of number signs in an ATX heading (`###`).
+    atxHeadingSequence: 'atxHeadingSequence',
+    // Content in an ATX heading (`alpha`).
+    // Includes text.
+    atxHeadingText: 'atxHeadingText',
+    // Whole autolink (`<https://example.com>` or `<admin@example.com>`)
+    // Includes `autolinkMarker` and `autolinkProtocol` or `autolinkEmail`.
+    autolink: 'autolink',
+    // Email autolink w/o markers (`admin@example.com`)
+    autolinkEmail: 'autolinkEmail',
+    // Marker around an `autolinkProtocol` or `autolinkEmail` (`<` or `>`).
+    autolinkMarker: 'autolinkMarker',
+    // Protocol autolink w/o markers (`https://example.com`)
+    autolinkProtocol: 'autolinkProtocol',
+    // A whole character escape (`\-`).
+    // Includes `escapeMarker` and `characterEscapeValue`.
+    characterEscape: 'characterEscape',
+    // The escaped character (`-`).
+    characterEscapeValue: 'characterEscapeValue',
+    // A whole character reference (`&amp;`, `&#8800;`, or `&#x1D306;`).
+    // Includes `characterReferenceMarker`, an optional
+    // `characterReferenceMarkerNumeric`, in which case an optional
+    // `characterReferenceMarkerHexadecimal`, and a `characterReferenceValue`.
+    characterReference: 'characterReference',
+    // The start or end marker (`&` or `;`).
+    characterReferenceMarker: 'characterReferenceMarker',
+    // Mark reference as numeric (`#`).
+    characterReferenceMarkerNumeric: 'characterReferenceMarkerNumeric',
+    // Mark reference as numeric (`x` or `X`).
+    characterReferenceMarkerHexadecimal: 'characterReferenceMarkerHexadecimal',
+    // Value of character reference w/o markers (`amp`, `8800`, or `1D306`).
+    characterReferenceValue: 'characterReferenceValue',
+    // Whole fenced code:
+    //
+    // ````markdown
+    // ```js
+    // alert(1)
+    // ```
+    // ````
+    codeFenced: 'codeFenced',
+    // A fenced code fence, including whitespace, sequence, info, and meta
+    // (` ```js `).
+    codeFencedFence: 'codeFencedFence',
+    // Sequence of grave accent or tilde characters (` ``` `) in a fence.
+    codeFencedFenceSequence: 'codeFencedFenceSequence',
+    // Info word (`js`) in a fence.
+    // Includes string.
+    codeFencedFenceInfo: 'codeFencedFenceInfo',
+    // Meta words (`highlight="1"`) in a fence.
+    // Includes string.
+    codeFencedFenceMeta: 'codeFencedFenceMeta',
+    // A line of code.
+    codeFlowValue: 'codeFlowValue',
+    // Whole indented code:
+    //
+    // ```markdown
+    //     alert(1)
+    // ```
+    //
+    // Includes `lineEnding`, `linePrefix`, and `codeFlowValue`.
+    codeIndented: 'codeIndented',
+    // A text code (``` `alpha` ```).
+    // Includes `codeTextSequence`, `codeTextData`, `lineEnding`, and can include
+    // `codeTextPadding`.
+    codeText: 'codeText',
+    codeTextData: 'codeTextData',
+    // A space or line ending right after or before a tick.
+    codeTextPadding: 'codeTextPadding',
+    // A text code fence (` `` `).
+    codeTextSequence: 'codeTextSequence',
+    // Whole content:
+    //
+    // ```markdown
+    // [a]: b
+    // c
+    // =
+    // d
+    // ```
+    //
+    // Includes `paragraph` and `definition`.
+    content: 'content',
+    // Whole definition:
+    //
+    // ```markdown
+    // [micromark]: https://github.com/micromark/micromark
+    // ```
+    //
+    // Includes `definitionLabel`, `definitionMarker`, `whitespace`,
+    // `definitionDestination`, and optionally `lineEnding` and `definitionTitle`.
+    definition: 'definition',
+    // Destination of a definition (`https://github.com/micromark/micromark` or
+    // `<https://github.com/micromark/micromark>`).
+    // Includes `definitionDestinationLiteral` or `definitionDestinationRaw`.
+    definitionDestination: 'definitionDestination',
+    // Enclosed destination of a definition
+    // (`<https://github.com/micromark/micromark>`).
+    // Includes `definitionDestinationLiteralMarker` and optionally
+    // `definitionDestinationString`.
+    definitionDestinationLiteral: 'definitionDestinationLiteral',
+    // Markers of an enclosed definition destination (`<` or `>`).
+    definitionDestinationLiteralMarker: 'definitionDestinationLiteralMarker',
+    // Unenclosed destination of a definition
+    // (`https://github.com/micromark/micromark`).
+    // Includes `definitionDestinationString`.
+    definitionDestinationRaw: 'definitionDestinationRaw',
+    // Text in an destination (`https://github.com/micromark/micromark`).
+    // Includes string.
+    definitionDestinationString: 'definitionDestinationString',
+    // Label of a definition (`[micromark]`).
+    // Includes `definitionLabelMarker` and `definitionLabelString`.
+    definitionLabel: 'definitionLabel',
+    // Markers of a definition label (`[` or `]`).
+    definitionLabelMarker: 'definitionLabelMarker',
+    // Value of a definition label (`micromark`).
+    // Includes string.
+    definitionLabelString: 'definitionLabelString',
+    // Marker between a label and a destination (`:`).
+    definitionMarker: 'definitionMarker',
+    // Title of a definition (`"x"`, `'y'`, or `(z)`).
+    // Includes `definitionTitleMarker` and optionally `definitionTitleString`.
+    definitionTitle: 'definitionTitle',
+    // Marker around a title of a definition (`"`, `'`, `(`, or `)`).
+    definitionTitleMarker: 'definitionTitleMarker',
+    // Data without markers in a title (`z`).
+    // Includes string.
+    definitionTitleString: 'definitionTitleString',
+    // Emphasis (`*alpha*`).
+    // Includes `emphasisSequence` and `emphasisText`.
+    emphasis: 'emphasis',
+    // Sequence of emphasis markers (`*` or `_`).
+    emphasisSequence: 'emphasisSequence',
+    // Emphasis text (`alpha`).
+    // Includes text.
+    emphasisText: 'emphasisText',
+    // The character escape marker (`\`).
+    escapeMarker: 'escapeMarker',
+    // A hard break created with a backslash (`\\n`).
+    // Note: does not include the line ending.
+    hardBreakEscape: 'hardBreakEscape',
+    // A hard break created with trailing spaces (`  \n`).
+    // Does not include the line ending.
+    hardBreakTrailing: 'hardBreakTrailing',
+    // Flow HTML:
+    //
+    // ```markdown
+    // <div
+    // ```
+    //
+    // Inlcudes `lineEnding`, `htmlFlowData`.
+    htmlFlow: 'htmlFlow',
+    htmlFlowData: 'htmlFlowData',
+    // HTML in text (the tag in `a <i> b`).
+    // Includes `lineEnding`, `htmlTextData`.
+    htmlText: 'htmlText',
+    htmlTextData: 'htmlTextData',
+    // Whole image (`![alpha](bravo)`, `![alpha][bravo]`, `![alpha][]`, or
+    // `![alpha]`).
+    // Includes `label` and an optional `resource` or `reference`.
+    image: 'image',
+    // Whole link label (`[*alpha*]`).
+    // Includes `labelLink` or `labelImage`, `labelText`, and `labelEnd`.
+    label: 'label',
+    // Text in an label (`*alpha*`).
+    // Includes text.
+    labelText: 'labelText',
+    // Start a link label (`[`).
+    // Includes a `labelMarker`.
+    labelLink: 'labelLink',
+    // Start an image label (`![`).
+    // Includes `labelImageMarker` and `labelMarker`.
+    labelImage: 'labelImage',
+    // Marker of a label (`[` or `]`).
+    labelMarker: 'labelMarker',
+    // Marker to start an image (`!`).
+    labelImageMarker: 'labelImageMarker',
+    // End a label (`]`).
+    // Includes `labelMarker`.
+    labelEnd: 'labelEnd',
+    // Whole link (`[alpha](bravo)`, `[alpha][bravo]`, `[alpha][]`, or `[alpha]`).
+    // Includes `label` and an optional `resource` or `reference`.
+    link: 'link',
+    // Whole paragraph:
+    //
+    // ```markdown
+    // alpha
+    // bravo.
+    // ```
+    //
+    // Includes text.
+    paragraph: 'paragraph',
+    // A reference (`[alpha]` or `[]`).
+    // Includes `referenceMarker` and an optional `referenceString`.
+    reference: 'reference',
+    // A reference marker (`[` or `]`).
+    referenceMarker: 'referenceMarker',
+    // Reference text (`alpha`).
+    // Includes string.
+    referenceString: 'referenceString',
+    // A resource (`(https://example.com "alpha")`).
+    // Includes `resourceMarker`, an optional `resourceDestination` with an optional
+    // `whitespace` and `resourceTitle`.
+    resource: 'resource',
+    // A resource destination (`https://example.com`).
+    // Includes `resourceDestinationLiteral` or `resourceDestinationRaw`.
+    resourceDestination: 'resourceDestination',
+    // A literal resource destination (`<https://example.com>`).
+    // Includes `resourceDestinationLiteralMarker` and optionally
+    // `resourceDestinationString`.
+    resourceDestinationLiteral: 'resourceDestinationLiteral',
+    // A resource destination marker (`<` or `>`).
+    resourceDestinationLiteralMarker: 'resourceDestinationLiteralMarker',
+    // A raw resource destination (`https://example.com`).
+    // Includes `resourceDestinationString`.
+    resourceDestinationRaw: 'resourceDestinationRaw',
+    // Resource destination text (`https://example.com`).
+    // Includes string.
+    resourceDestinationString: 'resourceDestinationString',
+    // A resource marker (`(` or `)`).
+    resourceMarker: 'resourceMarker',
+    // A resource title (`"alpha"`, `'alpha'`, or `(alpha)`).
+    // Includes `resourceTitleMarker` and optionally `resourceTitleString`.
+    resourceTitle: 'resourceTitle',
+    // A resource title marker (`"`, `'`, `(`, or `)`).
+    resourceTitleMarker: 'resourceTitleMarker',
+    // Resource destination title (`alpha`).
+    // Includes string.
+    resourceTitleString: 'resourceTitleString',
+    // Whole setext heading:
+    //
+    // ```markdown
+    // alpha
+    // bravo
+    // =====
+    // ```
+    //
+    // Includes `setextHeadingText`, `lineEnding`, `linePrefix`, and
+    // `setextHeadingLine`.
+    setextHeading: 'setextHeading',
+    // Content in a setext heading (`alpha\nbravo`).
+    // Includes text.
+    setextHeadingText: 'setextHeadingText',
+    // Underline in a setext heading, including whitespace suffix (`==`).
+    // Includes `setextHeadingLineSequence`.
+    setextHeadingLine: 'setextHeadingLine',
+    // Sequence of equals or dash characters in underline in a setext heading (`-`).
+    setextHeadingLineSequence: 'setextHeadingLineSequence',
+    // Strong (`**alpha**`).
+    // Includes `strongSequence` and `strongText`.
+    strong: 'strong',
+    // Sequence of strong markers (`**` or `__`).
+    strongSequence: 'strongSequence',
+    // Strong text (`alpha`).
+    // Includes text.
+    strongText: 'strongText',
+    // Whole thematic break:
+    //
+    // ```markdown
+    // * * *
+    // ```
+    //
+    // Includes `thematicBreakSequence` and `whitespace`.
+    thematicBreak: 'thematicBreak',
+    // A sequence of one or more thematic break markers (`***`).
+    thematicBreakSequence: 'thematicBreakSequence',
+    // Whole block quote:
+    //
+    // ```markdown
+    // > a
+    // >
+    // > b
+    // ```
+    //
+    // Includes `blockQuotePrefix` and flow.
+    blockQuote: 'blockQuote',
+    // The `>` or `> ` of a block quote.
+    blockQuotePrefix: 'blockQuotePrefix',
+    // The `>` of a block quote prefix.
+    blockQuoteMarker: 'blockQuoteMarker',
+    // The optional ` ` of a block quote prefix.
+    blockQuotePrefixWhitespace: 'blockQuotePrefixWhitespace',
+    // Whole ordered list:
+    //
+    // ```markdown
+    // 1. a
+    //    b
+    // ```
+    //
+    // Includes `listItemPrefix`, flow, and optionally  `listItemIndent` on further
+    // lines.
+    listOrdered: 'listOrdered',
+    // Whole unordered list:
+    //
+    // ```markdown
+    // - a
+    //   b
+    // ```
+    //
+    // Includes `listItemPrefix`, flow, and optionally  `listItemIndent` on further
+    // lines.
+    listUnordered: 'listUnordered',
+    // The indent of further list item lines.
+    listItemIndent: 'listItemIndent',
+    // A marker, as in, `*`, `+`, `-`, `.`, or `)`.
+    listItemMarker: 'listItemMarker',
+    // The thing that starts a list item, such as `1. `.
+    // Includes `listItemValue` if ordered, `listItemMarker`, and
+    // `listItemPrefixWhitespace` (unless followed by a line ending).
+    listItemPrefix: 'listItemPrefix',
+    // The whitespace after a marker.
+    listItemPrefixWhitespace: 'listItemPrefixWhitespace',
+    // The numerical value of an ordered item.
+    listItemValue: 'listItemValue',
+    // Internal types used for subtokenizers, compiled away
+    chunkDocument: 'chunkDocument',
+    chunkContent: 'chunkContent',
+    chunkFlow: 'chunkFlow',
+    chunkText: 'chunkText',
+    chunkString: 'chunkString'
+};
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/values.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * This module is compiled away!
+ *
+ * While micromark works based on character codes, this module includes the
+ * string versions of ’em.
+ * The C0 block, except for LF, CR, HT, and w/ the replacement character added,
+ * are available here.
+ */ __turbopack_context__.s([
+    "values",
+    ()=>values
+]);
+const values = {
+    ht: '\t',
+    lf: '\n',
+    cr: '\r',
+    space: ' ',
+    exclamationMark: '!',
+    quotationMark: '"',
+    numberSign: '#',
+    dollarSign: '$',
+    percentSign: '%',
+    ampersand: '&',
+    apostrophe: "'",
+    leftParenthesis: '(',
+    rightParenthesis: ')',
+    asterisk: '*',
+    plusSign: '+',
+    comma: ',',
+    dash: '-',
+    dot: '.',
+    slash: '/',
+    digit0: '0',
+    digit1: '1',
+    digit2: '2',
+    digit3: '3',
+    digit4: '4',
+    digit5: '5',
+    digit6: '6',
+    digit7: '7',
+    digit8: '8',
+    digit9: '9',
+    colon: ':',
+    semicolon: ';',
+    lessThan: '<',
+    equalsTo: '=',
+    greaterThan: '>',
+    questionMark: '?',
+    atSign: '@',
+    uppercaseA: 'A',
+    uppercaseB: 'B',
+    uppercaseC: 'C',
+    uppercaseD: 'D',
+    uppercaseE: 'E',
+    uppercaseF: 'F',
+    uppercaseG: 'G',
+    uppercaseH: 'H',
+    uppercaseI: 'I',
+    uppercaseJ: 'J',
+    uppercaseK: 'K',
+    uppercaseL: 'L',
+    uppercaseM: 'M',
+    uppercaseN: 'N',
+    uppercaseO: 'O',
+    uppercaseP: 'P',
+    uppercaseQ: 'Q',
+    uppercaseR: 'R',
+    uppercaseS: 'S',
+    uppercaseT: 'T',
+    uppercaseU: 'U',
+    uppercaseV: 'V',
+    uppercaseW: 'W',
+    uppercaseX: 'X',
+    uppercaseY: 'Y',
+    uppercaseZ: 'Z',
+    leftSquareBracket: '[',
+    backslash: '\\',
+    rightSquareBracket: ']',
+    caret: '^',
+    underscore: '_',
+    graveAccent: '`',
+    lowercaseA: 'a',
+    lowercaseB: 'b',
+    lowercaseC: 'c',
+    lowercaseD: 'd',
+    lowercaseE: 'e',
+    lowercaseF: 'f',
+    lowercaseG: 'g',
+    lowercaseH: 'h',
+    lowercaseI: 'i',
+    lowercaseJ: 'j',
+    lowercaseK: 'k',
+    lowercaseL: 'l',
+    lowercaseM: 'm',
+    lowercaseN: 'n',
+    lowercaseO: 'o',
+    lowercaseP: 'p',
+    lowercaseQ: 'q',
+    lowercaseR: 'r',
+    lowercaseS: 's',
+    lowercaseT: 't',
+    lowercaseU: 'u',
+    lowercaseV: 'v',
+    lowercaseW: 'w',
+    lowercaseX: 'x',
+    lowercaseY: 'y',
+    lowercaseZ: 'z',
+    leftCurlyBrace: '{',
+    verticalBar: '|',
+    rightCurlyBrace: '}',
+    tilde: '~',
+    replacementCharacter: '�'
+};
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-chunked@2.0.1/node_modules/micromark-util-chunked/dev/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "push",
+    ()=>push,
+    "splice",
+    ()=>splice
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/constants.js [app-ssr] (ecmascript)");
+;
+function splice(list, start, remove, items) {
+    const end = list.length;
+    let chunkStart = 0;
+    /** @type {Array<unknown>} */ let parameters;
+    // Make start between zero and `end` (included).
+    if (start < 0) {
+        start = -start > end ? 0 : end + start;
+    } else {
+        start = start > end ? end : start;
+    }
+    remove = remove > 0 ? remove : 0;
+    // No need to chunk the items if there’s only a couple (10k) items.
+    if (items.length < __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["constants"].v8MaxSafeChunkSize) {
+        parameters = Array.from(items);
+        parameters.unshift(start, remove);
+        // @ts-expect-error Hush, it’s fine.
+        list.splice(...parameters);
+    } else {
+        // Delete `remove` items starting from `start`
+        if (remove) list.splice(start, remove);
+        // Insert the items in chunks to not cause stack overflows.
+        while(chunkStart < items.length){
+            parameters = items.slice(chunkStart, chunkStart + __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["constants"].v8MaxSafeChunkSize);
+            parameters.unshift(start, 0);
+            // @ts-expect-error Hush, it’s fine.
+            list.splice(...parameters);
+            chunkStart += __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["constants"].v8MaxSafeChunkSize;
+            start += __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["constants"].v8MaxSafeChunkSize;
+        }
+    }
+}
+function push(list, items) {
+    if (list.length > 0) {
+        splice(list, list.length, 0, items);
+        return list;
+    }
+    return items;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-combine-extensions@2.0.1/node_modules/micromark-util-combine-extensions/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "combineExtensions",
+    ()=>combineExtensions,
+    "combineHtmlExtensions",
+    ()=>combineHtmlExtensions
+]);
+/**
+ * @import {
+ *   Extension,
+ *   Handles,
+ *   HtmlExtension,
+ *   NormalizedExtension
+ * } from 'micromark-util-types'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$chunked$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$chunked$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-chunked@2.0.1/node_modules/micromark-util-chunked/dev/index.js [app-ssr] (ecmascript)");
+;
+const hasOwnProperty = {}.hasOwnProperty;
+function combineExtensions(extensions) {
+    /** @type {NormalizedExtension} */ const all = {};
+    let index = -1;
+    while(++index < extensions.length){
+        syntaxExtension(all, extensions[index]);
+    }
+    return all;
+}
+/**
+ * Merge `extension` into `all`.
+ *
+ * @param {NormalizedExtension} all
+ *   Extension to merge into.
+ * @param {Extension} extension
+ *   Extension to merge.
+ * @returns {undefined}
+ *   Nothing.
+ */ function syntaxExtension(all, extension) {
+    /** @type {keyof Extension} */ let hook;
+    for(hook in extension){
+        const maybe = hasOwnProperty.call(all, hook) ? all[hook] : undefined;
+        /** @type {Record<string, unknown>} */ const left = maybe || (all[hook] = {});
+        /** @type {Record<string, unknown> | undefined} */ const right = extension[hook];
+        /** @type {string} */ let code;
+        if (right) {
+            for(code in right){
+                if (!hasOwnProperty.call(left, code)) left[code] = [];
+                const value = right[code];
+                constructs(// @ts-expect-error Looks like a list.
+                left[code], Array.isArray(value) ? value : value ? [
+                    value
+                ] : []);
+            }
+        }
+    }
+}
+/**
+ * Merge `list` into `existing` (both lists of constructs).
+ * Mutates `existing`.
+ *
+ * @param {Array<unknown>} existing
+ *   List of constructs to merge into.
+ * @param {Array<unknown>} list
+ *   List of constructs to merge.
+ * @returns {undefined}
+ *   Nothing.
+ */ function constructs(existing, list) {
+    let index = -1;
+    /** @type {Array<unknown>} */ const before = [];
+    while(++index < list.length){
+        // @ts-expect-error Looks like an object.
+        ;
+        (list[index].add === 'after' ? existing : before).push(list[index]);
+    }
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$chunked$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$chunked$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["splice"])(existing, 0, 0, before);
+}
+function combineHtmlExtensions(htmlExtensions) {
+    /** @type {HtmlExtension} */ const handlers = {};
+    let index = -1;
+    while(++index < htmlExtensions.length){
+        htmlExtension(handlers, htmlExtensions[index]);
+    }
+    return handlers;
+}
+/**
+ * Merge `extension` into `all`.
+ *
+ * @param {HtmlExtension} all
+ *   Extension to merge into.
+ * @param {HtmlExtension} extension
+ *   Extension to merge.
+ * @returns {undefined}
+ *   Nothing.
+ */ function htmlExtension(all, extension) {
+    /** @type {keyof HtmlExtension} */ let hook;
+    for(hook in extension){
+        const maybe = hasOwnProperty.call(all, hook) ? all[hook] : undefined;
+        const left = maybe || (all[hook] = {});
+        const right = extension[hook];
+        /** @type {keyof Handles} */ let type;
+        if (right) {
+            for(type in right){
+                // @ts-expect-error assume document vs regular handler are managed correctly.
+                left[type] = right[type];
+            }
+        }
+    }
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-character@2.1.1/node_modules/micromark-util-character/dev/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "asciiAlpha",
+    ()=>asciiAlpha,
+    "asciiAlphanumeric",
+    ()=>asciiAlphanumeric,
+    "asciiAtext",
+    ()=>asciiAtext,
+    "asciiControl",
+    ()=>asciiControl,
+    "asciiDigit",
+    ()=>asciiDigit,
+    "asciiHexDigit",
+    ()=>asciiHexDigit,
+    "asciiPunctuation",
+    ()=>asciiPunctuation,
+    "markdownLineEnding",
+    ()=>markdownLineEnding,
+    "markdownLineEndingOrSpace",
+    ()=>markdownLineEndingOrSpace,
+    "markdownSpace",
+    ()=>markdownSpace,
+    "unicodePunctuation",
+    ()=>unicodePunctuation,
+    "unicodeWhitespace",
+    ()=>unicodeWhitespace
+]);
+/**
+ * @import {Code} from 'micromark-util-types'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/codes.js [app-ssr] (ecmascript)");
+;
+const asciiAlpha = regexCheck(/[A-Za-z]/);
+const asciiAlphanumeric = regexCheck(/[\dA-Za-z]/);
+const asciiAtext = regexCheck(/[#-'*+\--9=?A-Z^-~]/);
+function asciiControl(code) {
+    return(// Special whitespace codes (which have negative values), C0 and Control
+    // character DEL
+    code !== null && (code < __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].space || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].del));
+}
+const asciiDigit = regexCheck(/\d/);
+const asciiHexDigit = regexCheck(/[\dA-Fa-f]/);
+const asciiPunctuation = regexCheck(/[!-/:-@[-`{-~]/);
+function markdownLineEnding(code) {
+    return code !== null && code < __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].horizontalTab;
+}
+function markdownLineEndingOrSpace(code) {
+    return code !== null && (code < __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].nul || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].space);
+}
+function markdownSpace(code) {
+    return code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].horizontalTab || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].virtualSpace || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].space;
+}
+const unicodePunctuation = regexCheck(/\p{P}|\p{S}/u);
+const unicodeWhitespace = regexCheck(/\s/);
+/**
+ * Create a code check from a regex.
+ *
+ * @param {RegExp} regex
+ *   Expression.
+ * @returns {(code: Code) => boolean}
+ *   Check.
+ */ function regexCheck(regex) {
+    return check;
+    //TURBOPACK unreachable
+    ;
+    /**
+   * Check whether a code matches the bound regex.
+   *
+   * @param {Code} code
+   *   Character code.
+   * @returns {boolean}
+   *   Whether the character code matches the bound regex.
+   */ function check(code) {
+        return code !== null && code > -1 && regex.test(String.fromCharCode(code));
+    }
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-factory-space@2.0.1/node_modules/micromark-factory-space/dev/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "factorySpace",
+    ()=>factorySpace
+]);
+/**
+ * @import {Effects, State, TokenType} from 'micromark-util-types'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$character$40$2$2e$1$2e$1$2f$node_modules$2f$micromark$2d$util$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-character@2.1.1/node_modules/micromark-util-character/dev/index.js [app-ssr] (ecmascript)");
+;
+function factorySpace(effects, ok, type, max) {
+    const limit = max ? max - 1 : Number.POSITIVE_INFINITY;
+    let size = 0;
+    return start;
+    //TURBOPACK unreachable
+    ;
+    /** @type {State} */ function start(code) {
+        if ((0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$character$40$2$2e$1$2e$1$2f$node_modules$2f$micromark$2d$util$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["markdownSpace"])(code)) {
+            effects.enter(type);
+            return prefix(code);
+        }
+        return ok(code);
+    }
+    /** @type {State} */ function prefix(code) {
+        if ((0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$character$40$2$2e$1$2e$1$2f$node_modules$2f$micromark$2d$util$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["markdownSpace"])(code) && size++ < limit) {
+            effects.consume(code);
+            return prefix;
+        }
+        effects.exit(type);
+        return ok(code);
+    }
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-subtokenize@2.1.0/node_modules/micromark-util-subtokenize/dev/lib/splice-buffer.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "SpliceBuffer",
+    ()=>SpliceBuffer
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/constants.js [app-ssr] (ecmascript)");
+;
+class SpliceBuffer {
+    /**
+   * @param {ReadonlyArray<T> | null | undefined} [initial]
+   *   Initial items (optional).
+   * @returns
+   *   Splice buffer.
+   */ constructor(initial){
+        /** @type {Array<T>} */ this.left = initial ? [
+            ...initial
+        ] : [];
+        /** @type {Array<T>} */ this.right = [];
+    }
+    /**
+   * Array access;
+   * does not move the cursor.
+   *
+   * @param {number} index
+   *   Index.
+   * @return {T}
+   *   Item.
+   */ get(index) {
+        if (index < 0 || index >= this.left.length + this.right.length) {
+            throw new RangeError('Cannot access index `' + index + '` in a splice buffer of size `' + (this.left.length + this.right.length) + '`');
+        }
+        if (index < this.left.length) return this.left[index];
+        return this.right[this.right.length - index + this.left.length - 1];
+    }
+    /**
+   * The length of the splice buffer, one greater than the largest index in the
+   * array.
+   */ get length() {
+        return this.left.length + this.right.length;
+    }
+    /**
+   * Remove and return `list[0]`;
+   * moves the cursor to `0`.
+   *
+   * @returns {T | undefined}
+   *   Item, optional.
+   */ shift() {
+        this.setCursor(0);
+        return this.right.pop();
+    }
+    /**
+   * Slice the buffer to get an array;
+   * does not move the cursor.
+   *
+   * @param {number} start
+   *   Start.
+   * @param {number | null | undefined} [end]
+   *   End (optional).
+   * @returns {Array<T>}
+   *   Array of items.
+   */ slice(start, end) {
+        /** @type {number} */ const stop = end === null || end === undefined ? Number.POSITIVE_INFINITY : end;
+        if (stop < this.left.length) {
+            return this.left.slice(start, stop);
+        }
+        if (start > this.left.length) {
+            return this.right.slice(this.right.length - stop + this.left.length, this.right.length - start + this.left.length).reverse();
+        }
+        return this.left.slice(start).concat(this.right.slice(this.right.length - stop + this.left.length).reverse());
+    }
+    /**
+   * Mimics the behavior of Array.prototype.splice() except for the change of
+   * interface necessary to avoid segfaults when patching in very large arrays.
+   *
+   * This operation moves cursor is moved to `start` and results in the cursor
+   * placed after any inserted items.
+   *
+   * @param {number} start
+   *   Start;
+   *   zero-based index at which to start changing the array;
+   *   negative numbers count backwards from the end of the array and values
+   *   that are out-of bounds are clamped to the appropriate end of the array.
+   * @param {number | null | undefined} [deleteCount=0]
+   *   Delete count (default: `0`);
+   *   maximum number of elements to delete, starting from start.
+   * @param {Array<T> | null | undefined} [items=[]]
+   *   Items to include in place of the deleted items (default: `[]`).
+   * @return {Array<T>}
+   *   Any removed items.
+   */ splice(start, deleteCount, items) {
+        /** @type {number} */ const count = deleteCount || 0;
+        this.setCursor(Math.trunc(start));
+        const removed = this.right.splice(this.right.length - count, Number.POSITIVE_INFINITY);
+        if (items) chunkedPush(this.left, items);
+        return removed.reverse();
+    }
+    /**
+   * Remove and return the highest-numbered item in the array, so
+   * `list[list.length - 1]`;
+   * Moves the cursor to `length`.
+   *
+   * @returns {T | undefined}
+   *   Item, optional.
+   */ pop() {
+        this.setCursor(Number.POSITIVE_INFINITY);
+        return this.left.pop();
+    }
+    /**
+   * Inserts a single item to the high-numbered side of the array;
+   * moves the cursor to `length`.
+   *
+   * @param {T} item
+   *   Item.
+   * @returns {undefined}
+   *   Nothing.
+   */ push(item) {
+        this.setCursor(Number.POSITIVE_INFINITY);
+        this.left.push(item);
+    }
+    /**
+   * Inserts many items to the high-numbered side of the array.
+   * Moves the cursor to `length`.
+   *
+   * @param {Array<T>} items
+   *   Items.
+   * @returns {undefined}
+   *   Nothing.
+   */ pushMany(items) {
+        this.setCursor(Number.POSITIVE_INFINITY);
+        chunkedPush(this.left, items);
+    }
+    /**
+   * Inserts a single item to the low-numbered side of the array;
+   * Moves the cursor to `0`.
+   *
+   * @param {T} item
+   *   Item.
+   * @returns {undefined}
+   *   Nothing.
+   */ unshift(item) {
+        this.setCursor(0);
+        this.right.push(item);
+    }
+    /**
+   * Inserts many items to the low-numbered side of the array;
+   * moves the cursor to `0`.
+   *
+   * @param {Array<T>} items
+   *   Items.
+   * @returns {undefined}
+   *   Nothing.
+   */ unshiftMany(items) {
+        this.setCursor(0);
+        chunkedPush(this.right, items.reverse());
+    }
+    /**
+   * Move the cursor to a specific position in the array. Requires
+   * time proportional to the distance moved.
+   *
+   * If `n < 0`, the cursor will end up at the beginning.
+   * If `n > length`, the cursor will end up at the end.
+   *
+   * @param {number} n
+   *   Position.
+   * @return {undefined}
+   *   Nothing.
+   */ setCursor(n) {
+        if (n === this.left.length || n > this.left.length && this.right.length === 0 || n < 0 && this.left.length === 0) return;
+        if (n < this.left.length) {
+            // Move cursor to the this.left
+            const removed = this.left.splice(n, Number.POSITIVE_INFINITY);
+            chunkedPush(this.right, removed.reverse());
+        } else {
+            // Move cursor to the this.right
+            const removed = this.right.splice(this.left.length + this.right.length - n, Number.POSITIVE_INFINITY);
+            chunkedPush(this.left, removed.reverse());
+        }
+    }
+}
+/**
+ * Avoid stack overflow by pushing items onto the stack in segments
+ *
+ * @template T
+ *   Item type.
+ * @param {Array<T>} list
+ *   List to inject into.
+ * @param {ReadonlyArray<T>} right
+ *   Items to inject.
+ * @return {undefined}
+ *   Nothing.
+ */ function chunkedPush(list, right) {
+    /** @type {number} */ let chunkStart = 0;
+    if (right.length < __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["constants"].v8MaxSafeChunkSize) {
+        list.push(...right);
+    } else {
+        while(chunkStart < right.length){
+            list.push(...right.slice(chunkStart, chunkStart + __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["constants"].v8MaxSafeChunkSize));
+            chunkStart += __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["constants"].v8MaxSafeChunkSize;
+        }
+    }
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-subtokenize@2.1.0/node_modules/micromark-util-subtokenize/dev/index.js [app-ssr] (ecmascript) <locals>", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "subtokenize",
+    ()=>subtokenize
+]);
+/**
+ * @import {Chunk, Event, Token} from 'micromark-util-types'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/devlop@1.1.0/node_modules/devlop/lib/development.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$chunked$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$chunked$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-chunked@2.0.1/node_modules/micromark-util-chunked/dev/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/codes.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/types.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$subtokenize$40$2$2e$1$2e$0$2f$node_modules$2f$micromark$2d$util$2d$subtokenize$2f$dev$2f$lib$2f$splice$2d$buffer$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-subtokenize@2.1.0/node_modules/micromark-util-subtokenize/dev/lib/splice-buffer.js [app-ssr] (ecmascript)");
+;
+;
+;
+;
+;
+function subtokenize(eventsArray) {
+    /** @type {Record<string, number>} */ const jumps = {};
+    let index = -1;
+    /** @type {Event} */ let event;
+    /** @type {number | undefined} */ let lineIndex;
+    /** @type {number} */ let otherIndex;
+    /** @type {Event} */ let otherEvent;
+    /** @type {Array<Event>} */ let parameters;
+    /** @type {Array<Event>} */ let subevents;
+    /** @type {boolean | undefined} */ let more;
+    const events = new __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$subtokenize$40$2$2e$1$2e$0$2f$node_modules$2f$micromark$2d$util$2d$subtokenize$2f$dev$2f$lib$2f$splice$2d$buffer$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SpliceBuffer"](eventsArray);
+    while(++index < events.length){
+        while(index in jumps){
+            index = jumps[index];
+        }
+        event = events.get(index);
+        // Add a hook for the GFM tasklist extension, which needs to know if text
+        // is in the first content of a list item.
+        if (index && event[1].type === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].chunkFlow && events.get(index - 1)[1].type === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].listItemPrefix) {
+            (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(event[1]._tokenizer, 'expected `_tokenizer` on subtokens');
+            subevents = event[1]._tokenizer.events;
+            otherIndex = 0;
+            if (otherIndex < subevents.length && subevents[otherIndex][1].type === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].lineEndingBlank) {
+                otherIndex += 2;
+            }
+            if (otherIndex < subevents.length && subevents[otherIndex][1].type === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].content) {
+                while(++otherIndex < subevents.length){
+                    if (subevents[otherIndex][1].type === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].content) {
+                        break;
+                    }
+                    if (subevents[otherIndex][1].type === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].chunkText) {
+                        subevents[otherIndex][1]._isInFirstContentOfListItem = true;
+                        otherIndex++;
+                    }
+                }
+            }
+        }
+        // Enter.
+        if (event[0] === 'enter') {
+            if (event[1].contentType) {
+                Object.assign(jumps, subcontent(events, index));
+                index = jumps[index];
+                more = true;
+            }
+        } else if (event[1]._container) {
+            otherIndex = index;
+            lineIndex = undefined;
+            while(otherIndex--){
+                otherEvent = events.get(otherIndex);
+                if (otherEvent[1].type === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].lineEnding || otherEvent[1].type === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].lineEndingBlank) {
+                    if (otherEvent[0] === 'enter') {
+                        if (lineIndex) {
+                            events.get(lineIndex)[1].type = __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].lineEndingBlank;
+                        }
+                        otherEvent[1].type = __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].lineEnding;
+                        lineIndex = otherIndex;
+                    }
+                } else if (otherEvent[1].type === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].linePrefix || otherEvent[1].type === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].listItemIndent) {
+                // Move past.
+                } else {
+                    break;
+                }
+            }
+            if (lineIndex) {
+                // Fix position.
+                event[1].end = {
+                    ...events.get(lineIndex)[1].start
+                };
+                // Switch container exit w/ line endings.
+                parameters = events.slice(lineIndex, index);
+                parameters.unshift(event);
+                events.splice(lineIndex, index - lineIndex + 1, parameters);
+            }
+        }
+    }
+    // The changes to the `events` buffer must be copied back into the eventsArray
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$chunked$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$chunked$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["splice"])(eventsArray, 0, Number.POSITIVE_INFINITY, events.slice(0));
+    return !more;
+}
+/**
+ * Tokenize embedded tokens.
+ *
+ * @param {SpliceBuffer<Event>} events
+ *   Events.
+ * @param {number} eventIndex
+ *   Index.
+ * @returns {Record<string, number>}
+ *   Gaps.
+ */ function subcontent(events, eventIndex) {
+    const token = events.get(eventIndex)[1];
+    const context = events.get(eventIndex)[2];
+    let startPosition = eventIndex - 1;
+    /** @type {Array<number>} */ const startPositions = [];
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(token.contentType, 'expected `contentType` on subtokens');
+    let tokenizer = token._tokenizer;
+    if (!tokenizer) {
+        tokenizer = context.parser[token.contentType](token.start);
+        if (token._contentTypeTextTrailing) {
+            tokenizer._contentTypeTextTrailing = true;
+        }
+    }
+    const childEvents = tokenizer.events;
+    /** @type {Array<[number, number]>} */ const jumps = [];
+    /** @type {Record<string, number>} */ const gaps = {};
+    /** @type {Array<Chunk>} */ let stream;
+    /** @type {Token | undefined} */ let previous;
+    let index = -1;
+    /** @type {Token | undefined} */ let current = token;
+    let adjust = 0;
+    let start = 0;
+    const breaks = [
+        start
+    ];
+    // Loop forward through the linked tokens to pass them in order to the
+    // subtokenizer.
+    while(current){
+        // Find the position of the event for this token.
+        while(events.get(++startPosition)[1] !== current){
+        // Empty.
+        }
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(!previous || current.previous === previous, 'expected previous to match');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(!previous || previous.next === current, 'expected next to match');
+        startPositions.push(startPosition);
+        if (!current._tokenizer) {
+            stream = context.sliceStream(current);
+            if (!current.next) {
+                stream.push(__TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].eof);
+            }
+            if (previous) {
+                tokenizer.defineSkip(current.start);
+            }
+            if (current._isInFirstContentOfListItem) {
+                tokenizer._gfmTasklistFirstContentOfListItem = true;
+            }
+            tokenizer.write(stream);
+            if (current._isInFirstContentOfListItem) {
+                tokenizer._gfmTasklistFirstContentOfListItem = undefined;
+            }
+        }
+        // Unravel the next token.
+        previous = current;
+        current = current.next;
+    }
+    // Now, loop back through all events (and linked tokens), to figure out which
+    // parts belong where.
+    current = token;
+    while(++index < childEvents.length){
+        if (// Find a void token that includes a break.
+        childEvents[index][0] === 'exit' && childEvents[index - 1][0] === 'enter' && childEvents[index][1].type === childEvents[index - 1][1].type && childEvents[index][1].start.line !== childEvents[index][1].end.line) {
+            (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(current, 'expected a current token');
+            start = index + 1;
+            breaks.push(start);
+            // Help GC.
+            current._tokenizer = undefined;
+            current.previous = undefined;
+            current = current.next;
+        }
+    }
+    // Help GC.
+    tokenizer.events = [];
+    // If there’s one more token (which is the cases for lines that end in an
+    // EOF), that’s perfect: the last point we found starts it.
+    // If there isn’t then make sure any remaining content is added to it.
+    if (current) {
+        // Help GC.
+        current._tokenizer = undefined;
+        current.previous = undefined;
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(!current.next, 'expected no next token');
+    } else {
+        breaks.pop();
+    }
+    // Now splice the events from the subtokenizer into the current events,
+    // moving back to front so that splice indices aren’t affected.
+    index = breaks.length;
+    while(index--){
+        const slice = childEvents.slice(breaks[index], breaks[index + 1]);
+        const start = startPositions.pop();
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(start !== undefined, 'expected a start position when splicing');
+        jumps.push([
+            start,
+            start + slice.length - 1
+        ]);
+        events.splice(start, 2, slice);
+    }
+    jumps.reverse();
+    index = -1;
+    while(++index < jumps.length){
+        gaps[adjust + jumps[index][0]] = adjust + jumps[index][1];
+        adjust += jumps[index][1] - jumps[index][0] - 1;
+    }
+    return gaps;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-classify-character@2.0.1/node_modules/micromark-util-classify-character/dev/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "classifyCharacter",
+    ()=>classifyCharacter
+]);
+/**
+ * @import {Code} from 'micromark-util-types'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$character$40$2$2e$1$2e$1$2f$node_modules$2f$micromark$2d$util$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-character@2.1.1/node_modules/micromark-util-character/dev/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/codes.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/constants.js [app-ssr] (ecmascript)");
+;
+;
+function classifyCharacter(code) {
+    if (code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].eof || (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$character$40$2$2e$1$2e$1$2f$node_modules$2f$micromark$2d$util$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["markdownLineEndingOrSpace"])(code) || (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$character$40$2$2e$1$2e$1$2f$node_modules$2f$micromark$2d$util$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["unicodeWhitespace"])(code)) {
+        return __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["constants"].characterGroupWhitespace;
+    }
+    if ((0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$character$40$2$2e$1$2e$1$2f$node_modules$2f$micromark$2d$util$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["unicodePunctuation"])(code)) {
+        return __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["constants"].characterGroupPunctuation;
+    }
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-resolve-all@2.0.1/node_modules/micromark-util-resolve-all/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * @import {Event, Resolver, TokenizeContext} from 'micromark-util-types'
+ */ /**
+ * Call all `resolveAll`s.
+ *
+ * @param {ReadonlyArray<{resolveAll?: Resolver | undefined}>} constructs
+ *   List of constructs, optionally with `resolveAll`s.
+ * @param {Array<Event>} events
+ *   List of events.
+ * @param {TokenizeContext} context
+ *   Context used by `tokenize`.
+ * @returns {Array<Event>}
+ *   Changed events.
+ */ __turbopack_context__.s([
+    "resolveAll",
+    ()=>resolveAll
+]);
+function resolveAll(constructs, events, context) {
+    /** @type {Array<Resolver>} */ const called = [];
+    let index = -1;
+    while(++index < constructs.length){
+        const resolve = constructs[index].resolveAll;
+        if (resolve && !called.includes(resolve)) {
+            events = resolve(events, context);
+            called.push(resolve);
+        }
+    }
+    return events;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/character-entities@2.0.2/node_modules/character-entities/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * Map of named character references.
+ *
+ * @type {Record<string, string>}
+ */ __turbopack_context__.s([
+    "characterEntities",
+    ()=>characterEntities
+]);
+const characterEntities = {
+    AElig: 'Æ',
+    AMP: '&',
+    Aacute: 'Á',
+    Abreve: 'Ă',
+    Acirc: 'Â',
+    Acy: 'А',
+    Afr: '𝔄',
+    Agrave: 'À',
+    Alpha: 'Α',
+    Amacr: 'Ā',
+    And: '⩓',
+    Aogon: 'Ą',
+    Aopf: '𝔸',
+    ApplyFunction: '⁡',
+    Aring: 'Å',
+    Ascr: '𝒜',
+    Assign: '≔',
+    Atilde: 'Ã',
+    Auml: 'Ä',
+    Backslash: '∖',
+    Barv: '⫧',
+    Barwed: '⌆',
+    Bcy: 'Б',
+    Because: '∵',
+    Bernoullis: 'ℬ',
+    Beta: 'Β',
+    Bfr: '𝔅',
+    Bopf: '𝔹',
+    Breve: '˘',
+    Bscr: 'ℬ',
+    Bumpeq: '≎',
+    CHcy: 'Ч',
+    COPY: '©',
+    Cacute: 'Ć',
+    Cap: '⋒',
+    CapitalDifferentialD: 'ⅅ',
+    Cayleys: 'ℭ',
+    Ccaron: 'Č',
+    Ccedil: 'Ç',
+    Ccirc: 'Ĉ',
+    Cconint: '∰',
+    Cdot: 'Ċ',
+    Cedilla: '¸',
+    CenterDot: '·',
+    Cfr: 'ℭ',
+    Chi: 'Χ',
+    CircleDot: '⊙',
+    CircleMinus: '⊖',
+    CirclePlus: '⊕',
+    CircleTimes: '⊗',
+    ClockwiseContourIntegral: '∲',
+    CloseCurlyDoubleQuote: '”',
+    CloseCurlyQuote: '’',
+    Colon: '∷',
+    Colone: '⩴',
+    Congruent: '≡',
+    Conint: '∯',
+    ContourIntegral: '∮',
+    Copf: 'ℂ',
+    Coproduct: '∐',
+    CounterClockwiseContourIntegral: '∳',
+    Cross: '⨯',
+    Cscr: '𝒞',
+    Cup: '⋓',
+    CupCap: '≍',
+    DD: 'ⅅ',
+    DDotrahd: '⤑',
+    DJcy: 'Ђ',
+    DScy: 'Ѕ',
+    DZcy: 'Џ',
+    Dagger: '‡',
+    Darr: '↡',
+    Dashv: '⫤',
+    Dcaron: 'Ď',
+    Dcy: 'Д',
+    Del: '∇',
+    Delta: 'Δ',
+    Dfr: '𝔇',
+    DiacriticalAcute: '´',
+    DiacriticalDot: '˙',
+    DiacriticalDoubleAcute: '˝',
+    DiacriticalGrave: '`',
+    DiacriticalTilde: '˜',
+    Diamond: '⋄',
+    DifferentialD: 'ⅆ',
+    Dopf: '𝔻',
+    Dot: '¨',
+    DotDot: '⃜',
+    DotEqual: '≐',
+    DoubleContourIntegral: '∯',
+    DoubleDot: '¨',
+    DoubleDownArrow: '⇓',
+    DoubleLeftArrow: '⇐',
+    DoubleLeftRightArrow: '⇔',
+    DoubleLeftTee: '⫤',
+    DoubleLongLeftArrow: '⟸',
+    DoubleLongLeftRightArrow: '⟺',
+    DoubleLongRightArrow: '⟹',
+    DoubleRightArrow: '⇒',
+    DoubleRightTee: '⊨',
+    DoubleUpArrow: '⇑',
+    DoubleUpDownArrow: '⇕',
+    DoubleVerticalBar: '∥',
+    DownArrow: '↓',
+    DownArrowBar: '⤓',
+    DownArrowUpArrow: '⇵',
+    DownBreve: '̑',
+    DownLeftRightVector: '⥐',
+    DownLeftTeeVector: '⥞',
+    DownLeftVector: '↽',
+    DownLeftVectorBar: '⥖',
+    DownRightTeeVector: '⥟',
+    DownRightVector: '⇁',
+    DownRightVectorBar: '⥗',
+    DownTee: '⊤',
+    DownTeeArrow: '↧',
+    Downarrow: '⇓',
+    Dscr: '𝒟',
+    Dstrok: 'Đ',
+    ENG: 'Ŋ',
+    ETH: 'Ð',
+    Eacute: 'É',
+    Ecaron: 'Ě',
+    Ecirc: 'Ê',
+    Ecy: 'Э',
+    Edot: 'Ė',
+    Efr: '𝔈',
+    Egrave: 'È',
+    Element: '∈',
+    Emacr: 'Ē',
+    EmptySmallSquare: '◻',
+    EmptyVerySmallSquare: '▫',
+    Eogon: 'Ę',
+    Eopf: '𝔼',
+    Epsilon: 'Ε',
+    Equal: '⩵',
+    EqualTilde: '≂',
+    Equilibrium: '⇌',
+    Escr: 'ℰ',
+    Esim: '⩳',
+    Eta: 'Η',
+    Euml: 'Ë',
+    Exists: '∃',
+    ExponentialE: 'ⅇ',
+    Fcy: 'Ф',
+    Ffr: '𝔉',
+    FilledSmallSquare: '◼',
+    FilledVerySmallSquare: '▪',
+    Fopf: '𝔽',
+    ForAll: '∀',
+    Fouriertrf: 'ℱ',
+    Fscr: 'ℱ',
+    GJcy: 'Ѓ',
+    GT: '>',
+    Gamma: 'Γ',
+    Gammad: 'Ϝ',
+    Gbreve: 'Ğ',
+    Gcedil: 'Ģ',
+    Gcirc: 'Ĝ',
+    Gcy: 'Г',
+    Gdot: 'Ġ',
+    Gfr: '𝔊',
+    Gg: '⋙',
+    Gopf: '𝔾',
+    GreaterEqual: '≥',
+    GreaterEqualLess: '⋛',
+    GreaterFullEqual: '≧',
+    GreaterGreater: '⪢',
+    GreaterLess: '≷',
+    GreaterSlantEqual: '⩾',
+    GreaterTilde: '≳',
+    Gscr: '𝒢',
+    Gt: '≫',
+    HARDcy: 'Ъ',
+    Hacek: 'ˇ',
+    Hat: '^',
+    Hcirc: 'Ĥ',
+    Hfr: 'ℌ',
+    HilbertSpace: 'ℋ',
+    Hopf: 'ℍ',
+    HorizontalLine: '─',
+    Hscr: 'ℋ',
+    Hstrok: 'Ħ',
+    HumpDownHump: '≎',
+    HumpEqual: '≏',
+    IEcy: 'Е',
+    IJlig: 'Ĳ',
+    IOcy: 'Ё',
+    Iacute: 'Í',
+    Icirc: 'Î',
+    Icy: 'И',
+    Idot: 'İ',
+    Ifr: 'ℑ',
+    Igrave: 'Ì',
+    Im: 'ℑ',
+    Imacr: 'Ī',
+    ImaginaryI: 'ⅈ',
+    Implies: '⇒',
+    Int: '∬',
+    Integral: '∫',
+    Intersection: '⋂',
+    InvisibleComma: '⁣',
+    InvisibleTimes: '⁢',
+    Iogon: 'Į',
+    Iopf: '𝕀',
+    Iota: 'Ι',
+    Iscr: 'ℐ',
+    Itilde: 'Ĩ',
+    Iukcy: 'І',
+    Iuml: 'Ï',
+    Jcirc: 'Ĵ',
+    Jcy: 'Й',
+    Jfr: '𝔍',
+    Jopf: '𝕁',
+    Jscr: '𝒥',
+    Jsercy: 'Ј',
+    Jukcy: 'Є',
+    KHcy: 'Х',
+    KJcy: 'Ќ',
+    Kappa: 'Κ',
+    Kcedil: 'Ķ',
+    Kcy: 'К',
+    Kfr: '𝔎',
+    Kopf: '𝕂',
+    Kscr: '𝒦',
+    LJcy: 'Љ',
+    LT: '<',
+    Lacute: 'Ĺ',
+    Lambda: 'Λ',
+    Lang: '⟪',
+    Laplacetrf: 'ℒ',
+    Larr: '↞',
+    Lcaron: 'Ľ',
+    Lcedil: 'Ļ',
+    Lcy: 'Л',
+    LeftAngleBracket: '⟨',
+    LeftArrow: '←',
+    LeftArrowBar: '⇤',
+    LeftArrowRightArrow: '⇆',
+    LeftCeiling: '⌈',
+    LeftDoubleBracket: '⟦',
+    LeftDownTeeVector: '⥡',
+    LeftDownVector: '⇃',
+    LeftDownVectorBar: '⥙',
+    LeftFloor: '⌊',
+    LeftRightArrow: '↔',
+    LeftRightVector: '⥎',
+    LeftTee: '⊣',
+    LeftTeeArrow: '↤',
+    LeftTeeVector: '⥚',
+    LeftTriangle: '⊲',
+    LeftTriangleBar: '⧏',
+    LeftTriangleEqual: '⊴',
+    LeftUpDownVector: '⥑',
+    LeftUpTeeVector: '⥠',
+    LeftUpVector: '↿',
+    LeftUpVectorBar: '⥘',
+    LeftVector: '↼',
+    LeftVectorBar: '⥒',
+    Leftarrow: '⇐',
+    Leftrightarrow: '⇔',
+    LessEqualGreater: '⋚',
+    LessFullEqual: '≦',
+    LessGreater: '≶',
+    LessLess: '⪡',
+    LessSlantEqual: '⩽',
+    LessTilde: '≲',
+    Lfr: '𝔏',
+    Ll: '⋘',
+    Lleftarrow: '⇚',
+    Lmidot: 'Ŀ',
+    LongLeftArrow: '⟵',
+    LongLeftRightArrow: '⟷',
+    LongRightArrow: '⟶',
+    Longleftarrow: '⟸',
+    Longleftrightarrow: '⟺',
+    Longrightarrow: '⟹',
+    Lopf: '𝕃',
+    LowerLeftArrow: '↙',
+    LowerRightArrow: '↘',
+    Lscr: 'ℒ',
+    Lsh: '↰',
+    Lstrok: 'Ł',
+    Lt: '≪',
+    Map: '⤅',
+    Mcy: 'М',
+    MediumSpace: ' ',
+    Mellintrf: 'ℳ',
+    Mfr: '𝔐',
+    MinusPlus: '∓',
+    Mopf: '𝕄',
+    Mscr: 'ℳ',
+    Mu: 'Μ',
+    NJcy: 'Њ',
+    Nacute: 'Ń',
+    Ncaron: 'Ň',
+    Ncedil: 'Ņ',
+    Ncy: 'Н',
+    NegativeMediumSpace: '​',
+    NegativeThickSpace: '​',
+    NegativeThinSpace: '​',
+    NegativeVeryThinSpace: '​',
+    NestedGreaterGreater: '≫',
+    NestedLessLess: '≪',
+    NewLine: '\n',
+    Nfr: '𝔑',
+    NoBreak: '⁠',
+    NonBreakingSpace: ' ',
+    Nopf: 'ℕ',
+    Not: '⫬',
+    NotCongruent: '≢',
+    NotCupCap: '≭',
+    NotDoubleVerticalBar: '∦',
+    NotElement: '∉',
+    NotEqual: '≠',
+    NotEqualTilde: '≂̸',
+    NotExists: '∄',
+    NotGreater: '≯',
+    NotGreaterEqual: '≱',
+    NotGreaterFullEqual: '≧̸',
+    NotGreaterGreater: '≫̸',
+    NotGreaterLess: '≹',
+    NotGreaterSlantEqual: '⩾̸',
+    NotGreaterTilde: '≵',
+    NotHumpDownHump: '≎̸',
+    NotHumpEqual: '≏̸',
+    NotLeftTriangle: '⋪',
+    NotLeftTriangleBar: '⧏̸',
+    NotLeftTriangleEqual: '⋬',
+    NotLess: '≮',
+    NotLessEqual: '≰',
+    NotLessGreater: '≸',
+    NotLessLess: '≪̸',
+    NotLessSlantEqual: '⩽̸',
+    NotLessTilde: '≴',
+    NotNestedGreaterGreater: '⪢̸',
+    NotNestedLessLess: '⪡̸',
+    NotPrecedes: '⊀',
+    NotPrecedesEqual: '⪯̸',
+    NotPrecedesSlantEqual: '⋠',
+    NotReverseElement: '∌',
+    NotRightTriangle: '⋫',
+    NotRightTriangleBar: '⧐̸',
+    NotRightTriangleEqual: '⋭',
+    NotSquareSubset: '⊏̸',
+    NotSquareSubsetEqual: '⋢',
+    NotSquareSuperset: '⊐̸',
+    NotSquareSupersetEqual: '⋣',
+    NotSubset: '⊂⃒',
+    NotSubsetEqual: '⊈',
+    NotSucceeds: '⊁',
+    NotSucceedsEqual: '⪰̸',
+    NotSucceedsSlantEqual: '⋡',
+    NotSucceedsTilde: '≿̸',
+    NotSuperset: '⊃⃒',
+    NotSupersetEqual: '⊉',
+    NotTilde: '≁',
+    NotTildeEqual: '≄',
+    NotTildeFullEqual: '≇',
+    NotTildeTilde: '≉',
+    NotVerticalBar: '∤',
+    Nscr: '𝒩',
+    Ntilde: 'Ñ',
+    Nu: 'Ν',
+    OElig: 'Œ',
+    Oacute: 'Ó',
+    Ocirc: 'Ô',
+    Ocy: 'О',
+    Odblac: 'Ő',
+    Ofr: '𝔒',
+    Ograve: 'Ò',
+    Omacr: 'Ō',
+    Omega: 'Ω',
+    Omicron: 'Ο',
+    Oopf: '𝕆',
+    OpenCurlyDoubleQuote: '“',
+    OpenCurlyQuote: '‘',
+    Or: '⩔',
+    Oscr: '𝒪',
+    Oslash: 'Ø',
+    Otilde: 'Õ',
+    Otimes: '⨷',
+    Ouml: 'Ö',
+    OverBar: '‾',
+    OverBrace: '⏞',
+    OverBracket: '⎴',
+    OverParenthesis: '⏜',
+    PartialD: '∂',
+    Pcy: 'П',
+    Pfr: '𝔓',
+    Phi: 'Φ',
+    Pi: 'Π',
+    PlusMinus: '±',
+    Poincareplane: 'ℌ',
+    Popf: 'ℙ',
+    Pr: '⪻',
+    Precedes: '≺',
+    PrecedesEqual: '⪯',
+    PrecedesSlantEqual: '≼',
+    PrecedesTilde: '≾',
+    Prime: '″',
+    Product: '∏',
+    Proportion: '∷',
+    Proportional: '∝',
+    Pscr: '𝒫',
+    Psi: 'Ψ',
+    QUOT: '"',
+    Qfr: '𝔔',
+    Qopf: 'ℚ',
+    Qscr: '𝒬',
+    RBarr: '⤐',
+    REG: '®',
+    Racute: 'Ŕ',
+    Rang: '⟫',
+    Rarr: '↠',
+    Rarrtl: '⤖',
+    Rcaron: 'Ř',
+    Rcedil: 'Ŗ',
+    Rcy: 'Р',
+    Re: 'ℜ',
+    ReverseElement: '∋',
+    ReverseEquilibrium: '⇋',
+    ReverseUpEquilibrium: '⥯',
+    Rfr: 'ℜ',
+    Rho: 'Ρ',
+    RightAngleBracket: '⟩',
+    RightArrow: '→',
+    RightArrowBar: '⇥',
+    RightArrowLeftArrow: '⇄',
+    RightCeiling: '⌉',
+    RightDoubleBracket: '⟧',
+    RightDownTeeVector: '⥝',
+    RightDownVector: '⇂',
+    RightDownVectorBar: '⥕',
+    RightFloor: '⌋',
+    RightTee: '⊢',
+    RightTeeArrow: '↦',
+    RightTeeVector: '⥛',
+    RightTriangle: '⊳',
+    RightTriangleBar: '⧐',
+    RightTriangleEqual: '⊵',
+    RightUpDownVector: '⥏',
+    RightUpTeeVector: '⥜',
+    RightUpVector: '↾',
+    RightUpVectorBar: '⥔',
+    RightVector: '⇀',
+    RightVectorBar: '⥓',
+    Rightarrow: '⇒',
+    Ropf: 'ℝ',
+    RoundImplies: '⥰',
+    Rrightarrow: '⇛',
+    Rscr: 'ℛ',
+    Rsh: '↱',
+    RuleDelayed: '⧴',
+    SHCHcy: 'Щ',
+    SHcy: 'Ш',
+    SOFTcy: 'Ь',
+    Sacute: 'Ś',
+    Sc: '⪼',
+    Scaron: 'Š',
+    Scedil: 'Ş',
+    Scirc: 'Ŝ',
+    Scy: 'С',
+    Sfr: '𝔖',
+    ShortDownArrow: '↓',
+    ShortLeftArrow: '←',
+    ShortRightArrow: '→',
+    ShortUpArrow: '↑',
+    Sigma: 'Σ',
+    SmallCircle: '∘',
+    Sopf: '𝕊',
+    Sqrt: '√',
+    Square: '□',
+    SquareIntersection: '⊓',
+    SquareSubset: '⊏',
+    SquareSubsetEqual: '⊑',
+    SquareSuperset: '⊐',
+    SquareSupersetEqual: '⊒',
+    SquareUnion: '⊔',
+    Sscr: '𝒮',
+    Star: '⋆',
+    Sub: '⋐',
+    Subset: '⋐',
+    SubsetEqual: '⊆',
+    Succeeds: '≻',
+    SucceedsEqual: '⪰',
+    SucceedsSlantEqual: '≽',
+    SucceedsTilde: '≿',
+    SuchThat: '∋',
+    Sum: '∑',
+    Sup: '⋑',
+    Superset: '⊃',
+    SupersetEqual: '⊇',
+    Supset: '⋑',
+    THORN: 'Þ',
+    TRADE: '™',
+    TSHcy: 'Ћ',
+    TScy: 'Ц',
+    Tab: '\t',
+    Tau: 'Τ',
+    Tcaron: 'Ť',
+    Tcedil: 'Ţ',
+    Tcy: 'Т',
+    Tfr: '𝔗',
+    Therefore: '∴',
+    Theta: 'Θ',
+    ThickSpace: '  ',
+    ThinSpace: ' ',
+    Tilde: '∼',
+    TildeEqual: '≃',
+    TildeFullEqual: '≅',
+    TildeTilde: '≈',
+    Topf: '𝕋',
+    TripleDot: '⃛',
+    Tscr: '𝒯',
+    Tstrok: 'Ŧ',
+    Uacute: 'Ú',
+    Uarr: '↟',
+    Uarrocir: '⥉',
+    Ubrcy: 'Ў',
+    Ubreve: 'Ŭ',
+    Ucirc: 'Û',
+    Ucy: 'У',
+    Udblac: 'Ű',
+    Ufr: '𝔘',
+    Ugrave: 'Ù',
+    Umacr: 'Ū',
+    UnderBar: '_',
+    UnderBrace: '⏟',
+    UnderBracket: '⎵',
+    UnderParenthesis: '⏝',
+    Union: '⋃',
+    UnionPlus: '⊎',
+    Uogon: 'Ų',
+    Uopf: '𝕌',
+    UpArrow: '↑',
+    UpArrowBar: '⤒',
+    UpArrowDownArrow: '⇅',
+    UpDownArrow: '↕',
+    UpEquilibrium: '⥮',
+    UpTee: '⊥',
+    UpTeeArrow: '↥',
+    Uparrow: '⇑',
+    Updownarrow: '⇕',
+    UpperLeftArrow: '↖',
+    UpperRightArrow: '↗',
+    Upsi: 'ϒ',
+    Upsilon: 'Υ',
+    Uring: 'Ů',
+    Uscr: '𝒰',
+    Utilde: 'Ũ',
+    Uuml: 'Ü',
+    VDash: '⊫',
+    Vbar: '⫫',
+    Vcy: 'В',
+    Vdash: '⊩',
+    Vdashl: '⫦',
+    Vee: '⋁',
+    Verbar: '‖',
+    Vert: '‖',
+    VerticalBar: '∣',
+    VerticalLine: '|',
+    VerticalSeparator: '❘',
+    VerticalTilde: '≀',
+    VeryThinSpace: ' ',
+    Vfr: '𝔙',
+    Vopf: '𝕍',
+    Vscr: '𝒱',
+    Vvdash: '⊪',
+    Wcirc: 'Ŵ',
+    Wedge: '⋀',
+    Wfr: '𝔚',
+    Wopf: '𝕎',
+    Wscr: '𝒲',
+    Xfr: '𝔛',
+    Xi: 'Ξ',
+    Xopf: '𝕏',
+    Xscr: '𝒳',
+    YAcy: 'Я',
+    YIcy: 'Ї',
+    YUcy: 'Ю',
+    Yacute: 'Ý',
+    Ycirc: 'Ŷ',
+    Ycy: 'Ы',
+    Yfr: '𝔜',
+    Yopf: '𝕐',
+    Yscr: '𝒴',
+    Yuml: 'Ÿ',
+    ZHcy: 'Ж',
+    Zacute: 'Ź',
+    Zcaron: 'Ž',
+    Zcy: 'З',
+    Zdot: 'Ż',
+    ZeroWidthSpace: '​',
+    Zeta: 'Ζ',
+    Zfr: 'ℨ',
+    Zopf: 'ℤ',
+    Zscr: '𝒵',
+    aacute: 'á',
+    abreve: 'ă',
+    ac: '∾',
+    acE: '∾̳',
+    acd: '∿',
+    acirc: 'â',
+    acute: '´',
+    acy: 'а',
+    aelig: 'æ',
+    af: '⁡',
+    afr: '𝔞',
+    agrave: 'à',
+    alefsym: 'ℵ',
+    aleph: 'ℵ',
+    alpha: 'α',
+    amacr: 'ā',
+    amalg: '⨿',
+    amp: '&',
+    and: '∧',
+    andand: '⩕',
+    andd: '⩜',
+    andslope: '⩘',
+    andv: '⩚',
+    ang: '∠',
+    ange: '⦤',
+    angle: '∠',
+    angmsd: '∡',
+    angmsdaa: '⦨',
+    angmsdab: '⦩',
+    angmsdac: '⦪',
+    angmsdad: '⦫',
+    angmsdae: '⦬',
+    angmsdaf: '⦭',
+    angmsdag: '⦮',
+    angmsdah: '⦯',
+    angrt: '∟',
+    angrtvb: '⊾',
+    angrtvbd: '⦝',
+    angsph: '∢',
+    angst: 'Å',
+    angzarr: '⍼',
+    aogon: 'ą',
+    aopf: '𝕒',
+    ap: '≈',
+    apE: '⩰',
+    apacir: '⩯',
+    ape: '≊',
+    apid: '≋',
+    apos: "'",
+    approx: '≈',
+    approxeq: '≊',
+    aring: 'å',
+    ascr: '𝒶',
+    ast: '*',
+    asymp: '≈',
+    asympeq: '≍',
+    atilde: 'ã',
+    auml: 'ä',
+    awconint: '∳',
+    awint: '⨑',
+    bNot: '⫭',
+    backcong: '≌',
+    backepsilon: '϶',
+    backprime: '‵',
+    backsim: '∽',
+    backsimeq: '⋍',
+    barvee: '⊽',
+    barwed: '⌅',
+    barwedge: '⌅',
+    bbrk: '⎵',
+    bbrktbrk: '⎶',
+    bcong: '≌',
+    bcy: 'б',
+    bdquo: '„',
+    becaus: '∵',
+    because: '∵',
+    bemptyv: '⦰',
+    bepsi: '϶',
+    bernou: 'ℬ',
+    beta: 'β',
+    beth: 'ℶ',
+    between: '≬',
+    bfr: '𝔟',
+    bigcap: '⋂',
+    bigcirc: '◯',
+    bigcup: '⋃',
+    bigodot: '⨀',
+    bigoplus: '⨁',
+    bigotimes: '⨂',
+    bigsqcup: '⨆',
+    bigstar: '★',
+    bigtriangledown: '▽',
+    bigtriangleup: '△',
+    biguplus: '⨄',
+    bigvee: '⋁',
+    bigwedge: '⋀',
+    bkarow: '⤍',
+    blacklozenge: '⧫',
+    blacksquare: '▪',
+    blacktriangle: '▴',
+    blacktriangledown: '▾',
+    blacktriangleleft: '◂',
+    blacktriangleright: '▸',
+    blank: '␣',
+    blk12: '▒',
+    blk14: '░',
+    blk34: '▓',
+    block: '█',
+    bne: '=⃥',
+    bnequiv: '≡⃥',
+    bnot: '⌐',
+    bopf: '𝕓',
+    bot: '⊥',
+    bottom: '⊥',
+    bowtie: '⋈',
+    boxDL: '╗',
+    boxDR: '╔',
+    boxDl: '╖',
+    boxDr: '╓',
+    boxH: '═',
+    boxHD: '╦',
+    boxHU: '╩',
+    boxHd: '╤',
+    boxHu: '╧',
+    boxUL: '╝',
+    boxUR: '╚',
+    boxUl: '╜',
+    boxUr: '╙',
+    boxV: '║',
+    boxVH: '╬',
+    boxVL: '╣',
+    boxVR: '╠',
+    boxVh: '╫',
+    boxVl: '╢',
+    boxVr: '╟',
+    boxbox: '⧉',
+    boxdL: '╕',
+    boxdR: '╒',
+    boxdl: '┐',
+    boxdr: '┌',
+    boxh: '─',
+    boxhD: '╥',
+    boxhU: '╨',
+    boxhd: '┬',
+    boxhu: '┴',
+    boxminus: '⊟',
+    boxplus: '⊞',
+    boxtimes: '⊠',
+    boxuL: '╛',
+    boxuR: '╘',
+    boxul: '┘',
+    boxur: '└',
+    boxv: '│',
+    boxvH: '╪',
+    boxvL: '╡',
+    boxvR: '╞',
+    boxvh: '┼',
+    boxvl: '┤',
+    boxvr: '├',
+    bprime: '‵',
+    breve: '˘',
+    brvbar: '¦',
+    bscr: '𝒷',
+    bsemi: '⁏',
+    bsim: '∽',
+    bsime: '⋍',
+    bsol: '\\',
+    bsolb: '⧅',
+    bsolhsub: '⟈',
+    bull: '•',
+    bullet: '•',
+    bump: '≎',
+    bumpE: '⪮',
+    bumpe: '≏',
+    bumpeq: '≏',
+    cacute: 'ć',
+    cap: '∩',
+    capand: '⩄',
+    capbrcup: '⩉',
+    capcap: '⩋',
+    capcup: '⩇',
+    capdot: '⩀',
+    caps: '∩︀',
+    caret: '⁁',
+    caron: 'ˇ',
+    ccaps: '⩍',
+    ccaron: 'č',
+    ccedil: 'ç',
+    ccirc: 'ĉ',
+    ccups: '⩌',
+    ccupssm: '⩐',
+    cdot: 'ċ',
+    cedil: '¸',
+    cemptyv: '⦲',
+    cent: '¢',
+    centerdot: '·',
+    cfr: '𝔠',
+    chcy: 'ч',
+    check: '✓',
+    checkmark: '✓',
+    chi: 'χ',
+    cir: '○',
+    cirE: '⧃',
+    circ: 'ˆ',
+    circeq: '≗',
+    circlearrowleft: '↺',
+    circlearrowright: '↻',
+    circledR: '®',
+    circledS: 'Ⓢ',
+    circledast: '⊛',
+    circledcirc: '⊚',
+    circleddash: '⊝',
+    cire: '≗',
+    cirfnint: '⨐',
+    cirmid: '⫯',
+    cirscir: '⧂',
+    clubs: '♣',
+    clubsuit: '♣',
+    colon: ':',
+    colone: '≔',
+    coloneq: '≔',
+    comma: ',',
+    commat: '@',
+    comp: '∁',
+    compfn: '∘',
+    complement: '∁',
+    complexes: 'ℂ',
+    cong: '≅',
+    congdot: '⩭',
+    conint: '∮',
+    copf: '𝕔',
+    coprod: '∐',
+    copy: '©',
+    copysr: '℗',
+    crarr: '↵',
+    cross: '✗',
+    cscr: '𝒸',
+    csub: '⫏',
+    csube: '⫑',
+    csup: '⫐',
+    csupe: '⫒',
+    ctdot: '⋯',
+    cudarrl: '⤸',
+    cudarrr: '⤵',
+    cuepr: '⋞',
+    cuesc: '⋟',
+    cularr: '↶',
+    cularrp: '⤽',
+    cup: '∪',
+    cupbrcap: '⩈',
+    cupcap: '⩆',
+    cupcup: '⩊',
+    cupdot: '⊍',
+    cupor: '⩅',
+    cups: '∪︀',
+    curarr: '↷',
+    curarrm: '⤼',
+    curlyeqprec: '⋞',
+    curlyeqsucc: '⋟',
+    curlyvee: '⋎',
+    curlywedge: '⋏',
+    curren: '¤',
+    curvearrowleft: '↶',
+    curvearrowright: '↷',
+    cuvee: '⋎',
+    cuwed: '⋏',
+    cwconint: '∲',
+    cwint: '∱',
+    cylcty: '⌭',
+    dArr: '⇓',
+    dHar: '⥥',
+    dagger: '†',
+    daleth: 'ℸ',
+    darr: '↓',
+    dash: '‐',
+    dashv: '⊣',
+    dbkarow: '⤏',
+    dblac: '˝',
+    dcaron: 'ď',
+    dcy: 'д',
+    dd: 'ⅆ',
+    ddagger: '‡',
+    ddarr: '⇊',
+    ddotseq: '⩷',
+    deg: '°',
+    delta: 'δ',
+    demptyv: '⦱',
+    dfisht: '⥿',
+    dfr: '𝔡',
+    dharl: '⇃',
+    dharr: '⇂',
+    diam: '⋄',
+    diamond: '⋄',
+    diamondsuit: '♦',
+    diams: '♦',
+    die: '¨',
+    digamma: 'ϝ',
+    disin: '⋲',
+    div: '÷',
+    divide: '÷',
+    divideontimes: '⋇',
+    divonx: '⋇',
+    djcy: 'ђ',
+    dlcorn: '⌞',
+    dlcrop: '⌍',
+    dollar: '$',
+    dopf: '𝕕',
+    dot: '˙',
+    doteq: '≐',
+    doteqdot: '≑',
+    dotminus: '∸',
+    dotplus: '∔',
+    dotsquare: '⊡',
+    doublebarwedge: '⌆',
+    downarrow: '↓',
+    downdownarrows: '⇊',
+    downharpoonleft: '⇃',
+    downharpoonright: '⇂',
+    drbkarow: '⤐',
+    drcorn: '⌟',
+    drcrop: '⌌',
+    dscr: '𝒹',
+    dscy: 'ѕ',
+    dsol: '⧶',
+    dstrok: 'đ',
+    dtdot: '⋱',
+    dtri: '▿',
+    dtrif: '▾',
+    duarr: '⇵',
+    duhar: '⥯',
+    dwangle: '⦦',
+    dzcy: 'џ',
+    dzigrarr: '⟿',
+    eDDot: '⩷',
+    eDot: '≑',
+    eacute: 'é',
+    easter: '⩮',
+    ecaron: 'ě',
+    ecir: '≖',
+    ecirc: 'ê',
+    ecolon: '≕',
+    ecy: 'э',
+    edot: 'ė',
+    ee: 'ⅇ',
+    efDot: '≒',
+    efr: '𝔢',
+    eg: '⪚',
+    egrave: 'è',
+    egs: '⪖',
+    egsdot: '⪘',
+    el: '⪙',
+    elinters: '⏧',
+    ell: 'ℓ',
+    els: '⪕',
+    elsdot: '⪗',
+    emacr: 'ē',
+    empty: '∅',
+    emptyset: '∅',
+    emptyv: '∅',
+    emsp13: ' ',
+    emsp14: ' ',
+    emsp: ' ',
+    eng: 'ŋ',
+    ensp: ' ',
+    eogon: 'ę',
+    eopf: '𝕖',
+    epar: '⋕',
+    eparsl: '⧣',
+    eplus: '⩱',
+    epsi: 'ε',
+    epsilon: 'ε',
+    epsiv: 'ϵ',
+    eqcirc: '≖',
+    eqcolon: '≕',
+    eqsim: '≂',
+    eqslantgtr: '⪖',
+    eqslantless: '⪕',
+    equals: '=',
+    equest: '≟',
+    equiv: '≡',
+    equivDD: '⩸',
+    eqvparsl: '⧥',
+    erDot: '≓',
+    erarr: '⥱',
+    escr: 'ℯ',
+    esdot: '≐',
+    esim: '≂',
+    eta: 'η',
+    eth: 'ð',
+    euml: 'ë',
+    euro: '€',
+    excl: '!',
+    exist: '∃',
+    expectation: 'ℰ',
+    exponentiale: 'ⅇ',
+    fallingdotseq: '≒',
+    fcy: 'ф',
+    female: '♀',
+    ffilig: 'ﬃ',
+    fflig: 'ﬀ',
+    ffllig: 'ﬄ',
+    ffr: '𝔣',
+    filig: 'ﬁ',
+    fjlig: 'fj',
+    flat: '♭',
+    fllig: 'ﬂ',
+    fltns: '▱',
+    fnof: 'ƒ',
+    fopf: '𝕗',
+    forall: '∀',
+    fork: '⋔',
+    forkv: '⫙',
+    fpartint: '⨍',
+    frac12: '½',
+    frac13: '⅓',
+    frac14: '¼',
+    frac15: '⅕',
+    frac16: '⅙',
+    frac18: '⅛',
+    frac23: '⅔',
+    frac25: '⅖',
+    frac34: '¾',
+    frac35: '⅗',
+    frac38: '⅜',
+    frac45: '⅘',
+    frac56: '⅚',
+    frac58: '⅝',
+    frac78: '⅞',
+    frasl: '⁄',
+    frown: '⌢',
+    fscr: '𝒻',
+    gE: '≧',
+    gEl: '⪌',
+    gacute: 'ǵ',
+    gamma: 'γ',
+    gammad: 'ϝ',
+    gap: '⪆',
+    gbreve: 'ğ',
+    gcirc: 'ĝ',
+    gcy: 'г',
+    gdot: 'ġ',
+    ge: '≥',
+    gel: '⋛',
+    geq: '≥',
+    geqq: '≧',
+    geqslant: '⩾',
+    ges: '⩾',
+    gescc: '⪩',
+    gesdot: '⪀',
+    gesdoto: '⪂',
+    gesdotol: '⪄',
+    gesl: '⋛︀',
+    gesles: '⪔',
+    gfr: '𝔤',
+    gg: '≫',
+    ggg: '⋙',
+    gimel: 'ℷ',
+    gjcy: 'ѓ',
+    gl: '≷',
+    glE: '⪒',
+    gla: '⪥',
+    glj: '⪤',
+    gnE: '≩',
+    gnap: '⪊',
+    gnapprox: '⪊',
+    gne: '⪈',
+    gneq: '⪈',
+    gneqq: '≩',
+    gnsim: '⋧',
+    gopf: '𝕘',
+    grave: '`',
+    gscr: 'ℊ',
+    gsim: '≳',
+    gsime: '⪎',
+    gsiml: '⪐',
+    gt: '>',
+    gtcc: '⪧',
+    gtcir: '⩺',
+    gtdot: '⋗',
+    gtlPar: '⦕',
+    gtquest: '⩼',
+    gtrapprox: '⪆',
+    gtrarr: '⥸',
+    gtrdot: '⋗',
+    gtreqless: '⋛',
+    gtreqqless: '⪌',
+    gtrless: '≷',
+    gtrsim: '≳',
+    gvertneqq: '≩︀',
+    gvnE: '≩︀',
+    hArr: '⇔',
+    hairsp: ' ',
+    half: '½',
+    hamilt: 'ℋ',
+    hardcy: 'ъ',
+    harr: '↔',
+    harrcir: '⥈',
+    harrw: '↭',
+    hbar: 'ℏ',
+    hcirc: 'ĥ',
+    hearts: '♥',
+    heartsuit: '♥',
+    hellip: '…',
+    hercon: '⊹',
+    hfr: '𝔥',
+    hksearow: '⤥',
+    hkswarow: '⤦',
+    hoarr: '⇿',
+    homtht: '∻',
+    hookleftarrow: '↩',
+    hookrightarrow: '↪',
+    hopf: '𝕙',
+    horbar: '―',
+    hscr: '𝒽',
+    hslash: 'ℏ',
+    hstrok: 'ħ',
+    hybull: '⁃',
+    hyphen: '‐',
+    iacute: 'í',
+    ic: '⁣',
+    icirc: 'î',
+    icy: 'и',
+    iecy: 'е',
+    iexcl: '¡',
+    iff: '⇔',
+    ifr: '𝔦',
+    igrave: 'ì',
+    ii: 'ⅈ',
+    iiiint: '⨌',
+    iiint: '∭',
+    iinfin: '⧜',
+    iiota: '℩',
+    ijlig: 'ĳ',
+    imacr: 'ī',
+    image: 'ℑ',
+    imagline: 'ℐ',
+    imagpart: 'ℑ',
+    imath: 'ı',
+    imof: '⊷',
+    imped: 'Ƶ',
+    in: '∈',
+    incare: '℅',
+    infin: '∞',
+    infintie: '⧝',
+    inodot: 'ı',
+    int: '∫',
+    intcal: '⊺',
+    integers: 'ℤ',
+    intercal: '⊺',
+    intlarhk: '⨗',
+    intprod: '⨼',
+    iocy: 'ё',
+    iogon: 'į',
+    iopf: '𝕚',
+    iota: 'ι',
+    iprod: '⨼',
+    iquest: '¿',
+    iscr: '𝒾',
+    isin: '∈',
+    isinE: '⋹',
+    isindot: '⋵',
+    isins: '⋴',
+    isinsv: '⋳',
+    isinv: '∈',
+    it: '⁢',
+    itilde: 'ĩ',
+    iukcy: 'і',
+    iuml: 'ï',
+    jcirc: 'ĵ',
+    jcy: 'й',
+    jfr: '𝔧',
+    jmath: 'ȷ',
+    jopf: '𝕛',
+    jscr: '𝒿',
+    jsercy: 'ј',
+    jukcy: 'є',
+    kappa: 'κ',
+    kappav: 'ϰ',
+    kcedil: 'ķ',
+    kcy: 'к',
+    kfr: '𝔨',
+    kgreen: 'ĸ',
+    khcy: 'х',
+    kjcy: 'ќ',
+    kopf: '𝕜',
+    kscr: '𝓀',
+    lAarr: '⇚',
+    lArr: '⇐',
+    lAtail: '⤛',
+    lBarr: '⤎',
+    lE: '≦',
+    lEg: '⪋',
+    lHar: '⥢',
+    lacute: 'ĺ',
+    laemptyv: '⦴',
+    lagran: 'ℒ',
+    lambda: 'λ',
+    lang: '⟨',
+    langd: '⦑',
+    langle: '⟨',
+    lap: '⪅',
+    laquo: '«',
+    larr: '←',
+    larrb: '⇤',
+    larrbfs: '⤟',
+    larrfs: '⤝',
+    larrhk: '↩',
+    larrlp: '↫',
+    larrpl: '⤹',
+    larrsim: '⥳',
+    larrtl: '↢',
+    lat: '⪫',
+    latail: '⤙',
+    late: '⪭',
+    lates: '⪭︀',
+    lbarr: '⤌',
+    lbbrk: '❲',
+    lbrace: '{',
+    lbrack: '[',
+    lbrke: '⦋',
+    lbrksld: '⦏',
+    lbrkslu: '⦍',
+    lcaron: 'ľ',
+    lcedil: 'ļ',
+    lceil: '⌈',
+    lcub: '{',
+    lcy: 'л',
+    ldca: '⤶',
+    ldquo: '“',
+    ldquor: '„',
+    ldrdhar: '⥧',
+    ldrushar: '⥋',
+    ldsh: '↲',
+    le: '≤',
+    leftarrow: '←',
+    leftarrowtail: '↢',
+    leftharpoondown: '↽',
+    leftharpoonup: '↼',
+    leftleftarrows: '⇇',
+    leftrightarrow: '↔',
+    leftrightarrows: '⇆',
+    leftrightharpoons: '⇋',
+    leftrightsquigarrow: '↭',
+    leftthreetimes: '⋋',
+    leg: '⋚',
+    leq: '≤',
+    leqq: '≦',
+    leqslant: '⩽',
+    les: '⩽',
+    lescc: '⪨',
+    lesdot: '⩿',
+    lesdoto: '⪁',
+    lesdotor: '⪃',
+    lesg: '⋚︀',
+    lesges: '⪓',
+    lessapprox: '⪅',
+    lessdot: '⋖',
+    lesseqgtr: '⋚',
+    lesseqqgtr: '⪋',
+    lessgtr: '≶',
+    lesssim: '≲',
+    lfisht: '⥼',
+    lfloor: '⌊',
+    lfr: '𝔩',
+    lg: '≶',
+    lgE: '⪑',
+    lhard: '↽',
+    lharu: '↼',
+    lharul: '⥪',
+    lhblk: '▄',
+    ljcy: 'љ',
+    ll: '≪',
+    llarr: '⇇',
+    llcorner: '⌞',
+    llhard: '⥫',
+    lltri: '◺',
+    lmidot: 'ŀ',
+    lmoust: '⎰',
+    lmoustache: '⎰',
+    lnE: '≨',
+    lnap: '⪉',
+    lnapprox: '⪉',
+    lne: '⪇',
+    lneq: '⪇',
+    lneqq: '≨',
+    lnsim: '⋦',
+    loang: '⟬',
+    loarr: '⇽',
+    lobrk: '⟦',
+    longleftarrow: '⟵',
+    longleftrightarrow: '⟷',
+    longmapsto: '⟼',
+    longrightarrow: '⟶',
+    looparrowleft: '↫',
+    looparrowright: '↬',
+    lopar: '⦅',
+    lopf: '𝕝',
+    loplus: '⨭',
+    lotimes: '⨴',
+    lowast: '∗',
+    lowbar: '_',
+    loz: '◊',
+    lozenge: '◊',
+    lozf: '⧫',
+    lpar: '(',
+    lparlt: '⦓',
+    lrarr: '⇆',
+    lrcorner: '⌟',
+    lrhar: '⇋',
+    lrhard: '⥭',
+    lrm: '‎',
+    lrtri: '⊿',
+    lsaquo: '‹',
+    lscr: '𝓁',
+    lsh: '↰',
+    lsim: '≲',
+    lsime: '⪍',
+    lsimg: '⪏',
+    lsqb: '[',
+    lsquo: '‘',
+    lsquor: '‚',
+    lstrok: 'ł',
+    lt: '<',
+    ltcc: '⪦',
+    ltcir: '⩹',
+    ltdot: '⋖',
+    lthree: '⋋',
+    ltimes: '⋉',
+    ltlarr: '⥶',
+    ltquest: '⩻',
+    ltrPar: '⦖',
+    ltri: '◃',
+    ltrie: '⊴',
+    ltrif: '◂',
+    lurdshar: '⥊',
+    luruhar: '⥦',
+    lvertneqq: '≨︀',
+    lvnE: '≨︀',
+    mDDot: '∺',
+    macr: '¯',
+    male: '♂',
+    malt: '✠',
+    maltese: '✠',
+    map: '↦',
+    mapsto: '↦',
+    mapstodown: '↧',
+    mapstoleft: '↤',
+    mapstoup: '↥',
+    marker: '▮',
+    mcomma: '⨩',
+    mcy: 'м',
+    mdash: '—',
+    measuredangle: '∡',
+    mfr: '𝔪',
+    mho: '℧',
+    micro: 'µ',
+    mid: '∣',
+    midast: '*',
+    midcir: '⫰',
+    middot: '·',
+    minus: '−',
+    minusb: '⊟',
+    minusd: '∸',
+    minusdu: '⨪',
+    mlcp: '⫛',
+    mldr: '…',
+    mnplus: '∓',
+    models: '⊧',
+    mopf: '𝕞',
+    mp: '∓',
+    mscr: '𝓂',
+    mstpos: '∾',
+    mu: 'μ',
+    multimap: '⊸',
+    mumap: '⊸',
+    nGg: '⋙̸',
+    nGt: '≫⃒',
+    nGtv: '≫̸',
+    nLeftarrow: '⇍',
+    nLeftrightarrow: '⇎',
+    nLl: '⋘̸',
+    nLt: '≪⃒',
+    nLtv: '≪̸',
+    nRightarrow: '⇏',
+    nVDash: '⊯',
+    nVdash: '⊮',
+    nabla: '∇',
+    nacute: 'ń',
+    nang: '∠⃒',
+    nap: '≉',
+    napE: '⩰̸',
+    napid: '≋̸',
+    napos: 'ŉ',
+    napprox: '≉',
+    natur: '♮',
+    natural: '♮',
+    naturals: 'ℕ',
+    nbsp: ' ',
+    nbump: '≎̸',
+    nbumpe: '≏̸',
+    ncap: '⩃',
+    ncaron: 'ň',
+    ncedil: 'ņ',
+    ncong: '≇',
+    ncongdot: '⩭̸',
+    ncup: '⩂',
+    ncy: 'н',
+    ndash: '–',
+    ne: '≠',
+    neArr: '⇗',
+    nearhk: '⤤',
+    nearr: '↗',
+    nearrow: '↗',
+    nedot: '≐̸',
+    nequiv: '≢',
+    nesear: '⤨',
+    nesim: '≂̸',
+    nexist: '∄',
+    nexists: '∄',
+    nfr: '𝔫',
+    ngE: '≧̸',
+    nge: '≱',
+    ngeq: '≱',
+    ngeqq: '≧̸',
+    ngeqslant: '⩾̸',
+    nges: '⩾̸',
+    ngsim: '≵',
+    ngt: '≯',
+    ngtr: '≯',
+    nhArr: '⇎',
+    nharr: '↮',
+    nhpar: '⫲',
+    ni: '∋',
+    nis: '⋼',
+    nisd: '⋺',
+    niv: '∋',
+    njcy: 'њ',
+    nlArr: '⇍',
+    nlE: '≦̸',
+    nlarr: '↚',
+    nldr: '‥',
+    nle: '≰',
+    nleftarrow: '↚',
+    nleftrightarrow: '↮',
+    nleq: '≰',
+    nleqq: '≦̸',
+    nleqslant: '⩽̸',
+    nles: '⩽̸',
+    nless: '≮',
+    nlsim: '≴',
+    nlt: '≮',
+    nltri: '⋪',
+    nltrie: '⋬',
+    nmid: '∤',
+    nopf: '𝕟',
+    not: '¬',
+    notin: '∉',
+    notinE: '⋹̸',
+    notindot: '⋵̸',
+    notinva: '∉',
+    notinvb: '⋷',
+    notinvc: '⋶',
+    notni: '∌',
+    notniva: '∌',
+    notnivb: '⋾',
+    notnivc: '⋽',
+    npar: '∦',
+    nparallel: '∦',
+    nparsl: '⫽⃥',
+    npart: '∂̸',
+    npolint: '⨔',
+    npr: '⊀',
+    nprcue: '⋠',
+    npre: '⪯̸',
+    nprec: '⊀',
+    npreceq: '⪯̸',
+    nrArr: '⇏',
+    nrarr: '↛',
+    nrarrc: '⤳̸',
+    nrarrw: '↝̸',
+    nrightarrow: '↛',
+    nrtri: '⋫',
+    nrtrie: '⋭',
+    nsc: '⊁',
+    nsccue: '⋡',
+    nsce: '⪰̸',
+    nscr: '𝓃',
+    nshortmid: '∤',
+    nshortparallel: '∦',
+    nsim: '≁',
+    nsime: '≄',
+    nsimeq: '≄',
+    nsmid: '∤',
+    nspar: '∦',
+    nsqsube: '⋢',
+    nsqsupe: '⋣',
+    nsub: '⊄',
+    nsubE: '⫅̸',
+    nsube: '⊈',
+    nsubset: '⊂⃒',
+    nsubseteq: '⊈',
+    nsubseteqq: '⫅̸',
+    nsucc: '⊁',
+    nsucceq: '⪰̸',
+    nsup: '⊅',
+    nsupE: '⫆̸',
+    nsupe: '⊉',
+    nsupset: '⊃⃒',
+    nsupseteq: '⊉',
+    nsupseteqq: '⫆̸',
+    ntgl: '≹',
+    ntilde: 'ñ',
+    ntlg: '≸',
+    ntriangleleft: '⋪',
+    ntrianglelefteq: '⋬',
+    ntriangleright: '⋫',
+    ntrianglerighteq: '⋭',
+    nu: 'ν',
+    num: '#',
+    numero: '№',
+    numsp: ' ',
+    nvDash: '⊭',
+    nvHarr: '⤄',
+    nvap: '≍⃒',
+    nvdash: '⊬',
+    nvge: '≥⃒',
+    nvgt: '>⃒',
+    nvinfin: '⧞',
+    nvlArr: '⤂',
+    nvle: '≤⃒',
+    nvlt: '<⃒',
+    nvltrie: '⊴⃒',
+    nvrArr: '⤃',
+    nvrtrie: '⊵⃒',
+    nvsim: '∼⃒',
+    nwArr: '⇖',
+    nwarhk: '⤣',
+    nwarr: '↖',
+    nwarrow: '↖',
+    nwnear: '⤧',
+    oS: 'Ⓢ',
+    oacute: 'ó',
+    oast: '⊛',
+    ocir: '⊚',
+    ocirc: 'ô',
+    ocy: 'о',
+    odash: '⊝',
+    odblac: 'ő',
+    odiv: '⨸',
+    odot: '⊙',
+    odsold: '⦼',
+    oelig: 'œ',
+    ofcir: '⦿',
+    ofr: '𝔬',
+    ogon: '˛',
+    ograve: 'ò',
+    ogt: '⧁',
+    ohbar: '⦵',
+    ohm: 'Ω',
+    oint: '∮',
+    olarr: '↺',
+    olcir: '⦾',
+    olcross: '⦻',
+    oline: '‾',
+    olt: '⧀',
+    omacr: 'ō',
+    omega: 'ω',
+    omicron: 'ο',
+    omid: '⦶',
+    ominus: '⊖',
+    oopf: '𝕠',
+    opar: '⦷',
+    operp: '⦹',
+    oplus: '⊕',
+    or: '∨',
+    orarr: '↻',
+    ord: '⩝',
+    order: 'ℴ',
+    orderof: 'ℴ',
+    ordf: 'ª',
+    ordm: 'º',
+    origof: '⊶',
+    oror: '⩖',
+    orslope: '⩗',
+    orv: '⩛',
+    oscr: 'ℴ',
+    oslash: 'ø',
+    osol: '⊘',
+    otilde: 'õ',
+    otimes: '⊗',
+    otimesas: '⨶',
+    ouml: 'ö',
+    ovbar: '⌽',
+    par: '∥',
+    para: '¶',
+    parallel: '∥',
+    parsim: '⫳',
+    parsl: '⫽',
+    part: '∂',
+    pcy: 'п',
+    percnt: '%',
+    period: '.',
+    permil: '‰',
+    perp: '⊥',
+    pertenk: '‱',
+    pfr: '𝔭',
+    phi: 'φ',
+    phiv: 'ϕ',
+    phmmat: 'ℳ',
+    phone: '☎',
+    pi: 'π',
+    pitchfork: '⋔',
+    piv: 'ϖ',
+    planck: 'ℏ',
+    planckh: 'ℎ',
+    plankv: 'ℏ',
+    plus: '+',
+    plusacir: '⨣',
+    plusb: '⊞',
+    pluscir: '⨢',
+    plusdo: '∔',
+    plusdu: '⨥',
+    pluse: '⩲',
+    plusmn: '±',
+    plussim: '⨦',
+    plustwo: '⨧',
+    pm: '±',
+    pointint: '⨕',
+    popf: '𝕡',
+    pound: '£',
+    pr: '≺',
+    prE: '⪳',
+    prap: '⪷',
+    prcue: '≼',
+    pre: '⪯',
+    prec: '≺',
+    precapprox: '⪷',
+    preccurlyeq: '≼',
+    preceq: '⪯',
+    precnapprox: '⪹',
+    precneqq: '⪵',
+    precnsim: '⋨',
+    precsim: '≾',
+    prime: '′',
+    primes: 'ℙ',
+    prnE: '⪵',
+    prnap: '⪹',
+    prnsim: '⋨',
+    prod: '∏',
+    profalar: '⌮',
+    profline: '⌒',
+    profsurf: '⌓',
+    prop: '∝',
+    propto: '∝',
+    prsim: '≾',
+    prurel: '⊰',
+    pscr: '𝓅',
+    psi: 'ψ',
+    puncsp: ' ',
+    qfr: '𝔮',
+    qint: '⨌',
+    qopf: '𝕢',
+    qprime: '⁗',
+    qscr: '𝓆',
+    quaternions: 'ℍ',
+    quatint: '⨖',
+    quest: '?',
+    questeq: '≟',
+    quot: '"',
+    rAarr: '⇛',
+    rArr: '⇒',
+    rAtail: '⤜',
+    rBarr: '⤏',
+    rHar: '⥤',
+    race: '∽̱',
+    racute: 'ŕ',
+    radic: '√',
+    raemptyv: '⦳',
+    rang: '⟩',
+    rangd: '⦒',
+    range: '⦥',
+    rangle: '⟩',
+    raquo: '»',
+    rarr: '→',
+    rarrap: '⥵',
+    rarrb: '⇥',
+    rarrbfs: '⤠',
+    rarrc: '⤳',
+    rarrfs: '⤞',
+    rarrhk: '↪',
+    rarrlp: '↬',
+    rarrpl: '⥅',
+    rarrsim: '⥴',
+    rarrtl: '↣',
+    rarrw: '↝',
+    ratail: '⤚',
+    ratio: '∶',
+    rationals: 'ℚ',
+    rbarr: '⤍',
+    rbbrk: '❳',
+    rbrace: '}',
+    rbrack: ']',
+    rbrke: '⦌',
+    rbrksld: '⦎',
+    rbrkslu: '⦐',
+    rcaron: 'ř',
+    rcedil: 'ŗ',
+    rceil: '⌉',
+    rcub: '}',
+    rcy: 'р',
+    rdca: '⤷',
+    rdldhar: '⥩',
+    rdquo: '”',
+    rdquor: '”',
+    rdsh: '↳',
+    real: 'ℜ',
+    realine: 'ℛ',
+    realpart: 'ℜ',
+    reals: 'ℝ',
+    rect: '▭',
+    reg: '®',
+    rfisht: '⥽',
+    rfloor: '⌋',
+    rfr: '𝔯',
+    rhard: '⇁',
+    rharu: '⇀',
+    rharul: '⥬',
+    rho: 'ρ',
+    rhov: 'ϱ',
+    rightarrow: '→',
+    rightarrowtail: '↣',
+    rightharpoondown: '⇁',
+    rightharpoonup: '⇀',
+    rightleftarrows: '⇄',
+    rightleftharpoons: '⇌',
+    rightrightarrows: '⇉',
+    rightsquigarrow: '↝',
+    rightthreetimes: '⋌',
+    ring: '˚',
+    risingdotseq: '≓',
+    rlarr: '⇄',
+    rlhar: '⇌',
+    rlm: '‏',
+    rmoust: '⎱',
+    rmoustache: '⎱',
+    rnmid: '⫮',
+    roang: '⟭',
+    roarr: '⇾',
+    robrk: '⟧',
+    ropar: '⦆',
+    ropf: '𝕣',
+    roplus: '⨮',
+    rotimes: '⨵',
+    rpar: ')',
+    rpargt: '⦔',
+    rppolint: '⨒',
+    rrarr: '⇉',
+    rsaquo: '›',
+    rscr: '𝓇',
+    rsh: '↱',
+    rsqb: ']',
+    rsquo: '’',
+    rsquor: '’',
+    rthree: '⋌',
+    rtimes: '⋊',
+    rtri: '▹',
+    rtrie: '⊵',
+    rtrif: '▸',
+    rtriltri: '⧎',
+    ruluhar: '⥨',
+    rx: '℞',
+    sacute: 'ś',
+    sbquo: '‚',
+    sc: '≻',
+    scE: '⪴',
+    scap: '⪸',
+    scaron: 'š',
+    sccue: '≽',
+    sce: '⪰',
+    scedil: 'ş',
+    scirc: 'ŝ',
+    scnE: '⪶',
+    scnap: '⪺',
+    scnsim: '⋩',
+    scpolint: '⨓',
+    scsim: '≿',
+    scy: 'с',
+    sdot: '⋅',
+    sdotb: '⊡',
+    sdote: '⩦',
+    seArr: '⇘',
+    searhk: '⤥',
+    searr: '↘',
+    searrow: '↘',
+    sect: '§',
+    semi: ';',
+    seswar: '⤩',
+    setminus: '∖',
+    setmn: '∖',
+    sext: '✶',
+    sfr: '𝔰',
+    sfrown: '⌢',
+    sharp: '♯',
+    shchcy: 'щ',
+    shcy: 'ш',
+    shortmid: '∣',
+    shortparallel: '∥',
+    shy: '­',
+    sigma: 'σ',
+    sigmaf: 'ς',
+    sigmav: 'ς',
+    sim: '∼',
+    simdot: '⩪',
+    sime: '≃',
+    simeq: '≃',
+    simg: '⪞',
+    simgE: '⪠',
+    siml: '⪝',
+    simlE: '⪟',
+    simne: '≆',
+    simplus: '⨤',
+    simrarr: '⥲',
+    slarr: '←',
+    smallsetminus: '∖',
+    smashp: '⨳',
+    smeparsl: '⧤',
+    smid: '∣',
+    smile: '⌣',
+    smt: '⪪',
+    smte: '⪬',
+    smtes: '⪬︀',
+    softcy: 'ь',
+    sol: '/',
+    solb: '⧄',
+    solbar: '⌿',
+    sopf: '𝕤',
+    spades: '♠',
+    spadesuit: '♠',
+    spar: '∥',
+    sqcap: '⊓',
+    sqcaps: '⊓︀',
+    sqcup: '⊔',
+    sqcups: '⊔︀',
+    sqsub: '⊏',
+    sqsube: '⊑',
+    sqsubset: '⊏',
+    sqsubseteq: '⊑',
+    sqsup: '⊐',
+    sqsupe: '⊒',
+    sqsupset: '⊐',
+    sqsupseteq: '⊒',
+    squ: '□',
+    square: '□',
+    squarf: '▪',
+    squf: '▪',
+    srarr: '→',
+    sscr: '𝓈',
+    ssetmn: '∖',
+    ssmile: '⌣',
+    sstarf: '⋆',
+    star: '☆',
+    starf: '★',
+    straightepsilon: 'ϵ',
+    straightphi: 'ϕ',
+    strns: '¯',
+    sub: '⊂',
+    subE: '⫅',
+    subdot: '⪽',
+    sube: '⊆',
+    subedot: '⫃',
+    submult: '⫁',
+    subnE: '⫋',
+    subne: '⊊',
+    subplus: '⪿',
+    subrarr: '⥹',
+    subset: '⊂',
+    subseteq: '⊆',
+    subseteqq: '⫅',
+    subsetneq: '⊊',
+    subsetneqq: '⫋',
+    subsim: '⫇',
+    subsub: '⫕',
+    subsup: '⫓',
+    succ: '≻',
+    succapprox: '⪸',
+    succcurlyeq: '≽',
+    succeq: '⪰',
+    succnapprox: '⪺',
+    succneqq: '⪶',
+    succnsim: '⋩',
+    succsim: '≿',
+    sum: '∑',
+    sung: '♪',
+    sup1: '¹',
+    sup2: '²',
+    sup3: '³',
+    sup: '⊃',
+    supE: '⫆',
+    supdot: '⪾',
+    supdsub: '⫘',
+    supe: '⊇',
+    supedot: '⫄',
+    suphsol: '⟉',
+    suphsub: '⫗',
+    suplarr: '⥻',
+    supmult: '⫂',
+    supnE: '⫌',
+    supne: '⊋',
+    supplus: '⫀',
+    supset: '⊃',
+    supseteq: '⊇',
+    supseteqq: '⫆',
+    supsetneq: '⊋',
+    supsetneqq: '⫌',
+    supsim: '⫈',
+    supsub: '⫔',
+    supsup: '⫖',
+    swArr: '⇙',
+    swarhk: '⤦',
+    swarr: '↙',
+    swarrow: '↙',
+    swnwar: '⤪',
+    szlig: 'ß',
+    target: '⌖',
+    tau: 'τ',
+    tbrk: '⎴',
+    tcaron: 'ť',
+    tcedil: 'ţ',
+    tcy: 'т',
+    tdot: '⃛',
+    telrec: '⌕',
+    tfr: '𝔱',
+    there4: '∴',
+    therefore: '∴',
+    theta: 'θ',
+    thetasym: 'ϑ',
+    thetav: 'ϑ',
+    thickapprox: '≈',
+    thicksim: '∼',
+    thinsp: ' ',
+    thkap: '≈',
+    thksim: '∼',
+    thorn: 'þ',
+    tilde: '˜',
+    times: '×',
+    timesb: '⊠',
+    timesbar: '⨱',
+    timesd: '⨰',
+    tint: '∭',
+    toea: '⤨',
+    top: '⊤',
+    topbot: '⌶',
+    topcir: '⫱',
+    topf: '𝕥',
+    topfork: '⫚',
+    tosa: '⤩',
+    tprime: '‴',
+    trade: '™',
+    triangle: '▵',
+    triangledown: '▿',
+    triangleleft: '◃',
+    trianglelefteq: '⊴',
+    triangleq: '≜',
+    triangleright: '▹',
+    trianglerighteq: '⊵',
+    tridot: '◬',
+    trie: '≜',
+    triminus: '⨺',
+    triplus: '⨹',
+    trisb: '⧍',
+    tritime: '⨻',
+    trpezium: '⏢',
+    tscr: '𝓉',
+    tscy: 'ц',
+    tshcy: 'ћ',
+    tstrok: 'ŧ',
+    twixt: '≬',
+    twoheadleftarrow: '↞',
+    twoheadrightarrow: '↠',
+    uArr: '⇑',
+    uHar: '⥣',
+    uacute: 'ú',
+    uarr: '↑',
+    ubrcy: 'ў',
+    ubreve: 'ŭ',
+    ucirc: 'û',
+    ucy: 'у',
+    udarr: '⇅',
+    udblac: 'ű',
+    udhar: '⥮',
+    ufisht: '⥾',
+    ufr: '𝔲',
+    ugrave: 'ù',
+    uharl: '↿',
+    uharr: '↾',
+    uhblk: '▀',
+    ulcorn: '⌜',
+    ulcorner: '⌜',
+    ulcrop: '⌏',
+    ultri: '◸',
+    umacr: 'ū',
+    uml: '¨',
+    uogon: 'ų',
+    uopf: '𝕦',
+    uparrow: '↑',
+    updownarrow: '↕',
+    upharpoonleft: '↿',
+    upharpoonright: '↾',
+    uplus: '⊎',
+    upsi: 'υ',
+    upsih: 'ϒ',
+    upsilon: 'υ',
+    upuparrows: '⇈',
+    urcorn: '⌝',
+    urcorner: '⌝',
+    urcrop: '⌎',
+    uring: 'ů',
+    urtri: '◹',
+    uscr: '𝓊',
+    utdot: '⋰',
+    utilde: 'ũ',
+    utri: '▵',
+    utrif: '▴',
+    uuarr: '⇈',
+    uuml: 'ü',
+    uwangle: '⦧',
+    vArr: '⇕',
+    vBar: '⫨',
+    vBarv: '⫩',
+    vDash: '⊨',
+    vangrt: '⦜',
+    varepsilon: 'ϵ',
+    varkappa: 'ϰ',
+    varnothing: '∅',
+    varphi: 'ϕ',
+    varpi: 'ϖ',
+    varpropto: '∝',
+    varr: '↕',
+    varrho: 'ϱ',
+    varsigma: 'ς',
+    varsubsetneq: '⊊︀',
+    varsubsetneqq: '⫋︀',
+    varsupsetneq: '⊋︀',
+    varsupsetneqq: '⫌︀',
+    vartheta: 'ϑ',
+    vartriangleleft: '⊲',
+    vartriangleright: '⊳',
+    vcy: 'в',
+    vdash: '⊢',
+    vee: '∨',
+    veebar: '⊻',
+    veeeq: '≚',
+    vellip: '⋮',
+    verbar: '|',
+    vert: '|',
+    vfr: '𝔳',
+    vltri: '⊲',
+    vnsub: '⊂⃒',
+    vnsup: '⊃⃒',
+    vopf: '𝕧',
+    vprop: '∝',
+    vrtri: '⊳',
+    vscr: '𝓋',
+    vsubnE: '⫋︀',
+    vsubne: '⊊︀',
+    vsupnE: '⫌︀',
+    vsupne: '⊋︀',
+    vzigzag: '⦚',
+    wcirc: 'ŵ',
+    wedbar: '⩟',
+    wedge: '∧',
+    wedgeq: '≙',
+    weierp: '℘',
+    wfr: '𝔴',
+    wopf: '𝕨',
+    wp: '℘',
+    wr: '≀',
+    wreath: '≀',
+    wscr: '𝓌',
+    xcap: '⋂',
+    xcirc: '◯',
+    xcup: '⋃',
+    xdtri: '▽',
+    xfr: '𝔵',
+    xhArr: '⟺',
+    xharr: '⟷',
+    xi: 'ξ',
+    xlArr: '⟸',
+    xlarr: '⟵',
+    xmap: '⟼',
+    xnis: '⋻',
+    xodot: '⨀',
+    xopf: '𝕩',
+    xoplus: '⨁',
+    xotime: '⨂',
+    xrArr: '⟹',
+    xrarr: '⟶',
+    xscr: '𝓍',
+    xsqcup: '⨆',
+    xuplus: '⨄',
+    xutri: '△',
+    xvee: '⋁',
+    xwedge: '⋀',
+    yacute: 'ý',
+    yacy: 'я',
+    ycirc: 'ŷ',
+    ycy: 'ы',
+    yen: '¥',
+    yfr: '𝔶',
+    yicy: 'ї',
+    yopf: '𝕪',
+    yscr: '𝓎',
+    yucy: 'ю',
+    yuml: 'ÿ',
+    zacute: 'ź',
+    zcaron: 'ž',
+    zcy: 'з',
+    zdot: 'ż',
+    zeetrf: 'ℨ',
+    zeta: 'ζ',
+    zfr: '𝔷',
+    zhcy: 'ж',
+    zigrarr: '⇝',
+    zopf: '𝕫',
+    zscr: '𝓏',
+    zwj: '‍',
+    zwnj: '‌'
+};
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/decode-named-character-reference@1.3.0/node_modules/decode-named-character-reference/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "decodeNamedCharacterReference",
+    ()=>decodeNamedCharacterReference
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$character$2d$entities$40$2$2e$0$2e$2$2f$node_modules$2f$character$2d$entities$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/character-entities@2.0.2/node_modules/character-entities/index.js [app-ssr] (ecmascript)");
+;
+// To do: next major: use `Object.hasOwn`.
+const own = {}.hasOwnProperty;
+function decodeNamedCharacterReference(value) {
+    return own.call(__TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$character$2d$entities$40$2$2e$0$2e$2$2f$node_modules$2f$character$2d$entities$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["characterEntities"], value) ? __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$character$2d$entities$40$2$2e$0$2e$2$2f$node_modules$2f$character$2d$entities$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["characterEntities"][value] : false;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-factory-destination@2.0.1/node_modules/micromark-factory-destination/dev/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "factoryDestination",
+    ()=>factoryDestination
+]);
+/**
+ * @import {Effects, State, TokenType} from 'micromark-util-types'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$character$40$2$2e$1$2e$1$2f$node_modules$2f$micromark$2d$util$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-character@2.1.1/node_modules/micromark-util-character/dev/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/codes.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/constants.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/types.js [app-ssr] (ecmascript)");
+;
+;
+function factoryDestination(effects, ok, nok, type, literalType, literalMarkerType, rawType, stringType, max) {
+    const limit = max || Number.POSITIVE_INFINITY;
+    let balance = 0;
+    return start;
+    //TURBOPACK unreachable
+    ;
+    /**
+   * Start of destination.
+   *
+   * ```markdown
+   * > | <aa>
+   *     ^
+   * > | aa
+   *     ^
+   * ```
+   *
+   * @type {State}
+   */ function start(code) {
+        if (code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].lessThan) {
+            effects.enter(type);
+            effects.enter(literalType);
+            effects.enter(literalMarkerType);
+            effects.consume(code);
+            effects.exit(literalMarkerType);
+            return enclosedBefore;
+        }
+        // ASCII control, space, closing paren.
+        if (code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].eof || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].space || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].rightParenthesis || (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$character$40$2$2e$1$2e$1$2f$node_modules$2f$micromark$2d$util$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["asciiControl"])(code)) {
+            return nok(code);
+        }
+        effects.enter(type);
+        effects.enter(rawType);
+        effects.enter(stringType);
+        effects.enter(__TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].chunkString, {
+            contentType: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["constants"].contentTypeString
+        });
+        return raw(code);
+    }
+    /**
+   * After `<`, at an enclosed destination.
+   *
+   * ```markdown
+   * > | <aa>
+   *      ^
+   * ```
+   *
+   * @type {State}
+   */ function enclosedBefore(code) {
+        if (code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].greaterThan) {
+            effects.enter(literalMarkerType);
+            effects.consume(code);
+            effects.exit(literalMarkerType);
+            effects.exit(literalType);
+            effects.exit(type);
+            return ok;
+        }
+        effects.enter(stringType);
+        effects.enter(__TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].chunkString, {
+            contentType: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["constants"].contentTypeString
+        });
+        return enclosed(code);
+    }
+    /**
+   * In enclosed destination.
+   *
+   * ```markdown
+   * > | <aa>
+   *      ^
+   * ```
+   *
+   * @type {State}
+   */ function enclosed(code) {
+        if (code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].greaterThan) {
+            effects.exit(__TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].chunkString);
+            effects.exit(stringType);
+            return enclosedBefore(code);
+        }
+        if (code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].eof || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].lessThan || (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$character$40$2$2e$1$2e$1$2f$node_modules$2f$micromark$2d$util$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["markdownLineEnding"])(code)) {
+            return nok(code);
+        }
+        effects.consume(code);
+        return code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].backslash ? enclosedEscape : enclosed;
+    }
+    /**
+   * After `\`, at a special character.
+   *
+   * ```markdown
+   * > | <a\*a>
+   *        ^
+   * ```
+   *
+   * @type {State}
+   */ function enclosedEscape(code) {
+        if (code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].lessThan || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].greaterThan || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].backslash) {
+            effects.consume(code);
+            return enclosed;
+        }
+        return enclosed(code);
+    }
+    /**
+   * In raw destination.
+   *
+   * ```markdown
+   * > | aa
+   *     ^
+   * ```
+   *
+   * @type {State}
+   */ function raw(code) {
+        if (!balance && (code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].eof || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].rightParenthesis || (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$character$40$2$2e$1$2e$1$2f$node_modules$2f$micromark$2d$util$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["markdownLineEndingOrSpace"])(code))) {
+            effects.exit(__TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].chunkString);
+            effects.exit(stringType);
+            effects.exit(rawType);
+            effects.exit(type);
+            return ok(code);
+        }
+        if (balance < limit && code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].leftParenthesis) {
+            effects.consume(code);
+            balance++;
+            return raw;
+        }
+        if (code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].rightParenthesis) {
+            effects.consume(code);
+            balance--;
+            return raw;
+        }
+        // ASCII control (but *not* `\0`) and space and `(`.
+        // Note: in `markdown-rs`, `\0` exists in codes, in `micromark-js` it
+        // doesn’t.
+        if (code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].eof || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].space || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].leftParenthesis || (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$character$40$2$2e$1$2e$1$2f$node_modules$2f$micromark$2d$util$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["asciiControl"])(code)) {
+            return nok(code);
+        }
+        effects.consume(code);
+        return code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].backslash ? rawEscape : raw;
+    }
+    /**
+   * After `\`, at special character.
+   *
+   * ```markdown
+   * > | a\*a
+   *       ^
+   * ```
+   *
+   * @type {State}
+   */ function rawEscape(code) {
+        if (code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].leftParenthesis || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].rightParenthesis || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].backslash) {
+            effects.consume(code);
+            return raw;
+        }
+        return raw(code);
+    }
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-factory-label@2.0.1/node_modules/micromark-factory-label/dev/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "factoryLabel",
+    ()=>factoryLabel
+]);
+/**
+ * @import {
+ *   Effects,
+ *   State,
+ *   TokenizeContext,
+ *   TokenType
+ * } from 'micromark-util-types'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/devlop@1.1.0/node_modules/devlop/lib/development.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$character$40$2$2e$1$2e$1$2f$node_modules$2f$micromark$2d$util$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-character@2.1.1/node_modules/micromark-util-character/dev/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/codes.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/constants.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/types.js [app-ssr] (ecmascript)");
+;
+;
+;
+function factoryLabel(effects, ok, nok, type, markerType, stringType) {
+    const self = this;
+    let size = 0;
+    /** @type {boolean} */ let seen;
+    return start;
+    //TURBOPACK unreachable
+    ;
+    /**
+   * Start of label.
+   *
+   * ```markdown
+   * > | [a]
+   *     ^
+   * ```
+   *
+   * @type {State}
+   */ function start(code) {
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].leftSquareBracket, 'expected `[`');
+        effects.enter(type);
+        effects.enter(markerType);
+        effects.consume(code);
+        effects.exit(markerType);
+        effects.enter(stringType);
+        return atBreak;
+    }
+    /**
+   * In label, at something, before something else.
+   *
+   * ```markdown
+   * > | [a]
+   *      ^
+   * ```
+   *
+   * @type {State}
+   */ function atBreak(code) {
+        if (size > __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["constants"].linkReferenceSizeMax || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].eof || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].leftSquareBracket || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].rightSquareBracket && !seen || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].caret && !size && '_hiddenFootnoteSupport' in self.parser.constructs) {
+            return nok(code);
+        }
+        if (code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].rightSquareBracket) {
+            effects.exit(stringType);
+            effects.enter(markerType);
+            effects.consume(code);
+            effects.exit(markerType);
+            effects.exit(type);
+            return ok;
+        }
+        // To do: indent? Link chunks and EOLs together?
+        if ((0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$character$40$2$2e$1$2e$1$2f$node_modules$2f$micromark$2d$util$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["markdownLineEnding"])(code)) {
+            effects.enter(__TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].lineEnding);
+            effects.consume(code);
+            effects.exit(__TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].lineEnding);
+            return atBreak;
+        }
+        effects.enter(__TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].chunkString, {
+            contentType: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["constants"].contentTypeString
+        });
+        return labelInside(code);
+    }
+    /**
+   * In label, in text.
+   *
+   * ```markdown
+   * > | [a]
+   *      ^
+   * ```
+   *
+   * @type {State}
+   */ function labelInside(code) {
+        if (code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].eof || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].leftSquareBracket || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].rightSquareBracket || (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$character$40$2$2e$1$2e$1$2f$node_modules$2f$micromark$2d$util$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["markdownLineEnding"])(code) || size++ > __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["constants"].linkReferenceSizeMax) {
+            effects.exit(__TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].chunkString);
+            return atBreak(code);
+        }
+        effects.consume(code);
+        if (!seen) seen = !(0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$character$40$2$2e$1$2e$1$2f$node_modules$2f$micromark$2d$util$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["markdownSpace"])(code);
+        return code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].backslash ? labelEscape : labelInside;
+    }
+    /**
+   * After `\`, at a special character.
+   *
+   * ```markdown
+   * > | [a\*a]
+   *        ^
+   * ```
+   *
+   * @type {State}
+   */ function labelEscape(code) {
+        if (code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].leftSquareBracket || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].backslash || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].rightSquareBracket) {
+            effects.consume(code);
+            size++;
+            return labelInside;
+        }
+        return labelInside(code);
+    }
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-factory-title@2.0.1/node_modules/micromark-factory-title/dev/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "factoryTitle",
+    ()=>factoryTitle
+]);
+/**
+ * @import {
+ *   Code,
+ *   Effects,
+ *   State,
+ *   TokenType
+ * } from 'micromark-util-types'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$factory$2d$space$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$factory$2d$space$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-factory-space@2.0.1/node_modules/micromark-factory-space/dev/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$character$40$2$2e$1$2e$1$2f$node_modules$2f$micromark$2d$util$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-character@2.1.1/node_modules/micromark-util-character/dev/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/codes.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/constants.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/types.js [app-ssr] (ecmascript)");
+;
+;
+;
+function factoryTitle(effects, ok, nok, type, markerType, stringType) {
+    /** @type {NonNullable<Code>} */ let marker;
+    return start;
+    //TURBOPACK unreachable
+    ;
+    /**
+   * Start of title.
+   *
+   * ```markdown
+   * > | "a"
+   *     ^
+   * ```
+   *
+   * @type {State}
+   */ function start(code) {
+        if (code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].quotationMark || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].apostrophe || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].leftParenthesis) {
+            effects.enter(type);
+            effects.enter(markerType);
+            effects.consume(code);
+            effects.exit(markerType);
+            marker = code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].leftParenthesis ? __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].rightParenthesis : code;
+            return begin;
+        }
+        return nok(code);
+    }
+    /**
+   * After opening marker.
+   *
+   * This is also used at the closing marker.
+   *
+   * ```markdown
+   * > | "a"
+   *      ^
+   * ```
+   *
+   * @type {State}
+   */ function begin(code) {
+        if (code === marker) {
+            effects.enter(markerType);
+            effects.consume(code);
+            effects.exit(markerType);
+            effects.exit(type);
+            return ok;
+        }
+        effects.enter(stringType);
+        return atBreak(code);
+    }
+    /**
+   * At something, before something else.
+   *
+   * ```markdown
+   * > | "a"
+   *      ^
+   * ```
+   *
+   * @type {State}
+   */ function atBreak(code) {
+        if (code === marker) {
+            effects.exit(stringType);
+            return begin(marker);
+        }
+        if (code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].eof) {
+            return nok(code);
+        }
+        // Note: blank lines can’t exist in content.
+        if ((0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$character$40$2$2e$1$2e$1$2f$node_modules$2f$micromark$2d$util$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["markdownLineEnding"])(code)) {
+            // To do: use `space_or_tab_eol_with_options`, connect.
+            effects.enter(__TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].lineEnding);
+            effects.consume(code);
+            effects.exit(__TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].lineEnding);
+            return (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$factory$2d$space$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$factory$2d$space$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["factorySpace"])(effects, atBreak, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].linePrefix);
+        }
+        effects.enter(__TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].chunkString, {
+            contentType: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["constants"].contentTypeString
+        });
+        return inside(code);
+    }
+    /**
+   *
+   *
+   * @type {State}
+   */ function inside(code) {
+        if (code === marker || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].eof || (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$character$40$2$2e$1$2e$1$2f$node_modules$2f$micromark$2d$util$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["markdownLineEnding"])(code)) {
+            effects.exit(__TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].chunkString);
+            return atBreak(code);
+        }
+        effects.consume(code);
+        return code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].backslash ? escape : inside;
+    }
+    /**
+   * After `\`, at a special character.
+   *
+   * ```markdown
+   * > | "a\*b"
+   *      ^
+   * ```
+   *
+   * @type {State}
+   */ function escape(code) {
+        if (code === marker || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].backslash) {
+            effects.consume(code);
+            return inside;
+        }
+        return inside(code);
+    }
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-factory-whitespace@2.0.1/node_modules/micromark-factory-whitespace/dev/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "factoryWhitespace",
+    ()=>factoryWhitespace
+]);
+/**
+ * @import {Effects, State} from 'micromark-util-types'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$factory$2d$space$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$factory$2d$space$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-factory-space@2.0.1/node_modules/micromark-factory-space/dev/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$character$40$2$2e$1$2e$1$2f$node_modules$2f$micromark$2d$util$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-character@2.1.1/node_modules/micromark-util-character/dev/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/types.js [app-ssr] (ecmascript)");
+;
+;
+;
+function factoryWhitespace(effects, ok) {
+    /** @type {boolean} */ let seen;
+    return start;
+    //TURBOPACK unreachable
+    ;
+    /** @type {State} */ function start(code) {
+        if ((0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$character$40$2$2e$1$2e$1$2f$node_modules$2f$micromark$2d$util$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["markdownLineEnding"])(code)) {
+            effects.enter(__TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].lineEnding);
+            effects.consume(code);
+            effects.exit(__TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].lineEnding);
+            seen = true;
+            return start;
+        }
+        if ((0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$character$40$2$2e$1$2e$1$2f$node_modules$2f$micromark$2d$util$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["markdownSpace"])(code)) {
+            return (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$factory$2d$space$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$factory$2d$space$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["factorySpace"])(effects, start, seen ? __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].linePrefix : __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].lineSuffix)(code);
+        }
+        return ok(code);
+    }
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-normalize-identifier@2.0.1/node_modules/micromark-util-normalize-identifier/dev/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "normalizeIdentifier",
+    ()=>normalizeIdentifier
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$values$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/values.js [app-ssr] (ecmascript)");
+;
+function normalizeIdentifier(value) {
+    return value// Collapse markdown whitespace.
+    .replace(/[\t\n\r ]+/g, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$values$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["values"].space)// Trim.
+    .replace(/^ | $/g, '')// Some characters are considered “uppercase”, but if their lowercase
+    // counterpart is uppercased will result in a different uppercase
+    // character.
+    // Hence, to get that form, we perform both lower- and uppercase.
+    // Upper case makes sure keys will not interact with default prototypal
+    // methods: no method is uppercase.
+    .toLowerCase().toUpperCase();
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-html-tag-name@2.0.1/node_modules/micromark-util-html-tag-name/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * List of lowercase HTML “block” tag names.
+ *
+ * The list, when parsing HTML (flow), results in more relaxed rules (condition
+ * 6).
+ * Because they are known blocks, the HTML-like syntax doesn’t have to be
+ * strictly parsed.
+ * For tag names not in this list, a more strict algorithm (condition 7) is used
+ * to detect whether the HTML-like syntax is seen as HTML (flow) or not.
+ *
+ * This is copied from:
+ * <https://spec.commonmark.org/0.30/#html-blocks>.
+ *
+ * > 👉 **Note**: `search` was added in `CommonMark@0.31`.
+ */ __turbopack_context__.s([
+    "htmlBlockNames",
+    ()=>htmlBlockNames,
+    "htmlRawNames",
+    ()=>htmlRawNames
+]);
+const htmlBlockNames = [
+    'address',
+    'article',
+    'aside',
+    'base',
+    'basefont',
+    'blockquote',
+    'body',
+    'caption',
+    'center',
+    'col',
+    'colgroup',
+    'dd',
+    'details',
+    'dialog',
+    'dir',
+    'div',
+    'dl',
+    'dt',
+    'fieldset',
+    'figcaption',
+    'figure',
+    'footer',
+    'form',
+    'frame',
+    'frameset',
+    'h1',
+    'h2',
+    'h3',
+    'h4',
+    'h5',
+    'h6',
+    'head',
+    'header',
+    'hr',
+    'html',
+    'iframe',
+    'legend',
+    'li',
+    'link',
+    'main',
+    'menu',
+    'menuitem',
+    'nav',
+    'noframes',
+    'ol',
+    'optgroup',
+    'option',
+    'p',
+    'param',
+    'search',
+    'section',
+    'summary',
+    'table',
+    'tbody',
+    'td',
+    'tfoot',
+    'th',
+    'thead',
+    'title',
+    'tr',
+    'track',
+    'ul'
+];
+const htmlRawNames = [
+    'pre',
+    'script',
+    'style',
+    'textarea'
+];
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/ms@2.1.3/node_modules/ms/index.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+
+/**
+ * Helpers.
+ */ var s = 1000;
+var m = s * 60;
+var h = m * 60;
+var d = h * 24;
+var w = d * 7;
+var y = d * 365.25;
+/**
+ * Parse or format the given `val`.
+ *
+ * Options:
+ *
+ *  - `long` verbose formatting [false]
+ *
+ * @param {String|Number} val
+ * @param {Object} [options]
+ * @throws {Error} throw an error if val is not a non-empty string or a number
+ * @return {String|Number}
+ * @api public
+ */ module.exports = function(val, options) {
+    options = options || {};
+    var type = typeof val;
+    if (type === 'string' && val.length > 0) {
+        return parse(val);
+    } else if (type === 'number' && isFinite(val)) {
+        return options.long ? fmtLong(val) : fmtShort(val);
+    }
+    throw new Error('val is not a non-empty string or a valid number. val=' + JSON.stringify(val));
+};
+/**
+ * Parse the given `str` and return milliseconds.
+ *
+ * @param {String} str
+ * @return {Number}
+ * @api private
+ */ function parse(str) {
+    str = String(str);
+    if (str.length > 100) {
+        return;
+    }
+    var match = /^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(str);
+    if (!match) {
+        return;
+    }
+    var n = parseFloat(match[1]);
+    var type = (match[2] || 'ms').toLowerCase();
+    switch(type){
+        case 'years':
+        case 'year':
+        case 'yrs':
+        case 'yr':
+        case 'y':
+            return n * y;
+        case 'weeks':
+        case 'week':
+        case 'w':
+            return n * w;
+        case 'days':
+        case 'day':
+        case 'd':
+            return n * d;
+        case 'hours':
+        case 'hour':
+        case 'hrs':
+        case 'hr':
+        case 'h':
+            return n * h;
+        case 'minutes':
+        case 'minute':
+        case 'mins':
+        case 'min':
+        case 'm':
+            return n * m;
+        case 'seconds':
+        case 'second':
+        case 'secs':
+        case 'sec':
+        case 's':
+            return n * s;
+        case 'milliseconds':
+        case 'millisecond':
+        case 'msecs':
+        case 'msec':
+        case 'ms':
+            return n;
+        default:
+            return undefined;
+    }
+}
+/**
+ * Short format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */ function fmtShort(ms) {
+    var msAbs = Math.abs(ms);
+    if (msAbs >= d) {
+        return Math.round(ms / d) + 'd';
+    }
+    if (msAbs >= h) {
+        return Math.round(ms / h) + 'h';
+    }
+    if (msAbs >= m) {
+        return Math.round(ms / m) + 'm';
+    }
+    if (msAbs >= s) {
+        return Math.round(ms / s) + 's';
+    }
+    return ms + 'ms';
+}
+/**
+ * Long format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */ function fmtLong(ms) {
+    var msAbs = Math.abs(ms);
+    if (msAbs >= d) {
+        return plural(ms, msAbs, d, 'day');
+    }
+    if (msAbs >= h) {
+        return plural(ms, msAbs, h, 'hour');
+    }
+    if (msAbs >= m) {
+        return plural(ms, msAbs, m, 'minute');
+    }
+    if (msAbs >= s) {
+        return plural(ms, msAbs, s, 'second');
+    }
+    return ms + ' ms';
+}
+/**
+ * Pluralization helper.
+ */ function plural(ms, msAbs, n, name) {
+    var isPlural = msAbs >= n * 1.5;
+    return Math.round(ms / n) + ' ' + name + (isPlural ? 's' : '');
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/common.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+
+/**
+ * This is the common logic for both the Node.js and web browser
+ * implementations of `debug()`.
+ */ function setup(env) {
+    createDebug.debug = createDebug;
+    createDebug.default = createDebug;
+    createDebug.coerce = coerce;
+    createDebug.disable = disable;
+    createDebug.enable = enable;
+    createDebug.enabled = enabled;
+    createDebug.humanize = __turbopack_context__.r("[project]/projects/open-plugin/docs/node_modules/.pnpm/ms@2.1.3/node_modules/ms/index.js [app-ssr] (ecmascript)");
+    createDebug.destroy = destroy;
+    Object.keys(env).forEach((key)=>{
+        createDebug[key] = env[key];
+    });
+    /**
+	* The currently active debug mode names, and names to skip.
+	*/ createDebug.names = [];
+    createDebug.skips = [];
+    /**
+	* Map of special "%n" handling functions, for the debug "format" argument.
+	*
+	* Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
+	*/ createDebug.formatters = {};
+    /**
+	* Selects a color for a debug namespace
+	* @param {String} namespace The namespace string for the debug instance to be colored
+	* @return {Number|String} An ANSI color code for the given namespace
+	* @api private
+	*/ function selectColor(namespace) {
+        let hash = 0;
+        for(let i = 0; i < namespace.length; i++){
+            hash = (hash << 5) - hash + namespace.charCodeAt(i);
+            hash |= 0; // Convert to 32bit integer
+        }
+        return createDebug.colors[Math.abs(hash) % createDebug.colors.length];
+    }
+    createDebug.selectColor = selectColor;
+    /**
+	* Create a debugger with the given `namespace`.
+	*
+	* @param {String} namespace
+	* @return {Function}
+	* @api public
+	*/ function createDebug(namespace) {
+        let prevTime;
+        let enableOverride = null;
+        let namespacesCache;
+        let enabledCache;
+        function debug(...args) {
+            // Disabled?
+            if (!debug.enabled) {
+                return;
+            }
+            const self = debug;
+            // Set `diff` timestamp
+            const curr = Number(new Date());
+            const ms = curr - (prevTime || curr);
+            self.diff = ms;
+            self.prev = prevTime;
+            self.curr = curr;
+            prevTime = curr;
+            args[0] = createDebug.coerce(args[0]);
+            if (typeof args[0] !== 'string') {
+                // Anything else let's inspect with %O
+                args.unshift('%O');
+            }
+            // Apply any `formatters` transformations
+            let index = 0;
+            args[0] = args[0].replace(/%([a-zA-Z%])/g, (match, format)=>{
+                // If we encounter an escaped % then don't increase the array index
+                if (match === '%%') {
+                    return '%';
+                }
+                index++;
+                const formatter = createDebug.formatters[format];
+                if (typeof formatter === 'function') {
+                    const val = args[index];
+                    match = formatter.call(self, val);
+                    // Now we need to remove `args[index]` since it's inlined in the `format`
+                    args.splice(index, 1);
+                    index--;
+                }
+                return match;
+            });
+            // Apply env-specific formatting (colors, etc.)
+            createDebug.formatArgs.call(self, args);
+            const logFn = self.log || createDebug.log;
+            logFn.apply(self, args);
+        }
+        debug.namespace = namespace;
+        debug.useColors = createDebug.useColors();
+        debug.color = createDebug.selectColor(namespace);
+        debug.extend = extend;
+        debug.destroy = createDebug.destroy; // XXX Temporary. Will be removed in the next major release.
+        Object.defineProperty(debug, 'enabled', {
+            enumerable: true,
+            configurable: false,
+            get: ()=>{
+                if (enableOverride !== null) {
+                    return enableOverride;
+                }
+                if (namespacesCache !== createDebug.namespaces) {
+                    namespacesCache = createDebug.namespaces;
+                    enabledCache = createDebug.enabled(namespace);
+                }
+                return enabledCache;
+            },
+            set: (v)=>{
+                enableOverride = v;
+            }
+        });
+        // Env-specific initialization logic for debug instances
+        if (typeof createDebug.init === 'function') {
+            createDebug.init(debug);
+        }
+        return debug;
+    }
+    function extend(namespace, delimiter) {
+        const newDebug = createDebug(this.namespace + (typeof delimiter === 'undefined' ? ':' : delimiter) + namespace);
+        newDebug.log = this.log;
+        return newDebug;
+    }
+    /**
+	* Enables a debug mode by namespaces. This can include modes
+	* separated by a colon and wildcards.
+	*
+	* @param {String} namespaces
+	* @api public
+	*/ function enable(namespaces) {
+        createDebug.save(namespaces);
+        createDebug.namespaces = namespaces;
+        createDebug.names = [];
+        createDebug.skips = [];
+        const split = (typeof namespaces === 'string' ? namespaces : '').trim().replace(/\s+/g, ',').split(',').filter(Boolean);
+        for (const ns of split){
+            if (ns[0] === '-') {
+                createDebug.skips.push(ns.slice(1));
+            } else {
+                createDebug.names.push(ns);
+            }
+        }
+    }
+    /**
+	 * Checks if the given string matches a namespace template, honoring
+	 * asterisks as wildcards.
+	 *
+	 * @param {String} search
+	 * @param {String} template
+	 * @return {Boolean}
+	 */ function matchesTemplate(search, template) {
+        let searchIndex = 0;
+        let templateIndex = 0;
+        let starIndex = -1;
+        let matchIndex = 0;
+        while(searchIndex < search.length){
+            if (templateIndex < template.length && (template[templateIndex] === search[searchIndex] || template[templateIndex] === '*')) {
+                // Match character or proceed with wildcard
+                if (template[templateIndex] === '*') {
+                    starIndex = templateIndex;
+                    matchIndex = searchIndex;
+                    templateIndex++; // Skip the '*'
+                } else {
+                    searchIndex++;
+                    templateIndex++;
+                }
+            } else if (starIndex !== -1) {
+                // Backtrack to the last '*' and try to match more characters
+                templateIndex = starIndex + 1;
+                matchIndex++;
+                searchIndex = matchIndex;
+            } else {
+                return false; // No match
+            }
+        }
+        // Handle trailing '*' in template
+        while(templateIndex < template.length && template[templateIndex] === '*'){
+            templateIndex++;
+        }
+        return templateIndex === template.length;
+    }
+    /**
+	* Disable debug output.
+	*
+	* @return {String} namespaces
+	* @api public
+	*/ function disable() {
+        const namespaces = [
+            ...createDebug.names,
+            ...createDebug.skips.map((namespace)=>'-' + namespace)
+        ].join(',');
+        createDebug.enable('');
+        return namespaces;
+    }
+    /**
+	* Returns true if the given mode name is enabled, false otherwise.
+	*
+	* @param {String} name
+	* @return {Boolean}
+	* @api public
+	*/ function enabled(name) {
+        for (const skip of createDebug.skips){
+            if (matchesTemplate(name, skip)) {
+                return false;
+            }
+        }
+        for (const ns of createDebug.names){
+            if (matchesTemplate(name, ns)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
+	* Coerce `val`.
+	*
+	* @param {Mixed} val
+	* @return {Mixed}
+	* @api private
+	*/ function coerce(val) {
+        if (val instanceof Error) {
+            return val.stack || val.message;
+        }
+        return val;
+    }
+    /**
+	* XXX DO NOT USE. This is a temporary stub function.
+	* XXX It WILL be removed in the next major release.
+	*/ function destroy() {
+        console.warn('Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.');
+    }
+    createDebug.enable(createDebug.load());
+    return createDebug;
+}
+module.exports = setup;
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/node.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+
+/**
+ * Module dependencies.
+ */ const tty = __turbopack_context__.r("[externals]/tty [external] (tty, cjs)");
+const util = __turbopack_context__.r("[externals]/util [external] (util, cjs)");
+/**
+ * This is the Node.js implementation of `debug()`.
+ */ exports.init = init;
+exports.log = log;
+exports.formatArgs = formatArgs;
+exports.save = save;
+exports.load = load;
+exports.useColors = useColors;
+exports.destroy = util.deprecate(()=>{}, 'Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.');
+/**
+ * Colors.
+ */ exports.colors = [
+    6,
+    2,
+    3,
+    4,
+    5,
+    1
+];
+try {
+    // Optional dependency (as in, doesn't need to be installed, NOT like optionalDependencies in package.json)
+    // eslint-disable-next-line import/no-extraneous-dependencies
+    const supportsColor = (()=>{
+        const e = new Error("Cannot find module 'supports-color'");
+        e.code = 'MODULE_NOT_FOUND';
+        throw e;
+    })();
+    if (supportsColor && (supportsColor.stderr || supportsColor).level >= 2) {
+        exports.colors = [
+            20,
+            21,
+            26,
+            27,
+            32,
+            33,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            56,
+            57,
+            62,
+            63,
+            68,
+            69,
+            74,
+            75,
+            76,
+            77,
+            78,
+            79,
+            80,
+            81,
+            92,
+            93,
+            98,
+            99,
+            112,
+            113,
+            128,
+            129,
+            134,
+            135,
+            148,
+            149,
+            160,
+            161,
+            162,
+            163,
+            164,
+            165,
+            166,
+            167,
+            168,
+            169,
+            170,
+            171,
+            172,
+            173,
+            178,
+            179,
+            184,
+            185,
+            196,
+            197,
+            198,
+            199,
+            200,
+            201,
+            202,
+            203,
+            204,
+            205,
+            206,
+            207,
+            208,
+            209,
+            214,
+            215,
+            220,
+            221
+        ];
+    }
+} catch (error) {
+// Swallow - we only care if `supports-color` is available; it doesn't have to be.
+}
+/**
+ * Build up the default `inspectOpts` object from the environment variables.
+ *
+ *   $ DEBUG_COLORS=no DEBUG_DEPTH=10 DEBUG_SHOW_HIDDEN=enabled node script.js
+ */ exports.inspectOpts = Object.keys(process.env).filter((key)=>{
+    return /^debug_/i.test(key);
+}).reduce((obj, key)=>{
+    // Camel-case
+    const prop = key.substring(6).toLowerCase().replace(/_([a-z])/g, (_, k)=>{
+        return k.toUpperCase();
+    });
+    // Coerce string value into JS value
+    let val = process.env[key];
+    if (/^(yes|on|true|enabled)$/i.test(val)) {
+        val = true;
+    } else if (/^(no|off|false|disabled)$/i.test(val)) {
+        val = false;
+    } else if (val === 'null') {
+        val = null;
+    } else {
+        val = Number(val);
+    }
+    obj[prop] = val;
+    return obj;
+}, {});
+/**
+ * Is stdout a TTY? Colored output is enabled when `true`.
+ */ function useColors() {
+    return 'colors' in exports.inspectOpts ? Boolean(exports.inspectOpts.colors) : tty.isatty(process.stderr.fd);
+}
+/**
+ * Adds ANSI color escape codes if enabled.
+ *
+ * @api public
+ */ function formatArgs(args) {
+    const { namespace: name, useColors } = this;
+    if (useColors) {
+        const c = this.color;
+        const colorCode = '\u001B[3' + (c < 8 ? c : '8;5;' + c);
+        const prefix = `  ${colorCode};1m${name} \u001B[0m`;
+        args[0] = prefix + args[0].split('\n').join('\n' + prefix);
+        args.push(colorCode + 'm+' + module.exports.humanize(this.diff) + '\u001B[0m');
+    } else {
+        args[0] = getDate() + name + ' ' + args[0];
+    }
+}
+function getDate() {
+    if (exports.inspectOpts.hideDate) {
+        return '';
+    }
+    return new Date().toISOString() + ' ';
+}
+/**
+ * Invokes `util.formatWithOptions()` with the specified arguments and writes to stderr.
+ */ function log(...args) {
+    return process.stderr.write(util.formatWithOptions(exports.inspectOpts, ...args) + '\n');
+}
+/**
+ * Save `namespaces`.
+ *
+ * @param {String} namespaces
+ * @api private
+ */ function save(namespaces) {
+    if (namespaces) {
+        process.env.DEBUG = namespaces;
+    } else {
+        // If you set a process.env field to null or undefined, it gets cast to the
+        // string 'null' or 'undefined'. Just delete instead.
+        delete process.env.DEBUG;
+    }
+}
+/**
+ * Load `namespaces`.
+ *
+ * @return {String} returns the previously persisted debug modes
+ * @api private
+ */ function load() {
+    return process.env.DEBUG;
+}
+/**
+ * Init logic for `debug` instances.
+ *
+ * Create a new `inspectOpts` object in case `useColors` is set
+ * differently for a particular `debug` instance.
+ */ function init(debug) {
+    debug.inspectOpts = {};
+    const keys = Object.keys(exports.inspectOpts);
+    for(let i = 0; i < keys.length; i++){
+        debug.inspectOpts[keys[i]] = exports.inspectOpts[keys[i]];
+    }
+}
+module.exports = __turbopack_context__.r("[project]/projects/open-plugin/docs/node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/common.js [app-ssr] (ecmascript)")(exports);
+const { formatters } = module.exports;
+/**
+ * Map %o to `util.inspect()`, all on a single line.
+ */ formatters.o = function(v) {
+    this.inspectOpts.colors = this.useColors;
+    return util.inspect(v, this.inspectOpts).split('\n').map((str)=>str.trim()).join(' ');
+};
+/**
+ * Map %O to `util.inspect()`, allowing multiple lines if needed.
+ */ formatters.O = function(v) {
+    this.inspectOpts.colors = this.useColors;
+    return util.inspect(v, this.inspectOpts);
+};
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/browser.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+
+/* eslint-env browser */ /**
+ * This is the web browser implementation of `debug()`.
+ */ exports.formatArgs = formatArgs;
+exports.save = save;
+exports.load = load;
+exports.useColors = useColors;
+exports.storage = localstorage();
+exports.destroy = (()=>{
+    let warned = false;
+    return ()=>{
+        if (!warned) {
+            warned = true;
+            console.warn('Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.');
+        }
+    };
+})();
+/**
+ * Colors.
+ */ exports.colors = [
+    '#0000CC',
+    '#0000FF',
+    '#0033CC',
+    '#0033FF',
+    '#0066CC',
+    '#0066FF',
+    '#0099CC',
+    '#0099FF',
+    '#00CC00',
+    '#00CC33',
+    '#00CC66',
+    '#00CC99',
+    '#00CCCC',
+    '#00CCFF',
+    '#3300CC',
+    '#3300FF',
+    '#3333CC',
+    '#3333FF',
+    '#3366CC',
+    '#3366FF',
+    '#3399CC',
+    '#3399FF',
+    '#33CC00',
+    '#33CC33',
+    '#33CC66',
+    '#33CC99',
+    '#33CCCC',
+    '#33CCFF',
+    '#6600CC',
+    '#6600FF',
+    '#6633CC',
+    '#6633FF',
+    '#66CC00',
+    '#66CC33',
+    '#9900CC',
+    '#9900FF',
+    '#9933CC',
+    '#9933FF',
+    '#99CC00',
+    '#99CC33',
+    '#CC0000',
+    '#CC0033',
+    '#CC0066',
+    '#CC0099',
+    '#CC00CC',
+    '#CC00FF',
+    '#CC3300',
+    '#CC3333',
+    '#CC3366',
+    '#CC3399',
+    '#CC33CC',
+    '#CC33FF',
+    '#CC6600',
+    '#CC6633',
+    '#CC9900',
+    '#CC9933',
+    '#CCCC00',
+    '#CCCC33',
+    '#FF0000',
+    '#FF0033',
+    '#FF0066',
+    '#FF0099',
+    '#FF00CC',
+    '#FF00FF',
+    '#FF3300',
+    '#FF3333',
+    '#FF3366',
+    '#FF3399',
+    '#FF33CC',
+    '#FF33FF',
+    '#FF6600',
+    '#FF6633',
+    '#FF9900',
+    '#FF9933',
+    '#FFCC00',
+    '#FFCC33'
+];
+/**
+ * Currently only WebKit-based Web Inspectors, Firefox >= v31,
+ * and the Firebug extension (any Firefox version) are known
+ * to support "%c" CSS customizations.
+ *
+ * TODO: add a `localStorage` variable to explicitly enable/disable colors
+ */ // eslint-disable-next-line complexity
+function useColors() {
+    // NB: In an Electron preload script, document will be defined but not fully
+    // initialized. Since we know we're in Chrome, we'll just detect this case
+    // explicitly
+    if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+    ;
+    // Internet Explorer and Edge do not support colors.
+    if (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/(edge|trident)\/(\d+)/)) {
+        return false;
+    }
+    let m;
+    // Is webkit? http://stackoverflow.com/a/16459606/376773
+    // document is undefined in react-native: https://github.com/facebook/react-native/pull/1632
+    // eslint-disable-next-line no-return-assign
+    return typeof document !== 'undefined' && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance || ("TURBOPACK compile-time value", "undefined") !== 'undefined' && window.console && (window.console.firebug || window.console.exception && window.console.table) || typeof navigator !== 'undefined' && navigator.userAgent && (m = navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/)) && parseInt(m[1], 10) >= 31 || typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/);
+}
+/**
+ * Colorize log arguments if enabled.
+ *
+ * @api public
+ */ function formatArgs(args) {
+    args[0] = (this.useColors ? '%c' : '') + this.namespace + (this.useColors ? ' %c' : ' ') + args[0] + (this.useColors ? '%c ' : ' ') + '+' + module.exports.humanize(this.diff);
+    if (!this.useColors) {
+        return;
+    }
+    const c = 'color: ' + this.color;
+    args.splice(1, 0, c, 'color: inherit');
+    // The final "%c" is somewhat tricky, because there could be other
+    // arguments passed either before or after the %c, so we need to
+    // figure out the correct index to insert the CSS into
+    let index = 0;
+    let lastC = 0;
+    args[0].replace(/%[a-zA-Z%]/g, (match)=>{
+        if (match === '%%') {
+            return;
+        }
+        index++;
+        if (match === '%c') {
+            // We only are interested in the *last* %c
+            // (the user may have provided their own)
+            lastC = index;
+        }
+    });
+    args.splice(lastC, 0, c);
+}
+/**
+ * Invokes `console.debug()` when available.
+ * No-op when `console.debug` is not a "function".
+ * If `console.debug` is not available, falls back
+ * to `console.log`.
+ *
+ * @api public
+ */ exports.log = console.debug || console.log || (()=>{});
+/**
+ * Save `namespaces`.
+ *
+ * @param {String} namespaces
+ * @api private
+ */ function save(namespaces) {
+    try {
+        if (namespaces) {
+            exports.storage.setItem('debug', namespaces);
+        } else {
+            exports.storage.removeItem('debug');
+        }
+    } catch (error) {
+    // Swallow
+    // XXX (@Qix-) should we be logging these?
+    }
+}
+/**
+ * Load `namespaces`.
+ *
+ * @return {String} returns the previously persisted debug modes
+ * @api private
+ */ function load() {
+    let r;
+    try {
+        r = exports.storage.getItem('debug') || exports.storage.getItem('DEBUG');
+    } catch (error) {
+    // Swallow
+    // XXX (@Qix-) should we be logging these?
+    }
+    // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
+    if (!r && typeof process !== 'undefined' && 'env' in process) {
+        r = process.env.DEBUG;
+    }
+    return r;
+}
+/**
+ * Localstorage attempts to return the localstorage.
+ *
+ * This is necessary because safari throws
+ * when a user disables cookies/localstorage
+ * and you attempt to access it.
+ *
+ * @return {LocalStorage}
+ * @api private
+ */ function localstorage() {
+    try {
+        // TVMLKit (Apple TV JS Runtime) does not have a window object, just localStorage in the global context
+        // The Browser also has localStorage in the global context.
+        return localStorage;
+    } catch (error) {
+    // Swallow
+    // XXX (@Qix-) should we be logging these?
+    }
+}
+module.exports = __turbopack_context__.r("[project]/projects/open-plugin/docs/node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/common.js [app-ssr] (ecmascript)")(exports);
+const { formatters } = module.exports;
+/**
+ * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
+ */ formatters.j = function(v) {
+    try {
+        return JSON.stringify(v);
+    } catch (error) {
+        return '[UnexpectedJSONParseError]: ' + error.message;
+    }
+};
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/index.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+
+/**
+ * Detect Electron renderer / nwjs process, which is node, but we should
+ * treat as a browser.
+ */ if (typeof process === 'undefined' || process.type === 'renderer' || ("TURBOPACK compile-time value", false) === true || process.__nwjs) {
+    module.exports = __turbopack_context__.r("[project]/projects/open-plugin/docs/node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/browser.js [app-ssr] (ecmascript)");
+} else {
+    module.exports = __turbopack_context__.r("[project]/projects/open-plugin/docs/node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/node.js [app-ssr] (ecmascript)");
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-decode-numeric-character-reference@2.0.2/node_modules/micromark-util-decode-numeric-character-reference/dev/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "decodeNumericCharacterReference",
+    ()=>decodeNumericCharacterReference
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/codes.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$values$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/values.js [app-ssr] (ecmascript)");
+;
+function decodeNumericCharacterReference(value, base) {
+    const code = Number.parseInt(value, base);
+    if (// C0 except for HT, LF, FF, CR, space.
+    code < __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].ht || code === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].vt || code > __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].cr && code < __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].space || code > __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].tilde && code < 160 || code > 55_295 && code < 57_344 || code > 64_975 && code < 65_008 || /* eslint-disable no-bitwise */ (code & 65_535) === 65_535 || (code & 65_535) === 65_534 || /* eslint-enable no-bitwise */ // Out of range
+    code > 1_114_111) {
+        return __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$values$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["values"].replacementCharacter;
+    }
+    return String.fromCodePoint(code);
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-decode-string@2.0.1/node_modules/micromark-util-decode-string/dev/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "decodeString",
+    ()=>decodeString
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$decode$2d$named$2d$character$2d$reference$40$1$2e$3$2e$0$2f$node_modules$2f$decode$2d$named$2d$character$2d$reference$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/decode-named-character-reference@1.3.0/node_modules/decode-named-character-reference/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$decode$2d$numeric$2d$character$2d$reference$40$2$2e$0$2e$2$2f$node_modules$2f$micromark$2d$util$2d$decode$2d$numeric$2d$character$2d$reference$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-decode-numeric-character-reference@2.0.2/node_modules/micromark-util-decode-numeric-character-reference/dev/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/codes.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/constants.js [app-ssr] (ecmascript)");
+;
+;
+;
+const characterEscapeOrReference = /\\([!-/:-@[-`{-~])|&(#(?:\d{1,7}|x[\da-f]{1,6})|[\da-z]{1,31});/gi;
+function decodeString(value) {
+    return value.replace(characterEscapeOrReference, decode);
+}
+/**
+ * @param {string} $0
+ *   Match.
+ * @param {string} $1
+ *   Character escape.
+ * @param {string} $2
+ *   Character reference.
+ * @returns {string}
+ *   Decoded value
+ */ function decode($0, $1, $2) {
+    if ($1) {
+        // Escape.
+        return $1;
+    }
+    // Reference.
+    const head = $2.charCodeAt(0);
+    if (head === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].numberSign) {
+        const head = $2.charCodeAt(1);
+        const hex = head === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].lowercaseX || head === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].uppercaseX;
+        return (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$decode$2d$numeric$2d$character$2d$reference$40$2$2e$0$2e$2$2f$node_modules$2f$micromark$2d$util$2d$decode$2d$numeric$2d$character$2d$reference$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["decodeNumericCharacterReference"])($2.slice(hex ? 2 : 1), hex ? __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["constants"].numericBaseHexadecimal : __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["constants"].numericBaseDecimal);
+    }
+    return (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$decode$2d$named$2d$character$2d$reference$40$1$2e$3$2e$0$2f$node_modules$2f$decode$2d$named$2d$character$2d$reference$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["decodeNamedCharacterReference"])($2) || $0;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/unist-util-stringify-position@4.0.0/node_modules/unist-util-stringify-position/lib/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * @typedef {import('unist').Node} Node
+ * @typedef {import('unist').Point} Point
+ * @typedef {import('unist').Position} Position
+ */ /**
+ * @typedef NodeLike
+ * @property {string} type
+ * @property {PositionLike | null | undefined} [position]
+ *
+ * @typedef PointLike
+ * @property {number | null | undefined} [line]
+ * @property {number | null | undefined} [column]
+ * @property {number | null | undefined} [offset]
+ *
+ * @typedef PositionLike
+ * @property {PointLike | null | undefined} [start]
+ * @property {PointLike | null | undefined} [end]
+ */ /**
+ * Serialize the positional info of a point, position (start and end points),
+ * or node.
+ *
+ * @param {Node | NodeLike | Point | PointLike | Position | PositionLike | null | undefined} [value]
+ *   Node, position, or point.
+ * @returns {string}
+ *   Pretty printed positional info of a node (`string`).
+ *
+ *   In the format of a range `ls:cs-le:ce` (when given `node` or `position`)
+ *   or a point `l:c` (when given `point`), where `l` stands for line, `c` for
+ *   column, `s` for `start`, and `e` for end.
+ *   An empty string (`''`) is returned if the given value is neither `node`,
+ *   `position`, nor `point`.
+ */ __turbopack_context__.s([
+    "stringifyPosition",
+    ()=>stringifyPosition
+]);
+function stringifyPosition(value) {
+    // Nothing.
+    if (!value || typeof value !== 'object') {
+        return '';
+    }
+    // Node.
+    if ('position' in value || 'type' in value) {
+        return position(value.position);
+    }
+    // Position.
+    if ('start' in value || 'end' in value) {
+        return position(value);
+    }
+    // Point.
+    if ('line' in value || 'column' in value) {
+        return point(value);
+    }
+    // ?
+    return '';
+}
+/**
+ * @param {Point | PointLike | null | undefined} point
+ * @returns {string}
+ */ function point(point) {
+    return index(point && point.line) + ':' + index(point && point.column);
+}
+/**
+ * @param {Position | PositionLike | null | undefined} pos
+ * @returns {string}
+ */ function position(pos) {
+    return point(pos && pos.start) + '-' + point(pos && pos.end);
+}
+/**
+ * @param {number | null | undefined} value
+ * @returns {number}
+ */ function index(value) {
+    return value && typeof value === 'number' ? value : 1;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-from-markdown@2.0.3/node_modules/mdast-util-from-markdown/dev/lib/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "fromMarkdown",
+    ()=>fromMarkdown
+]);
+/**
+ * @import {
+ *   Break,
+ *   Blockquote,
+ *   Code,
+ *   Definition,
+ *   Emphasis,
+ *   Heading,
+ *   Html,
+ *   Image,
+ *   InlineCode,
+ *   Link,
+ *   ListItem,
+ *   List,
+ *   Nodes,
+ *   Paragraph,
+ *   PhrasingContent,
+ *   ReferenceType,
+ *   Root,
+ *   Strong,
+ *   Text,
+ *   ThematicBreak
+ * } from 'mdast'
+ * @import {
+ *   Encoding,
+ *   Event,
+ *   Token,
+ *   Value
+ * } from 'micromark-util-types'
+ * @import {Point} from 'unist'
+ * @import {
+ *   CompileContext,
+ *   CompileData,
+ *   Config,
+ *   Extension,
+ *   Handle,
+ *   OnEnterError,
+ *   Options
+ * } from './types.js'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/devlop@1.1.0/node_modules/devlop/lib/development.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$string$40$4$2e$0$2e$0$2f$node_modules$2f$mdast$2d$util$2d$to$2d$string$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-string@4.0.0/node_modules/mdast-util-to-string/lib/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$40$4$2e$0$2e$2$2f$node_modules$2f$micromark$2f$dev$2f$lib$2f$parse$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark@4.0.2/node_modules/micromark/dev/lib/parse.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$40$4$2e$0$2e$2$2f$node_modules$2f$micromark$2f$dev$2f$lib$2f$postprocess$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark@4.0.2/node_modules/micromark/dev/lib/postprocess.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$40$4$2e$0$2e$2$2f$node_modules$2f$micromark$2f$dev$2f$lib$2f$preprocess$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark@4.0.2/node_modules/micromark/dev/lib/preprocess.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$decode$2d$numeric$2d$character$2d$reference$40$2$2e$0$2e$2$2f$node_modules$2f$micromark$2d$util$2d$decode$2d$numeric$2d$character$2d$reference$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-decode-numeric-character-reference@2.0.2/node_modules/micromark-util-decode-numeric-character-reference/dev/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$decode$2d$string$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$decode$2d$string$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-decode-string@2.0.1/node_modules/micromark-util-decode-string/dev/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$normalize$2d$identifier$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$normalize$2d$identifier$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-normalize-identifier@2.0.1/node_modules/micromark-util-normalize-identifier/dev/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/codes.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/constants.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/types.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$decode$2d$named$2d$character$2d$reference$40$1$2e$3$2e$0$2f$node_modules$2f$decode$2d$named$2d$character$2d$reference$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/decode-named-character-reference@1.3.0/node_modules/decode-named-character-reference/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unist$2d$util$2d$stringify$2d$position$40$4$2e$0$2e$0$2f$node_modules$2f$unist$2d$util$2d$stringify$2d$position$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/unist-util-stringify-position@4.0.0/node_modules/unist-util-stringify-position/lib/index.js [app-ssr] (ecmascript)");
+;
+;
+;
+;
+;
+;
+;
+;
+;
+const own = {}.hasOwnProperty;
+function fromMarkdown(value, encoding, options) {
+    if (encoding && typeof encoding === 'object') {
+        options = encoding;
+        encoding = undefined;
+    }
+    return compiler(options)((0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$40$4$2e$0$2e$2$2f$node_modules$2f$micromark$2f$dev$2f$lib$2f$postprocess$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["postprocess"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$40$4$2e$0$2e$2$2f$node_modules$2f$micromark$2f$dev$2f$lib$2f$parse$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["parse"])(options).document().write((0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$40$4$2e$0$2e$2$2f$node_modules$2f$micromark$2f$dev$2f$lib$2f$preprocess$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["preprocess"])()(value, encoding, true))));
+}
+/**
+ * Note this compiler only understand complete buffering, not streaming.
+ *
+ * @param {Options | null | undefined} [options]
+ */ function compiler(options) {
+    /** @type {Config} */ const config = {
+        transforms: [],
+        canContainEols: [
+            'emphasis',
+            'fragment',
+            'heading',
+            'paragraph',
+            'strong'
+        ],
+        enter: {
+            autolink: opener(link),
+            autolinkProtocol: onenterdata,
+            autolinkEmail: onenterdata,
+            atxHeading: opener(heading),
+            blockQuote: opener(blockQuote),
+            characterEscape: onenterdata,
+            characterReference: onenterdata,
+            codeFenced: opener(codeFlow),
+            codeFencedFenceInfo: buffer,
+            codeFencedFenceMeta: buffer,
+            codeIndented: opener(codeFlow, buffer),
+            codeText: opener(codeText, buffer),
+            codeTextData: onenterdata,
+            data: onenterdata,
+            codeFlowValue: onenterdata,
+            definition: opener(definition),
+            definitionDestinationString: buffer,
+            definitionLabelString: buffer,
+            definitionTitleString: buffer,
+            emphasis: opener(emphasis),
+            hardBreakEscape: opener(hardBreak),
+            hardBreakTrailing: opener(hardBreak),
+            htmlFlow: opener(html, buffer),
+            htmlFlowData: onenterdata,
+            htmlText: opener(html, buffer),
+            htmlTextData: onenterdata,
+            image: opener(image),
+            label: buffer,
+            link: opener(link),
+            listItem: opener(listItem),
+            listItemValue: onenterlistitemvalue,
+            listOrdered: opener(list, onenterlistordered),
+            listUnordered: opener(list),
+            paragraph: opener(paragraph),
+            reference: onenterreference,
+            referenceString: buffer,
+            resourceDestinationString: buffer,
+            resourceTitleString: buffer,
+            setextHeading: opener(heading),
+            strong: opener(strong),
+            thematicBreak: opener(thematicBreak)
+        },
+        exit: {
+            atxHeading: closer(),
+            atxHeadingSequence: onexitatxheadingsequence,
+            autolink: closer(),
+            autolinkEmail: onexitautolinkemail,
+            autolinkProtocol: onexitautolinkprotocol,
+            blockQuote: closer(),
+            characterEscapeValue: onexitdata,
+            characterReferenceMarkerHexadecimal: onexitcharacterreferencemarker,
+            characterReferenceMarkerNumeric: onexitcharacterreferencemarker,
+            characterReferenceValue: onexitcharacterreferencevalue,
+            characterReference: onexitcharacterreference,
+            codeFenced: closer(onexitcodefenced),
+            codeFencedFence: onexitcodefencedfence,
+            codeFencedFenceInfo: onexitcodefencedfenceinfo,
+            codeFencedFenceMeta: onexitcodefencedfencemeta,
+            codeFlowValue: onexitdata,
+            codeIndented: closer(onexitcodeindented),
+            codeText: closer(onexitcodetext),
+            codeTextData: onexitdata,
+            data: onexitdata,
+            definition: closer(),
+            definitionDestinationString: onexitdefinitiondestinationstring,
+            definitionLabelString: onexitdefinitionlabelstring,
+            definitionTitleString: onexitdefinitiontitlestring,
+            emphasis: closer(),
+            hardBreakEscape: closer(onexithardbreak),
+            hardBreakTrailing: closer(onexithardbreak),
+            htmlFlow: closer(onexithtmlflow),
+            htmlFlowData: onexitdata,
+            htmlText: closer(onexithtmltext),
+            htmlTextData: onexitdata,
+            image: closer(onexitimage),
+            label: onexitlabel,
+            labelText: onexitlabeltext,
+            lineEnding: onexitlineending,
+            link: closer(onexitlink),
+            listItem: closer(),
+            listOrdered: closer(),
+            listUnordered: closer(),
+            paragraph: closer(),
+            referenceString: onexitreferencestring,
+            resourceDestinationString: onexitresourcedestinationstring,
+            resourceTitleString: onexitresourcetitlestring,
+            resource: onexitresource,
+            setextHeading: closer(onexitsetextheading),
+            setextHeadingLineSequence: onexitsetextheadinglinesequence,
+            setextHeadingText: onexitsetextheadingtext,
+            strong: closer(),
+            thematicBreak: closer()
+        }
+    };
+    configure(config, (options || {}).mdastExtensions || []);
+    /** @type {CompileData} */ const data = {};
+    return compile;
+    //TURBOPACK unreachable
+    ;
+    /**
+   * Turn micromark events into an mdast tree.
+   *
+   * @param {Array<Event>} events
+   *   Events.
+   * @returns {Root}
+   *   mdast tree.
+   */ function compile(events) {
+        /** @type {Root} */ let tree = {
+            type: 'root',
+            children: []
+        };
+        /** @type {Omit<CompileContext, 'sliceSerialize'>} */ const context = {
+            stack: [
+                tree
+            ],
+            tokenStack: [],
+            config,
+            enter,
+            exit,
+            buffer,
+            resume,
+            data
+        };
+        /** @type {Array<number>} */ const listStack = [];
+        let index = -1;
+        while(++index < events.length){
+            // We preprocess lists to add `listItem` tokens, and to infer whether
+            // items the list itself are spread out.
+            if (events[index][1].type === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].listOrdered || events[index][1].type === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].listUnordered) {
+                if (events[index][0] === 'enter') {
+                    listStack.push(index);
+                } else {
+                    const tail = listStack.pop();
+                    (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(typeof tail === 'number', 'expected list to be open');
+                    index = prepareList(events, tail, index);
+                }
+            }
+        }
+        index = -1;
+        while(++index < events.length){
+            const handler = config[events[index][0]];
+            if (own.call(handler, events[index][1].type)) {
+                handler[events[index][1].type].call(Object.assign({
+                    sliceSerialize: events[index][2].sliceSerialize
+                }, context), events[index][1]);
+            }
+        }
+        // Handle tokens still being open.
+        if (context.tokenStack.length > 0) {
+            const tail = context.tokenStack[context.tokenStack.length - 1];
+            const handler = tail[1] || defaultOnError;
+            handler.call(context, undefined, tail[0]);
+        }
+        // Figure out `root` position.
+        tree.position = {
+            start: point(events.length > 0 ? events[0][1].start : {
+                line: 1,
+                column: 1,
+                offset: 0
+            }),
+            end: point(events.length > 0 ? events[events.length - 2][1].end : {
+                line: 1,
+                column: 1,
+                offset: 0
+            })
+        };
+        // Call transforms.
+        index = -1;
+        while(++index < config.transforms.length){
+            tree = config.transforms[index](tree) || tree;
+        }
+        return tree;
+    }
+    /**
+   * @param {Array<Event>} events
+   * @param {number} start
+   * @param {number} length
+   * @returns {number}
+   */ function prepareList(events, start, length) {
+        let index = start - 1;
+        let containerBalance = -1;
+        let listSpread = false;
+        /** @type {Token | undefined} */ let listItem;
+        /** @type {number | undefined} */ let lineIndex;
+        /** @type {number | undefined} */ let firstBlankLineIndex;
+        /** @type {boolean | undefined} */ let atMarker;
+        while(++index <= length){
+            const event = events[index];
+            switch(event[1].type){
+                case __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].listUnordered:
+                case __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].listOrdered:
+                case __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].blockQuote:
+                    {
+                        if (event[0] === 'enter') {
+                            containerBalance++;
+                        } else {
+                            containerBalance--;
+                        }
+                        atMarker = undefined;
+                        break;
+                    }
+                case __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].lineEndingBlank:
+                    {
+                        if (event[0] === 'enter') {
+                            if (listItem && !atMarker && !containerBalance && !firstBlankLineIndex) {
+                                firstBlankLineIndex = index;
+                            }
+                            atMarker = undefined;
+                        }
+                        break;
+                    }
+                case __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].linePrefix:
+                case __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].listItemValue:
+                case __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].listItemMarker:
+                case __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].listItemPrefix:
+                case __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].listItemPrefixWhitespace:
+                    {
+                        break;
+                    }
+                default:
+                    {
+                        atMarker = undefined;
+                    }
+            }
+            if (!containerBalance && event[0] === 'enter' && event[1].type === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].listItemPrefix || containerBalance === -1 && event[0] === 'exit' && (event[1].type === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].listUnordered || event[1].type === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].listOrdered)) {
+                if (listItem) {
+                    let tailIndex = index;
+                    lineIndex = undefined;
+                    while(tailIndex--){
+                        const tailEvent = events[tailIndex];
+                        if (tailEvent[1].type === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].lineEnding || tailEvent[1].type === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].lineEndingBlank) {
+                            if (tailEvent[0] === 'exit') continue;
+                            if (lineIndex) {
+                                events[lineIndex][1].type = __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].lineEndingBlank;
+                                listSpread = true;
+                            }
+                            tailEvent[1].type = __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].lineEnding;
+                            lineIndex = tailIndex;
+                        } else if (tailEvent[1].type === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].linePrefix || tailEvent[1].type === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].blockQuotePrefix || tailEvent[1].type === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].blockQuotePrefixWhitespace || tailEvent[1].type === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].blockQuoteMarker || tailEvent[1].type === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].listItemIndent) {
+                        // Empty
+                        } else {
+                            break;
+                        }
+                    }
+                    if (firstBlankLineIndex && (!lineIndex || firstBlankLineIndex < lineIndex)) {
+                        listItem._spread = true;
+                    }
+                    // Fix position.
+                    listItem.end = Object.assign({}, lineIndex ? events[lineIndex][1].start : event[1].end);
+                    events.splice(lineIndex || index, 0, [
+                        'exit',
+                        listItem,
+                        event[2]
+                    ]);
+                    index++;
+                    length++;
+                }
+                // Create a new list item.
+                if (event[1].type === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].listItemPrefix) {
+                    /** @type {Token} */ const item = {
+                        type: 'listItem',
+                        _spread: false,
+                        start: Object.assign({}, event[1].start),
+                        // @ts-expect-error: we’ll add `end` in a second.
+                        end: undefined
+                    };
+                    listItem = item;
+                    events.splice(index, 0, [
+                        'enter',
+                        item,
+                        event[2]
+                    ]);
+                    index++;
+                    length++;
+                    firstBlankLineIndex = undefined;
+                    atMarker = true;
+                }
+            }
+        }
+        events[start][1]._spread = listSpread;
+        return length;
+    }
+    /**
+   * Create an opener handle.
+   *
+   * @param {(token: Token) => Nodes} create
+   *   Create a node.
+   * @param {Handle | undefined} [and]
+   *   Optional function to also run.
+   * @returns {Handle}
+   *   Handle.
+   */ function opener(create, and) {
+        return open;
+        //TURBOPACK unreachable
+        ;
+        /**
+     * @this {CompileContext}
+     * @param {Token} token
+     * @returns {undefined}
+     */ function open(token) {
+            enter.call(this, create(token), token);
+            if (and) and.call(this, token);
+        }
+    }
+    /**
+   * @type {CompileContext['buffer']}
+   */ function buffer() {
+        this.stack.push({
+            type: 'fragment',
+            children: []
+        });
+    }
+    /**
+   * @type {CompileContext['enter']}
+   */ function enter(node, token, errorHandler) {
+        const parent = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(parent, 'expected `parent`');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])('children' in parent, 'expected `parent`');
+        /** @type {Array<Nodes>} */ const siblings = parent.children;
+        siblings.push(node);
+        this.stack.push(node);
+        this.tokenStack.push([
+            token,
+            errorHandler || undefined
+        ]);
+        node.position = {
+            start: point(token.start),
+            // @ts-expect-error: `end` will be patched later.
+            end: undefined
+        };
+    }
+    /**
+   * Create a closer handle.
+   *
+   * @param {Handle | undefined} [and]
+   *   Optional function to also run.
+   * @returns {Handle}
+   *   Handle.
+   */ function closer(and) {
+        return close;
+        //TURBOPACK unreachable
+        ;
+        /**
+     * @this {CompileContext}
+     * @param {Token} token
+     * @returns {undefined}
+     */ function close(token) {
+            if (and) and.call(this, token);
+            exit.call(this, token);
+        }
+    }
+    /**
+   * @type {CompileContext['exit']}
+   */ function exit(token, onExitError) {
+        const node = this.stack.pop();
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node, 'expected `node`');
+        const open = this.tokenStack.pop();
+        if (!open) {
+            throw new Error('Cannot close `' + token.type + '` (' + (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unist$2d$util$2d$stringify$2d$position$40$4$2e$0$2e$0$2f$node_modules$2f$unist$2d$util$2d$stringify$2d$position$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["stringifyPosition"])({
+                start: token.start,
+                end: token.end
+            }) + '): it’s not open');
+        } else if (open[0].type !== token.type) {
+            if (onExitError) {
+                onExitError.call(this, token, open[0]);
+            } else {
+                const handler = open[1] || defaultOnError;
+                handler.call(this, token, open[0]);
+            }
+        }
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node.type !== 'fragment', 'unexpected fragment `exit`ed');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node.position, 'expected `position` to be defined');
+        node.position.end = point(token.end);
+    }
+    /**
+   * @type {CompileContext['resume']}
+   */ function resume() {
+        return (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$string$40$4$2e$0$2e$0$2f$node_modules$2f$mdast$2d$util$2d$to$2d$string$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["toString"])(this.stack.pop());
+    }
+    //
+    // Handlers.
+    //
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onenterlistordered() {
+        this.data.expectingFirstListItemValue = true;
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onenterlistitemvalue(token) {
+        if (this.data.expectingFirstListItemValue) {
+            const ancestor = this.stack[this.stack.length - 2];
+            (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(ancestor, 'expected nodes on stack');
+            (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(ancestor.type === 'list', 'expected list on stack');
+            ancestor.start = Number.parseInt(this.sliceSerialize(token), __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["constants"].numericBaseDecimal);
+            this.data.expectingFirstListItemValue = undefined;
+        }
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitcodefencedfenceinfo() {
+        const data = this.resume();
+        const node = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node, 'expected node on stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node.type === 'code', 'expected code on stack');
+        node.lang = data;
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitcodefencedfencemeta() {
+        const data = this.resume();
+        const node = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node, 'expected node on stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node.type === 'code', 'expected code on stack');
+        node.meta = data;
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitcodefencedfence() {
+        // Exit if this is the closing fence.
+        if (this.data.flowCodeInside) return;
+        this.buffer();
+        this.data.flowCodeInside = true;
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitcodefenced() {
+        const data = this.resume();
+        const node = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node, 'expected node on stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node.type === 'code', 'expected code on stack');
+        node.value = data.replace(/^(\r?\n|\r)|(\r?\n|\r)$/g, '');
+        this.data.flowCodeInside = undefined;
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitcodeindented() {
+        const data = this.resume();
+        const node = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node, 'expected node on stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node.type === 'code', 'expected code on stack');
+        node.value = data.replace(/(\r?\n|\r)$/g, '');
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitdefinitionlabelstring(token) {
+        const label = this.resume();
+        const node = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node, 'expected node on stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node.type === 'definition', 'expected definition on stack');
+        node.label = label;
+        node.identifier = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$normalize$2d$identifier$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$normalize$2d$identifier$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["normalizeIdentifier"])(this.sliceSerialize(token)).toLowerCase();
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitdefinitiontitlestring() {
+        const data = this.resume();
+        const node = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node, 'expected node on stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node.type === 'definition', 'expected definition on stack');
+        node.title = data;
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitdefinitiondestinationstring() {
+        const data = this.resume();
+        const node = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node, 'expected node on stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node.type === 'definition', 'expected definition on stack');
+        node.url = data;
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitatxheadingsequence(token) {
+        const node = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node, 'expected node on stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node.type === 'heading', 'expected heading on stack');
+        if (!node.depth) {
+            const depth = this.sliceSerialize(token).length;
+            (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(depth === 1 || depth === 2 || depth === 3 || depth === 4 || depth === 5 || depth === 6, 'expected `depth` between `1` and `6`');
+            node.depth = depth;
+        }
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitsetextheadingtext() {
+        this.data.setextHeadingSlurpLineEnding = true;
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitsetextheadinglinesequence(token) {
+        const node = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node, 'expected node on stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node.type === 'heading', 'expected heading on stack');
+        node.depth = this.sliceSerialize(token).codePointAt(0) === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$codes$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["codes"].equalsTo ? 1 : 2;
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitsetextheading() {
+        this.data.setextHeadingSlurpLineEnding = undefined;
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onenterdata(token) {
+        const node = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node, 'expected node on stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])('children' in node, 'expected parent on stack');
+        /** @type {Array<Nodes>} */ const siblings = node.children;
+        let tail = siblings[siblings.length - 1];
+        if (!tail || tail.type !== 'text') {
+            // Add a new text node.
+            tail = text();
+            tail.position = {
+                start: point(token.start),
+                // @ts-expect-error: we’ll add `end` later.
+                end: undefined
+            };
+            siblings.push(tail);
+        }
+        this.stack.push(tail);
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitdata(token) {
+        const tail = this.stack.pop();
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(tail, 'expected a `node` to be on the stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])('value' in tail, 'expected a `literal` to be on the stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(tail.position, 'expected `node` to have an open position');
+        tail.value += this.sliceSerialize(token);
+        tail.position.end = point(token.end);
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitlineending(token) {
+        const context = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(context, 'expected `node`');
+        // If we’re at a hard break, include the line ending in there.
+        if (this.data.atHardBreak) {
+            (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])('children' in context, 'expected `parent`');
+            const tail = context.children[context.children.length - 1];
+            (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(tail.position, 'expected tail to have a starting position');
+            tail.position.end = point(token.end);
+            this.data.atHardBreak = undefined;
+            return;
+        }
+        if (!this.data.setextHeadingSlurpLineEnding && config.canContainEols.includes(context.type)) {
+            onenterdata.call(this, token);
+            onexitdata.call(this, token);
+        }
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexithardbreak() {
+        this.data.atHardBreak = true;
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexithtmlflow() {
+        const data = this.resume();
+        const node = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node, 'expected node on stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node.type === 'html', 'expected html on stack');
+        node.value = data;
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexithtmltext() {
+        const data = this.resume();
+        const node = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node, 'expected node on stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node.type === 'html', 'expected html on stack');
+        node.value = data;
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitcodetext() {
+        const data = this.resume();
+        const node = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node, 'expected node on stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node.type === 'inlineCode', 'expected inline code on stack');
+        node.value = data;
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitlink() {
+        const node = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node, 'expected node on stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node.type === 'link', 'expected link on stack');
+        // Note: there are also `identifier` and `label` fields on this link node!
+        // These are used / cleaned here.
+        // To do: clean.
+        if (this.data.inReference) {
+            /** @type {ReferenceType} */ const referenceType = this.data.referenceType || 'shortcut';
+            node.type += 'Reference';
+            // @ts-expect-error: mutate.
+            node.referenceType = referenceType;
+            // @ts-expect-error: mutate.
+            delete node.url;
+            delete node.title;
+        } else {
+            // @ts-expect-error: mutate.
+            delete node.identifier;
+            // @ts-expect-error: mutate.
+            delete node.label;
+        }
+        this.data.referenceType = undefined;
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitimage() {
+        const node = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node, 'expected node on stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node.type === 'image', 'expected image on stack');
+        // Note: there are also `identifier` and `label` fields on this link node!
+        // These are used / cleaned here.
+        // To do: clean.
+        if (this.data.inReference) {
+            /** @type {ReferenceType} */ const referenceType = this.data.referenceType || 'shortcut';
+            node.type += 'Reference';
+            // @ts-expect-error: mutate.
+            node.referenceType = referenceType;
+            // @ts-expect-error: mutate.
+            delete node.url;
+            delete node.title;
+        } else {
+            // @ts-expect-error: mutate.
+            delete node.identifier;
+            // @ts-expect-error: mutate.
+            delete node.label;
+        }
+        this.data.referenceType = undefined;
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitlabeltext(token) {
+        const string = this.sliceSerialize(token);
+        const ancestor = this.stack[this.stack.length - 2];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(ancestor, 'expected ancestor on stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(ancestor.type === 'image' || ancestor.type === 'link', 'expected image or link on stack');
+        // @ts-expect-error: stash this on the node, as it might become a reference
+        // later.
+        ancestor.label = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$decode$2d$string$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$decode$2d$string$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["decodeString"])(string);
+        // @ts-expect-error: same as above.
+        ancestor.identifier = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$normalize$2d$identifier$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$normalize$2d$identifier$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["normalizeIdentifier"])(string).toLowerCase();
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitlabel() {
+        const fragment = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(fragment, 'expected node on stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(fragment.type === 'fragment', 'expected fragment on stack');
+        const value = this.resume();
+        const node = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node, 'expected node on stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node.type === 'image' || node.type === 'link', 'expected image or link on stack');
+        // Assume a reference.
+        this.data.inReference = true;
+        if (node.type === 'link') {
+            /** @type {Array<PhrasingContent>} */ const children = fragment.children;
+            node.children = children;
+        } else {
+            node.alt = value;
+        }
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitresourcedestinationstring() {
+        const data = this.resume();
+        const node = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node, 'expected node on stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node.type === 'image' || node.type === 'link', 'expected image or link on stack');
+        node.url = data;
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitresourcetitlestring() {
+        const data = this.resume();
+        const node = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node, 'expected node on stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node.type === 'image' || node.type === 'link', 'expected image or link on stack');
+        node.title = data;
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitresource() {
+        this.data.inReference = undefined;
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onenterreference() {
+        this.data.referenceType = 'collapsed';
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitreferencestring(token) {
+        const label = this.resume();
+        const node = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node, 'expected node on stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node.type === 'image' || node.type === 'link', 'expected image reference or link reference on stack');
+        // @ts-expect-error: stash this on the node, as it might become a reference
+        // later.
+        node.label = label;
+        // @ts-expect-error: same as above.
+        node.identifier = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$normalize$2d$identifier$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$normalize$2d$identifier$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["normalizeIdentifier"])(this.sliceSerialize(token)).toLowerCase();
+        this.data.referenceType = 'full';
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitcharacterreferencemarker(token) {
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(token.type === 'characterReferenceMarkerNumeric' || token.type === 'characterReferenceMarkerHexadecimal');
+        this.data.characterReferenceType = token.type;
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitcharacterreferencevalue(token) {
+        const data = this.sliceSerialize(token);
+        const type = this.data.characterReferenceType;
+        /** @type {string} */ let value;
+        if (type) {
+            value = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$decode$2d$numeric$2d$character$2d$reference$40$2$2e$0$2e$2$2f$node_modules$2f$micromark$2d$util$2d$decode$2d$numeric$2d$character$2d$reference$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["decodeNumericCharacterReference"])(data, type === __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$types$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["types"].characterReferenceMarkerNumeric ? __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["constants"].numericBaseDecimal : __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$symbol$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$symbol$2f$lib$2f$constants$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["constants"].numericBaseHexadecimal);
+            this.data.characterReferenceType = undefined;
+        } else {
+            const result = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$decode$2d$named$2d$character$2d$reference$40$1$2e$3$2e$0$2f$node_modules$2f$decode$2d$named$2d$character$2d$reference$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["decodeNamedCharacterReference"])(data);
+            (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(result !== false, 'expected reference to decode');
+            value = result;
+        }
+        const tail = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(tail, 'expected `node`');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])('value' in tail, 'expected `node.value`');
+        tail.value += value;
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitcharacterreference(token) {
+        const tail = this.stack.pop();
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(tail, 'expected `node`');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(tail.position, 'expected `node.position`');
+        tail.position.end = point(token.end);
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitautolinkprotocol(token) {
+        onexitdata.call(this, token);
+        const node = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node, 'expected node on stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node.type === 'link', 'expected link on stack');
+        node.url = this.sliceSerialize(token);
+    }
+    /**
+   * @this {CompileContext}
+   * @type {Handle}
+   */ function onexitautolinkemail(token) {
+        onexitdata.call(this, token);
+        const node = this.stack[this.stack.length - 1];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node, 'expected node on stack');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(node.type === 'link', 'expected link on stack');
+        node.url = 'mailto:' + this.sliceSerialize(token);
+    }
+    //
+    // Creaters.
+    //
+    /** @returns {Blockquote} */ function blockQuote() {
+        return {
+            type: 'blockquote',
+            children: []
+        };
+    }
+    /** @returns {Code} */ function codeFlow() {
+        return {
+            type: 'code',
+            lang: null,
+            meta: null,
+            value: ''
+        };
+    }
+    /** @returns {InlineCode} */ function codeText() {
+        return {
+            type: 'inlineCode',
+            value: ''
+        };
+    }
+    /** @returns {Definition} */ function definition() {
+        return {
+            type: 'definition',
+            identifier: '',
+            label: null,
+            title: null,
+            url: ''
+        };
+    }
+    /** @returns {Emphasis} */ function emphasis() {
+        return {
+            type: 'emphasis',
+            children: []
+        };
+    }
+    /** @returns {Heading} */ function heading() {
+        return {
+            type: 'heading',
+            // @ts-expect-error `depth` will be set later.
+            depth: 0,
+            children: []
+        };
+    }
+    /** @returns {Break} */ function hardBreak() {
+        return {
+            type: 'break'
+        };
+    }
+    /** @returns {Html} */ function html() {
+        return {
+            type: 'html',
+            value: ''
+        };
+    }
+    /** @returns {Image} */ function image() {
+        return {
+            type: 'image',
+            title: null,
+            url: '',
+            alt: null
+        };
+    }
+    /** @returns {Link} */ function link() {
+        return {
+            type: 'link',
+            title: null,
+            url: '',
+            children: []
+        };
+    }
+    /**
+   * @param {Token} token
+   * @returns {List}
+   */ function list(token) {
+        return {
+            type: 'list',
+            ordered: token.type === 'listOrdered',
+            start: null,
+            spread: token._spread,
+            children: []
+        };
+    }
+    /**
+   * @param {Token} token
+   * @returns {ListItem}
+   */ function listItem(token) {
+        return {
+            type: 'listItem',
+            spread: token._spread,
+            checked: null,
+            children: []
+        };
+    }
+    /** @returns {Paragraph} */ function paragraph() {
+        return {
+            type: 'paragraph',
+            children: []
+        };
+    }
+    /** @returns {Strong} */ function strong() {
+        return {
+            type: 'strong',
+            children: []
+        };
+    }
+    /** @returns {Text} */ function text() {
+        return {
+            type: 'text',
+            value: ''
+        };
+    }
+    /** @returns {ThematicBreak} */ function thematicBreak() {
+        return {
+            type: 'thematicBreak'
+        };
+    }
+}
+/**
+ * Copy a point-like value.
+ *
+ * @param {Point} d
+ *   Point-like value.
+ * @returns {Point}
+ *   unist point.
+ */ function point(d) {
+    return {
+        line: d.line,
+        column: d.column,
+        offset: d.offset
+    };
+}
+/**
+ * @param {Config} combined
+ * @param {Array<Array<Extension> | Extension>} extensions
+ * @returns {undefined}
+ */ function configure(combined, extensions) {
+    let index = -1;
+    while(++index < extensions.length){
+        const value = extensions[index];
+        if (Array.isArray(value)) {
+            configure(combined, value);
+        } else {
+            extension(combined, value);
+        }
+    }
+}
+/**
+ * @param {Config} combined
+ * @param {Extension} extension
+ * @returns {undefined}
+ */ function extension(combined, extension) {
+    /** @type {keyof Extension} */ let key;
+    for(key in extension){
+        if (own.call(extension, key)) {
+            switch(key){
+                case 'canContainEols':
+                    {
+                        const right = extension[key];
+                        if (right) {
+                            combined[key].push(...right);
+                        }
+                        break;
+                    }
+                case 'transforms':
+                    {
+                        const right = extension[key];
+                        if (right) {
+                            combined[key].push(...right);
+                        }
+                        break;
+                    }
+                case 'enter':
+                case 'exit':
+                    {
+                        const right = extension[key];
+                        if (right) {
+                            Object.assign(combined[key], right);
+                        }
+                        break;
+                    }
+            }
+        }
+    }
+}
+/** @type {OnEnterError} */ function defaultOnError(left, right) {
+    if (left) {
+        throw new Error('Cannot close `' + left.type + '` (' + (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unist$2d$util$2d$stringify$2d$position$40$4$2e$0$2e$0$2f$node_modules$2f$unist$2d$util$2d$stringify$2d$position$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["stringifyPosition"])({
+            start: left.start,
+            end: left.end
+        }) + '): a different token (`' + right.type + '`, ' + (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unist$2d$util$2d$stringify$2d$position$40$4$2e$0$2e$0$2f$node_modules$2f$unist$2d$util$2d$stringify$2d$position$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["stringifyPosition"])({
+            start: right.start,
+            end: right.end
+        }) + ') is open');
+    } else {
+        throw new Error('Cannot close document, a token (`' + right.type + '`, ' + (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unist$2d$util$2d$stringify$2d$position$40$4$2e$0$2e$0$2f$node_modules$2f$unist$2d$util$2d$stringify$2d$position$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["stringifyPosition"])({
+            start: right.start,
+            end: right.end
+        }) + ') is still open');
+    }
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/remark-parse@11.0.0/node_modules/remark-parse/lib/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>remarkParse
+]);
+/**
+ * @typedef {import('mdast').Root} Root
+ * @typedef {import('mdast-util-from-markdown').Options} FromMarkdownOptions
+ * @typedef {import('unified').Parser<Root>} Parser
+ * @typedef {import('unified').Processor<Root>} Processor
+ */ /**
+ * @typedef {Omit<FromMarkdownOptions, 'extensions' | 'mdastExtensions'>} Options
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$from$2d$markdown$40$2$2e$0$2e$3$2f$node_modules$2f$mdast$2d$util$2d$from$2d$markdown$2f$dev$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-from-markdown@2.0.3/node_modules/mdast-util-from-markdown/dev/lib/index.js [app-ssr] (ecmascript)");
+;
+function remarkParse(options) {
+    /** @type {Processor} */ // @ts-expect-error: TS in JSDoc generates wrong types if `this` is typed regularly.
+    const self = this;
+    self.parser = parser;
+    /**
+   * @type {Parser}
+   */ function parser(doc) {
+        return (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$from$2d$markdown$40$2$2e$0$2e$3$2f$node_modules$2f$mdast$2d$util$2d$from$2d$markdown$2f$dev$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["fromMarkdown"])(doc, {
+            ...self.data('settings'),
+            ...options,
+            // Note: these options are not in the readme.
+            // The goal is for them to be set by plugins on `data` instead of being
+            // passed by users.
+            extensions: self.data('micromarkExtensions') || [],
+            mdastExtensions: self.data('fromMarkdownExtensions') || []
+        });
+    }
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/zwitch@2.0.4/node_modules/zwitch/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "zwitch",
+    ()=>zwitch
+]);
+/**
+ * @callback Handler
+ *   Handle a value, with a certain ID field set to a certain value.
+ *   The ID field is passed to `zwitch`, and it’s value is this function’s
+ *   place on the `handlers` record.
+ * @param {...any} parameters
+ *   Arbitrary parameters passed to the zwitch.
+ *   The first will be an object with a certain ID field set to a certain value.
+ * @returns {any}
+ *   Anything!
+ */ /**
+ * @callback UnknownHandler
+ *   Handle values that do have a certain ID field, but it’s set to a value
+ *   that is not listed in the `handlers` record.
+ * @param {unknown} value
+ *   An object with a certain ID field set to an unknown value.
+ * @param {...any} rest
+ *   Arbitrary parameters passed to the zwitch.
+ * @returns {any}
+ *   Anything!
+ */ /**
+ * @callback InvalidHandler
+ *   Handle values that do not have a certain ID field.
+ * @param {unknown} value
+ *   Any unknown value.
+ * @param {...any} rest
+ *   Arbitrary parameters passed to the zwitch.
+ * @returns {void|null|undefined|never}
+ *   This should crash or return nothing.
+ */ /**
+ * @template {InvalidHandler} [Invalid=InvalidHandler]
+ * @template {UnknownHandler} [Unknown=UnknownHandler]
+ * @template {Record<string, Handler>} [Handlers=Record<string, Handler>]
+ * @typedef Options
+ *   Configuration (required).
+ * @property {Invalid} [invalid]
+ *   Handler to use for invalid values.
+ * @property {Unknown} [unknown]
+ *   Handler to use for unknown values.
+ * @property {Handlers} [handlers]
+ *   Handlers to use.
+ */ const own = {}.hasOwnProperty;
+function zwitch(key, options) {
+    const settings = options || {};
+    /**
+   * Handle one value.
+   *
+   * Based on the bound `key`, a respective handler will be called.
+   * If `value` is not an object, or doesn’t have a `key` property, the special
+   * “invalid” handler will be called.
+   * If `value` has an unknown `key`, the special “unknown” handler will be
+   * called.
+   *
+   * All arguments, and the context object, are passed through to the handler,
+   * and it’s result is returned.
+   *
+   * @this {unknown}
+   *   Any context object.
+   * @param {unknown} [value]
+   *   Any value.
+   * @param {...unknown} parameters
+   *   Arbitrary parameters passed to the zwitch.
+   * @property {Handler} invalid
+   *   Handle for values that do not have a certain ID field.
+   * @property {Handler} unknown
+   *   Handle values that do have a certain ID field, but it’s set to a value
+   *   that is not listed in the `handlers` record.
+   * @property {Handlers} handlers
+   *   Record of handlers.
+   * @returns {unknown}
+   *   Anything.
+   */ function one(value, ...parameters) {
+        /** @type {Handler|undefined} */ let fn = one.invalid;
+        const handlers = one.handlers;
+        if (value && own.call(value, key)) {
+            // @ts-expect-error Indexable.
+            const id = String(value[key]);
+            // @ts-expect-error Indexable.
+            fn = own.call(handlers, id) ? handlers[id] : one.unknown;
+        }
+        if (fn) {
+            return fn.call(this, value, ...parameters);
+        }
+    }
+    one.handlers = settings.handlers || {};
+    one.invalid = settings.invalid;
+    one.unknown = settings.unknown;
+    // @ts-expect-error: matches!
+    return one;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/configure.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "configure",
+    ()=>configure
+]);
+/**
+ * @import {Options, State} from './types.js'
+ */ const own = {}.hasOwnProperty;
+function configure(base, extension) {
+    let index = -1;
+    /** @type {keyof Options} */ let key;
+    // First do subextensions.
+    if (extension.extensions) {
+        while(++index < extension.extensions.length){
+            configure(base, extension.extensions[index]);
+        }
+    }
+    for(key in extension){
+        if (own.call(extension, key)) {
+            switch(key){
+                case 'extensions':
+                    {
+                        break;
+                    }
+                /* c8 ignore next 4 */ case 'unsafe':
+                    {
+                        list(base[key], extension[key]);
+                        break;
+                    }
+                case 'join':
+                    {
+                        list(base[key], extension[key]);
+                        break;
+                    }
+                case 'handlers':
+                    {
+                        map(base[key], extension[key]);
+                        break;
+                    }
+                default:
+                    {
+                        // @ts-expect-error: matches.
+                        base.options[key] = extension[key];
+                    }
+            }
+        }
+    }
+    return base;
+}
+/**
+ * @template T
+ * @param {Array<T>} left
+ * @param {Array<T> | null | undefined} right
+ */ function list(left, right) {
+    if (right) {
+        left.push(...right);
+    }
+}
+/**
+ * @template T
+ * @param {Record<string, T>} left
+ * @param {Record<string, T> | null | undefined} right
+ */ function map(left, right) {
+    if (right) {
+        Object.assign(left, right);
+    }
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/blockquote.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * @import {Blockquote, Parents} from 'mdast'
+ * @import {Info, Map, State} from 'mdast-util-to-markdown'
+ */ /**
+ * @param {Blockquote} node
+ * @param {Parents | undefined} _
+ * @param {State} state
+ * @param {Info} info
+ * @returns {string}
+ */ __turbopack_context__.s([
+    "blockquote",
+    ()=>blockquote
+]);
+function blockquote(node, _, state, info) {
+    const exit = state.enter('blockquote');
+    const tracker = state.createTracker(info);
+    tracker.move('> ');
+    tracker.shift(2);
+    const value = state.indentLines(state.containerFlow(node, tracker.current()), map);
+    exit();
+    return value;
+}
+/** @type {Map} */ function map(line, _, blank) {
+    return '>' + (blank ? '' : ' ') + line;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/pattern-in-scope.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * @import {ConstructName, Unsafe} from 'mdast-util-to-markdown'
+ */ /**
+ * @param {Array<ConstructName>} stack
+ * @param {Unsafe} pattern
+ * @returns {boolean}
+ */ __turbopack_context__.s([
+    "patternInScope",
+    ()=>patternInScope
+]);
+function patternInScope(stack, pattern) {
+    return listInScope(stack, pattern.inConstruct, true) && !listInScope(stack, pattern.notInConstruct, false);
+}
+/**
+ * @param {Array<ConstructName>} stack
+ * @param {Unsafe['inConstruct']} list
+ * @param {boolean} none
+ * @returns {boolean}
+ */ function listInScope(stack, list, none) {
+    if (typeof list === 'string') {
+        list = [
+            list
+        ];
+    }
+    if (!list || list.length === 0) {
+        return none;
+    }
+    let index = -1;
+    while(++index < list.length){
+        if (stack.includes(list[index])) {
+            return true;
+        }
+    }
+    return false;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/break.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "hardBreak",
+    ()=>hardBreak
+]);
+/**
+ * @import {Break, Parents} from 'mdast'
+ * @import {Info, State} from 'mdast-util-to-markdown'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$pattern$2d$in$2d$scope$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/pattern-in-scope.js [app-ssr] (ecmascript)");
+;
+function hardBreak(_, _1, state, info) {
+    let index = -1;
+    while(++index < state.unsafe.length){
+        // If we can’t put eols in this construct (setext headings, tables), use a
+        // space instead.
+        if (state.unsafe[index].character === '\n' && (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$pattern$2d$in$2d$scope$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["patternInScope"])(state.stack, state.unsafe[index])) {
+            return /[ \t]/.test(info.before) ? '' : ' ';
+        }
+    }
+    return '\\\n';
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/format-code-as-indented.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * @import {State} from 'mdast-util-to-markdown'
+ * @import {Code} from 'mdast'
+ */ /**
+ * @param {Code} node
+ * @param {State} state
+ * @returns {boolean}
+ */ __turbopack_context__.s([
+    "formatCodeAsIndented",
+    ()=>formatCodeAsIndented
+]);
+function formatCodeAsIndented(node, state) {
+    return Boolean(state.options.fences === false && node.value && // If there’s no info…
+    !node.lang && // And there’s a non-whitespace character…
+    /[^ \r\n]/.test(node.value) && // And the value doesn’t start or end in a blank…
+    !/^[\t ]*(?:[\r\n]|$)|(?:^|[\r\n])[\t ]*$/.test(node.value));
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-fence.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * @import {Options, State} from 'mdast-util-to-markdown'
+ */ /**
+ * @param {State} state
+ * @returns {Exclude<Options['fence'], null | undefined>}
+ */ __turbopack_context__.s([
+    "checkFence",
+    ()=>checkFence
+]);
+function checkFence(state) {
+    const marker = state.options.fence || '`';
+    if (marker !== '`' && marker !== '~') {
+        throw new Error('Cannot serialize code with `' + marker + '` for `options.fence`, expected `` ` `` or `~`');
+    }
+    return marker;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/code.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "code",
+    ()=>code
+]);
+/**
+ * @import {Info, Map, State} from 'mdast-util-to-markdown'
+ * @import {Code, Parents} from 'mdast'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$longest$2d$streak$40$3$2e$1$2e$0$2f$node_modules$2f$longest$2d$streak$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/longest-streak@3.1.0/node_modules/longest-streak/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$format$2d$code$2d$as$2d$indented$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/format-code-as-indented.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$fence$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-fence.js [app-ssr] (ecmascript)");
+;
+;
+;
+function code(node, _, state, info) {
+    const marker = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$fence$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["checkFence"])(state);
+    const raw = node.value || '';
+    const suffix = marker === '`' ? 'GraveAccent' : 'Tilde';
+    if ((0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$format$2d$code$2d$as$2d$indented$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["formatCodeAsIndented"])(node, state)) {
+        const exit = state.enter('codeIndented');
+        const value = state.indentLines(raw, map);
+        exit();
+        return value;
+    }
+    const tracker = state.createTracker(info);
+    const sequence = marker.repeat(Math.max((0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$longest$2d$streak$40$3$2e$1$2e$0$2f$node_modules$2f$longest$2d$streak$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["longestStreak"])(raw, marker) + 1, 3));
+    const exit = state.enter('codeFenced');
+    let value = tracker.move(sequence);
+    if (node.lang) {
+        const subexit = state.enter(`codeFencedLang${suffix}`);
+        value += tracker.move(state.safe(node.lang, {
+            before: value,
+            after: ' ',
+            encode: [
+                '`'
+            ],
+            ...tracker.current()
+        }));
+        subexit();
+    }
+    if (node.lang && node.meta) {
+        const subexit = state.enter(`codeFencedMeta${suffix}`);
+        value += tracker.move(' ');
+        value += tracker.move(state.safe(node.meta, {
+            before: value,
+            after: '\n',
+            encode: [
+                '`'
+            ],
+            ...tracker.current()
+        }));
+        subexit();
+    }
+    value += tracker.move('\n');
+    if (raw) {
+        value += tracker.move(raw + '\n');
+    }
+    value += tracker.move(sequence);
+    exit();
+    return value;
+}
+/** @type {Map} */ function map(line, _, blank) {
+    return (blank ? '' : '    ') + line;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-quote.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * @import {Options, State} from 'mdast-util-to-markdown'
+ */ /**
+ * @param {State} state
+ * @returns {Exclude<Options['quote'], null | undefined>}
+ */ __turbopack_context__.s([
+    "checkQuote",
+    ()=>checkQuote
+]);
+function checkQuote(state) {
+    const marker = state.options.quote || '"';
+    if (marker !== '"' && marker !== "'") {
+        throw new Error('Cannot serialize title with `' + marker + '` for `options.quote`, expected `"`, or `\'`');
+    }
+    return marker;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/definition.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "definition",
+    ()=>definition
+]);
+/**
+ * @import {Info, State} from 'mdast-util-to-markdown'
+ * @import {Definition, Parents} from 'mdast'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$quote$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-quote.js [app-ssr] (ecmascript)");
+;
+function definition(node, _, state, info) {
+    const quote = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$quote$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["checkQuote"])(state);
+    const suffix = quote === '"' ? 'Quote' : 'Apostrophe';
+    const exit = state.enter('definition');
+    let subexit = state.enter('label');
+    const tracker = state.createTracker(info);
+    let value = tracker.move('[');
+    value += tracker.move(state.safe(state.associationId(node), {
+        before: value,
+        after: ']',
+        ...tracker.current()
+    }));
+    value += tracker.move(']: ');
+    subexit();
+    if (// If there’s no url, or…
+    !node.url || // If there are control characters or whitespace.
+    /[\0- \u007F]/.test(node.url)) {
+        subexit = state.enter('destinationLiteral');
+        value += tracker.move('<');
+        value += tracker.move(state.safe(node.url, {
+            before: value,
+            after: '>',
+            ...tracker.current()
+        }));
+        value += tracker.move('>');
+    } else {
+        // No whitespace, raw is prettier.
+        subexit = state.enter('destinationRaw');
+        value += tracker.move(state.safe(node.url, {
+            before: value,
+            after: node.title ? ' ' : '\n',
+            ...tracker.current()
+        }));
+    }
+    subexit();
+    if (node.title) {
+        subexit = state.enter(`title${suffix}`);
+        value += tracker.move(' ' + quote);
+        value += tracker.move(state.safe(node.title, {
+            before: value,
+            after: quote,
+            ...tracker.current()
+        }));
+        value += tracker.move(quote);
+        subexit();
+    }
+    exit();
+    return value;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-emphasis.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * @import {Options, State} from 'mdast-util-to-markdown'
+ */ /**
+ * @param {State} state
+ * @returns {Exclude<Options['emphasis'], null | undefined>}
+ */ __turbopack_context__.s([
+    "checkEmphasis",
+    ()=>checkEmphasis
+]);
+function checkEmphasis(state) {
+    const marker = state.options.emphasis || '*';
+    if (marker !== '*' && marker !== '_') {
+        throw new Error('Cannot serialize emphasis with `' + marker + '` for `options.emphasis`, expected `*`, or `_`');
+    }
+    return marker;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/encode-character-reference.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * Encode a code point as a character reference.
+ *
+ * @param {number} code
+ *   Code point to encode.
+ * @returns {string}
+ *   Encoded character reference.
+ */ __turbopack_context__.s([
+    "encodeCharacterReference",
+    ()=>encodeCharacterReference
+]);
+function encodeCharacterReference(code) {
+    return '&#x' + code.toString(16).toUpperCase() + ';';
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/encode-info.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "encodeInfo",
+    ()=>encodeInfo
+]);
+/**
+ * @import {EncodeSides} from '../types.js'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$classify$2d$character$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$classify$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-classify-character@2.0.1/node_modules/micromark-util-classify-character/dev/index.js [app-ssr] (ecmascript)");
+;
+function encodeInfo(outside, inside, marker) {
+    const outsideKind = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$classify$2d$character$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$classify$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["classifyCharacter"])(outside);
+    const insideKind = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$classify$2d$character$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$classify$2d$character$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["classifyCharacter"])(inside);
+    // Letter outside:
+    if (outsideKind === undefined) {
+        return insideKind === undefined ? // we have to encode *both* letters for `_` as it is looser.
+        // it already forms for `*` (and GFMs `~`).
+        marker === '_' ? {
+            inside: true,
+            outside: true
+        } : {
+            inside: false,
+            outside: false
+        } : insideKind === 1 ? {
+            inside: true,
+            outside: true
+        } : {
+            inside: false,
+            outside: true
+        };
+    }
+    // Whitespace outside:
+    if (outsideKind === 1) {
+        return insideKind === undefined ? {
+            inside: false,
+            outside: false
+        } : insideKind === 1 ? {
+            inside: true,
+            outside: true
+        } : {
+            inside: false,
+            outside: false
+        };
+    }
+    // Punctuation outside:
+    return insideKind === undefined ? {
+        inside: false,
+        outside: false
+    } : insideKind === 1 ? {
+        inside: true,
+        outside: false
+    } : {
+        inside: false,
+        outside: false
+    };
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/emphasis.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "emphasis",
+    ()=>emphasis
+]);
+/**
+ * @import {Info, State} from 'mdast-util-to-markdown'
+ * @import {Emphasis, Parents} from 'mdast'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$emphasis$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-emphasis.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$encode$2d$character$2d$reference$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/encode-character-reference.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$encode$2d$info$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/encode-info.js [app-ssr] (ecmascript)");
+;
+;
+;
+emphasis.peek = emphasisPeek;
+function emphasis(node, _, state, info) {
+    const marker = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$emphasis$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["checkEmphasis"])(state);
+    const exit = state.enter('emphasis');
+    const tracker = state.createTracker(info);
+    const before = tracker.move(marker);
+    let between = tracker.move(state.containerPhrasing(node, {
+        after: marker,
+        before,
+        ...tracker.current()
+    }));
+    const betweenHead = between.charCodeAt(0);
+    const open = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$encode$2d$info$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["encodeInfo"])(info.before.charCodeAt(info.before.length - 1), betweenHead, marker);
+    if (open.inside) {
+        between = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$encode$2d$character$2d$reference$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["encodeCharacterReference"])(betweenHead) + between.slice(1);
+    }
+    const betweenTail = between.charCodeAt(between.length - 1);
+    const close = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$encode$2d$info$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["encodeInfo"])(info.after.charCodeAt(0), betweenTail, marker);
+    if (close.inside) {
+        between = between.slice(0, -1) + (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$encode$2d$character$2d$reference$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["encodeCharacterReference"])(betweenTail);
+    }
+    const after = tracker.move(marker);
+    exit();
+    state.attentionEncodeSurroundingInfo = {
+        after: close.outside,
+        before: open.outside
+    };
+    return before + between + after;
+}
+/**
+ * @param {Emphasis} _
+ * @param {Parents | undefined} _1
+ * @param {State} state
+ * @returns {string}
+ */ function emphasisPeek(_, _1, state) {
+    return state.options.emphasis || '*';
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/format-heading-as-setext.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "formatHeadingAsSetext",
+    ()=>formatHeadingAsSetext
+]);
+/**
+ * @import {State} from 'mdast-util-to-markdown'
+ * @import {Heading} from 'mdast'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unist$2d$util$2d$visit$2d$parents$40$6$2e$0$2e$2$2f$node_modules$2f$unist$2d$util$2d$visit$2d$parents$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/unist-util-visit-parents@6.0.2/node_modules/unist-util-visit-parents/lib/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unist$2d$util$2d$visit$40$5$2e$1$2e$0$2f$node_modules$2f$unist$2d$util$2d$visit$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/unist-util-visit@5.1.0/node_modules/unist-util-visit/lib/index.js [app-ssr] (ecmascript) <locals>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$string$40$4$2e$0$2e$0$2f$node_modules$2f$mdast$2d$util$2d$to$2d$string$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-string@4.0.0/node_modules/mdast-util-to-string/lib/index.js [app-ssr] (ecmascript)");
+;
+;
+function formatHeadingAsSetext(node, state) {
+    let literalWithBreak = false;
+    // Look for literals with a line break.
+    // Note that this also
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unist$2d$util$2d$visit$40$5$2e$1$2e$0$2f$node_modules$2f$unist$2d$util$2d$visit$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["visit"])(node, function(node) {
+        if ('value' in node && /\r?\n|\r/.test(node.value) || node.type === 'break') {
+            literalWithBreak = true;
+            return __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unist$2d$util$2d$visit$2d$parents$40$6$2e$0$2e$2$2f$node_modules$2f$unist$2d$util$2d$visit$2d$parents$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["EXIT"];
+        }
+    });
+    return Boolean((!node.depth || node.depth < 3) && (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$string$40$4$2e$0$2e$0$2f$node_modules$2f$mdast$2d$util$2d$to$2d$string$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["toString"])(node) && (state.options.setext || literalWithBreak));
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/heading.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "heading",
+    ()=>heading
+]);
+/**
+ * @import {Info, State} from 'mdast-util-to-markdown'
+ * @import {Heading, Parents} from 'mdast'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$encode$2d$character$2d$reference$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/encode-character-reference.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$format$2d$heading$2d$as$2d$setext$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/format-heading-as-setext.js [app-ssr] (ecmascript)");
+;
+;
+function heading(node, _, state, info) {
+    const rank = Math.max(Math.min(6, node.depth || 1), 1);
+    const tracker = state.createTracker(info);
+    if ((0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$format$2d$heading$2d$as$2d$setext$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["formatHeadingAsSetext"])(node, state)) {
+        const exit = state.enter('headingSetext');
+        const subexit = state.enter('phrasing');
+        const value = state.containerPhrasing(node, {
+            ...tracker.current(),
+            before: '\n',
+            after: '\n'
+        });
+        subexit();
+        exit();
+        return value + '\n' + (rank === 1 ? '=' : '-').repeat(// The whole size…
+        value.length - // Minus the position of the character after the last EOL (or
+        // 0 if there is none)…
+        (Math.max(value.lastIndexOf('\r'), value.lastIndexOf('\n')) + 1));
+    }
+    const sequence = '#'.repeat(rank);
+    const exit = state.enter('headingAtx');
+    const subexit = state.enter('phrasing');
+    // Note: for proper tracking, we should reset the output positions when there
+    // is no content returned, because then the space is not output.
+    // Practically, in that case, there is no content, so it doesn’t matter that
+    // we’ve tracked one too many characters.
+    tracker.move(sequence + ' ');
+    let value = state.containerPhrasing(node, {
+        before: '# ',
+        after: '\n',
+        ...tracker.current()
+    });
+    if (/^[\t ]/.test(value)) {
+        // To do: what effect has the character reference on tracking?
+        value = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$encode$2d$character$2d$reference$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["encodeCharacterReference"])(value.charCodeAt(0)) + value.slice(1);
+    }
+    value = value ? sequence + ' ' + value : sequence;
+    if (state.options.closeAtx) {
+        value += ' ' + sequence;
+    }
+    subexit();
+    exit();
+    return value;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/html.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "html",
+    ()=>html
+]);
+/**
+ * @import {Html} from 'mdast'
+ */ html.peek = htmlPeek;
+function html(node) {
+    return node.value || '';
+}
+/**
+ * @returns {string}
+ */ function htmlPeek() {
+    return '<';
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/image.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "image",
+    ()=>image
+]);
+/**
+ * @import {Info, State} from 'mdast-util-to-markdown'
+ * @import {Image, Parents} from 'mdast'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$quote$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-quote.js [app-ssr] (ecmascript)");
+;
+image.peek = imagePeek;
+function image(node, _, state, info) {
+    const quote = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$quote$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["checkQuote"])(state);
+    const suffix = quote === '"' ? 'Quote' : 'Apostrophe';
+    const exit = state.enter('image');
+    let subexit = state.enter('label');
+    const tracker = state.createTracker(info);
+    let value = tracker.move('![');
+    value += tracker.move(state.safe(node.alt, {
+        before: value,
+        after: ']',
+        ...tracker.current()
+    }));
+    value += tracker.move('](');
+    subexit();
+    if (// If there’s no url but there is a title…
+    !node.url && node.title || // If there are control characters or whitespace.
+    /[\0- \u007F]/.test(node.url)) {
+        subexit = state.enter('destinationLiteral');
+        value += tracker.move('<');
+        value += tracker.move(state.safe(node.url, {
+            before: value,
+            after: '>',
+            ...tracker.current()
+        }));
+        value += tracker.move('>');
+    } else {
+        // No whitespace, raw is prettier.
+        subexit = state.enter('destinationRaw');
+        value += tracker.move(state.safe(node.url, {
+            before: value,
+            after: node.title ? ' ' : ')',
+            ...tracker.current()
+        }));
+    }
+    subexit();
+    if (node.title) {
+        subexit = state.enter(`title${suffix}`);
+        value += tracker.move(' ' + quote);
+        value += tracker.move(state.safe(node.title, {
+            before: value,
+            after: quote,
+            ...tracker.current()
+        }));
+        value += tracker.move(quote);
+        subexit();
+    }
+    value += tracker.move(')');
+    exit();
+    return value;
+}
+/**
+ * @returns {string}
+ */ function imagePeek() {
+    return '!';
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/image-reference.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "imageReference",
+    ()=>imageReference
+]);
+/**
+ * @import {Info, State} from 'mdast-util-to-markdown'
+ * @import {ImageReference, Parents} from 'mdast'
+ */ imageReference.peek = imageReferencePeek;
+function imageReference(node, _, state, info) {
+    const type = node.referenceType;
+    const exit = state.enter('imageReference');
+    let subexit = state.enter('label');
+    const tracker = state.createTracker(info);
+    let value = tracker.move('![');
+    const alt = state.safe(node.alt, {
+        before: value,
+        after: ']',
+        ...tracker.current()
+    });
+    value += tracker.move(alt + '][');
+    subexit();
+    // Hide the fact that we’re in phrasing, because escapes don’t work.
+    const stack = state.stack;
+    state.stack = [];
+    subexit = state.enter('reference');
+    // Note: for proper tracking, we should reset the output positions when we end
+    // up making a `shortcut` reference, because then there is no brace output.
+    // Practically, in that case, there is no content, so it doesn’t matter that
+    // we’ve tracked one too many characters.
+    const reference = state.safe(state.associationId(node), {
+        before: value,
+        after: ']',
+        ...tracker.current()
+    });
+    subexit();
+    state.stack = stack;
+    exit();
+    if (type === 'full' || !alt || alt !== reference) {
+        value += tracker.move(reference + ']');
+    } else if (type === 'shortcut') {
+        // Remove the unwanted `[`.
+        value = value.slice(0, -1);
+    } else {
+        value += tracker.move(']');
+    }
+    return value;
+}
+/**
+ * @returns {string}
+ */ function imageReferencePeek() {
+    return '!';
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/inline-code.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "inlineCode",
+    ()=>inlineCode
+]);
+/**
+ * @import {State} from 'mdast-util-to-markdown'
+ * @import {InlineCode, Parents} from 'mdast'
+ */ inlineCode.peek = inlineCodePeek;
+function inlineCode(node, _, state) {
+    let value = node.value || '';
+    let sequence = '`';
+    let index = -1;
+    // If there is a single grave accent on its own in the code, use a fence of
+    // two.
+    // If there are two in a row, use one.
+    while(new RegExp('(^|[^`])' + sequence + '([^`]|$)').test(value)){
+        sequence += '`';
+    }
+    // If this is not just spaces or eols (tabs don’t count), and either the
+    // first or last character are a space, eol, or tick, then pad with spaces.
+    if (/[^ \r\n]/.test(value) && (/^[ \r\n]/.test(value) && /[ \r\n]$/.test(value) || /^`|`$/.test(value))) {
+        value = ' ' + value + ' ';
+    }
+    // We have a potential problem: certain characters after eols could result in
+    // blocks being seen.
+    // For example, if someone injected the string `'\n# b'`, then that would
+    // result in an ATX heading.
+    // We can’t escape characters in `inlineCode`, but because eols are
+    // transformed to spaces when going from markdown to HTML anyway, we can swap
+    // them out.
+    while(++index < state.unsafe.length){
+        const pattern = state.unsafe[index];
+        const expression = state.compilePattern(pattern);
+        /** @type {RegExpExecArray | null} */ let match;
+        // Only look for `atBreak`s.
+        // Btw: note that `atBreak` patterns will always start the regex at LF or
+        // CR.
+        if (!pattern.atBreak) continue;
+        while(match = expression.exec(value)){
+            let position = match.index;
+            // Support CRLF (patterns only look for one of the characters).
+            if (value.charCodeAt(position) === 10 /* `\n` */  && value.charCodeAt(position - 1) === 13 /* `\r` */ ) {
+                position--;
+            }
+            value = value.slice(0, position) + ' ' + value.slice(match.index + 1);
+        }
+    }
+    return sequence + value + sequence;
+}
+/**
+ * @returns {string}
+ */ function inlineCodePeek() {
+    return '`';
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/format-link-as-autolink.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "formatLinkAsAutolink",
+    ()=>formatLinkAsAutolink
+]);
+/**
+ * @import {State} from 'mdast-util-to-markdown'
+ * @import {Link} from 'mdast'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$string$40$4$2e$0$2e$0$2f$node_modules$2f$mdast$2d$util$2d$to$2d$string$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-string@4.0.0/node_modules/mdast-util-to-string/lib/index.js [app-ssr] (ecmascript)");
+;
+function formatLinkAsAutolink(node, state) {
+    const raw = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$string$40$4$2e$0$2e$0$2f$node_modules$2f$mdast$2d$util$2d$to$2d$string$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["toString"])(node);
+    return Boolean(!state.options.resourceLink && // If there’s a url…
+    node.url && // And there’s a no title…
+    !node.title && // And the content of `node` is a single text node…
+    node.children && node.children.length === 1 && node.children[0].type === 'text' && // And if the url is the same as the content…
+    (raw === node.url || 'mailto:' + raw === node.url) && // And that starts w/ a protocol…
+    /^[a-z][a-z+.-]+:/i.test(node.url) && // And that doesn’t contain ASCII control codes (character escapes and
+    // references don’t work), space, or angle brackets…
+    !/[\0- <>\u007F]/.test(node.url));
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/link.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "link",
+    ()=>link
+]);
+/**
+ * @import {Info, State} from 'mdast-util-to-markdown'
+ * @import {Link, Parents} from 'mdast'
+ * @import {Exit} from '../types.js'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$quote$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-quote.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$format$2d$link$2d$as$2d$autolink$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/format-link-as-autolink.js [app-ssr] (ecmascript)");
+;
+;
+link.peek = linkPeek;
+function link(node, _, state, info) {
+    const quote = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$quote$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["checkQuote"])(state);
+    const suffix = quote === '"' ? 'Quote' : 'Apostrophe';
+    const tracker = state.createTracker(info);
+    /** @type {Exit} */ let exit;
+    /** @type {Exit} */ let subexit;
+    if ((0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$format$2d$link$2d$as$2d$autolink$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["formatLinkAsAutolink"])(node, state)) {
+        // Hide the fact that we’re in phrasing, because escapes don’t work.
+        const stack = state.stack;
+        state.stack = [];
+        exit = state.enter('autolink');
+        let value = tracker.move('<');
+        value += tracker.move(state.containerPhrasing(node, {
+            before: value,
+            after: '>',
+            ...tracker.current()
+        }));
+        value += tracker.move('>');
+        exit();
+        state.stack = stack;
+        return value;
+    }
+    exit = state.enter('link');
+    subexit = state.enter('label');
+    let value = tracker.move('[');
+    value += tracker.move(state.containerPhrasing(node, {
+        before: value,
+        after: '](',
+        ...tracker.current()
+    }));
+    value += tracker.move('](');
+    subexit();
+    if (// If there’s no url but there is a title…
+    !node.url && node.title || // If there are control characters or whitespace.
+    /[\0- \u007F]/.test(node.url)) {
+        subexit = state.enter('destinationLiteral');
+        value += tracker.move('<');
+        value += tracker.move(state.safe(node.url, {
+            before: value,
+            after: '>',
+            ...tracker.current()
+        }));
+        value += tracker.move('>');
+    } else {
+        // No whitespace, raw is prettier.
+        subexit = state.enter('destinationRaw');
+        value += tracker.move(state.safe(node.url, {
+            before: value,
+            after: node.title ? ' ' : ')',
+            ...tracker.current()
+        }));
+    }
+    subexit();
+    if (node.title) {
+        subexit = state.enter(`title${suffix}`);
+        value += tracker.move(' ' + quote);
+        value += tracker.move(state.safe(node.title, {
+            before: value,
+            after: quote,
+            ...tracker.current()
+        }));
+        value += tracker.move(quote);
+        subexit();
+    }
+    value += tracker.move(')');
+    exit();
+    return value;
+}
+/**
+ * @param {Link} node
+ * @param {Parents | undefined} _
+ * @param {State} state
+ * @returns {string}
+ */ function linkPeek(node, _, state) {
+    return (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$format$2d$link$2d$as$2d$autolink$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["formatLinkAsAutolink"])(node, state) ? '<' : '[';
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/link-reference.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "linkReference",
+    ()=>linkReference
+]);
+/**
+ * @import {Info, State} from 'mdast-util-to-markdown'
+ * @import {LinkReference, Parents} from 'mdast'
+ */ linkReference.peek = linkReferencePeek;
+function linkReference(node, _, state, info) {
+    const type = node.referenceType;
+    const exit = state.enter('linkReference');
+    let subexit = state.enter('label');
+    const tracker = state.createTracker(info);
+    let value = tracker.move('[');
+    const text = state.containerPhrasing(node, {
+        before: value,
+        after: ']',
+        ...tracker.current()
+    });
+    value += tracker.move(text + '][');
+    subexit();
+    // Hide the fact that we’re in phrasing, because escapes don’t work.
+    const stack = state.stack;
+    state.stack = [];
+    subexit = state.enter('reference');
+    // Note: for proper tracking, we should reset the output positions when we end
+    // up making a `shortcut` reference, because then there is no brace output.
+    // Practically, in that case, there is no content, so it doesn’t matter that
+    // we’ve tracked one too many characters.
+    const reference = state.safe(state.associationId(node), {
+        before: value,
+        after: ']',
+        ...tracker.current()
+    });
+    subexit();
+    state.stack = stack;
+    exit();
+    if (type === 'full' || !text || text !== reference) {
+        value += tracker.move(reference + ']');
+    } else if (type === 'shortcut') {
+        // Remove the unwanted `[`.
+        value = value.slice(0, -1);
+    } else {
+        value += tracker.move(']');
+    }
+    return value;
+}
+/**
+ * @returns {string}
+ */ function linkReferencePeek() {
+    return '[';
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-bullet.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * @import {Options, State} from 'mdast-util-to-markdown'
+ */ /**
+ * @param {State} state
+ * @returns {Exclude<Options['bullet'], null | undefined>}
+ */ __turbopack_context__.s([
+    "checkBullet",
+    ()=>checkBullet
+]);
+function checkBullet(state) {
+    const marker = state.options.bullet || '*';
+    if (marker !== '*' && marker !== '+' && marker !== '-') {
+        throw new Error('Cannot serialize items with `' + marker + '` for `options.bullet`, expected `*`, `+`, or `-`');
+    }
+    return marker;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-bullet-other.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "checkBulletOther",
+    ()=>checkBulletOther
+]);
+/**
+ * @import {Options, State} from 'mdast-util-to-markdown'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$bullet$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-bullet.js [app-ssr] (ecmascript)");
+;
+function checkBulletOther(state) {
+    const bullet = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$bullet$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["checkBullet"])(state);
+    const bulletOther = state.options.bulletOther;
+    if (!bulletOther) {
+        return bullet === '*' ? '-' : '*';
+    }
+    if (bulletOther !== '*' && bulletOther !== '+' && bulletOther !== '-') {
+        throw new Error('Cannot serialize items with `' + bulletOther + '` for `options.bulletOther`, expected `*`, `+`, or `-`');
+    }
+    if (bulletOther === bullet) {
+        throw new Error('Expected `bullet` (`' + bullet + '`) and `bulletOther` (`' + bulletOther + '`) to be different');
+    }
+    return bulletOther;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-bullet-ordered.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * @import {Options, State} from 'mdast-util-to-markdown'
+ */ /**
+ * @param {State} state
+ * @returns {Exclude<Options['bulletOrdered'], null | undefined>}
+ */ __turbopack_context__.s([
+    "checkBulletOrdered",
+    ()=>checkBulletOrdered
+]);
+function checkBulletOrdered(state) {
+    const marker = state.options.bulletOrdered || '.';
+    if (marker !== '.' && marker !== ')') {
+        throw new Error('Cannot serialize items with `' + marker + '` for `options.bulletOrdered`, expected `.` or `)`');
+    }
+    return marker;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-rule.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * @import {Options, State} from 'mdast-util-to-markdown'
+ */ /**
+ * @param {State} state
+ * @returns {Exclude<Options['rule'], null | undefined>}
+ */ __turbopack_context__.s([
+    "checkRule",
+    ()=>checkRule
+]);
+function checkRule(state) {
+    const marker = state.options.rule || '*';
+    if (marker !== '*' && marker !== '-' && marker !== '_') {
+        throw new Error('Cannot serialize rules with `' + marker + '` for `options.rule`, expected `*`, `-`, or `_`');
+    }
+    return marker;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/list.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "list",
+    ()=>list
+]);
+/**
+ * @import {Info, State} from 'mdast-util-to-markdown'
+ * @import {List, Parents} from 'mdast'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$bullet$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-bullet.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$bullet$2d$other$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-bullet-other.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$bullet$2d$ordered$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-bullet-ordered.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$rule$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-rule.js [app-ssr] (ecmascript)");
+;
+;
+;
+;
+function list(node, parent, state, info) {
+    const exit = state.enter('list');
+    const bulletCurrent = state.bulletCurrent;
+    /** @type {string} */ let bullet = node.ordered ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$bullet$2d$ordered$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["checkBulletOrdered"])(state) : (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$bullet$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["checkBullet"])(state);
+    /** @type {string} */ const bulletOther = node.ordered ? bullet === '.' ? ')' : '.' : (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$bullet$2d$other$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["checkBulletOther"])(state);
+    let useDifferentMarker = parent && state.bulletLastUsed ? bullet === state.bulletLastUsed : false;
+    if (!node.ordered) {
+        const firstListItem = node.children ? node.children[0] : undefined;
+        // If there’s an empty first list item directly in two list items,
+        // we have to use a different bullet:
+        //
+        // ```markdown
+        // * - *
+        // ```
+        //
+        // …because otherwise it would become one big thematic break.
+        if (// Bullet could be used as a thematic break marker:
+        (bullet === '*' || bullet === '-') && // Empty first list item:
+        firstListItem && (!firstListItem.children || !firstListItem.children[0]) && // Directly in two other list items:
+        state.stack[state.stack.length - 1] === 'list' && state.stack[state.stack.length - 2] === 'listItem' && state.stack[state.stack.length - 3] === 'list' && state.stack[state.stack.length - 4] === 'listItem' && // That are each the first child.
+        state.indexStack[state.indexStack.length - 1] === 0 && state.indexStack[state.indexStack.length - 2] === 0 && state.indexStack[state.indexStack.length - 3] === 0) {
+            useDifferentMarker = true;
+        }
+        // If there’s a thematic break at the start of the first list item,
+        // we have to use a different bullet:
+        //
+        // ```markdown
+        // * ---
+        // ```
+        //
+        // …because otherwise it would become one big thematic break.
+        if ((0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$rule$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["checkRule"])(state) === bullet && firstListItem) {
+            let index = -1;
+            while(++index < node.children.length){
+                const item = node.children[index];
+                if (item && item.type === 'listItem' && item.children && item.children[0] && item.children[0].type === 'thematicBreak') {
+                    useDifferentMarker = true;
+                    break;
+                }
+            }
+        }
+    }
+    if (useDifferentMarker) {
+        bullet = bulletOther;
+    }
+    state.bulletCurrent = bullet;
+    const value = state.containerFlow(node, info);
+    state.bulletLastUsed = bullet;
+    state.bulletCurrent = bulletCurrent;
+    exit();
+    return value;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-list-item-indent.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * @import {Options, State} from 'mdast-util-to-markdown'
+ */ /**
+ * @param {State} state
+ * @returns {Exclude<Options['listItemIndent'], null | undefined>}
+ */ __turbopack_context__.s([
+    "checkListItemIndent",
+    ()=>checkListItemIndent
+]);
+function checkListItemIndent(state) {
+    const style = state.options.listItemIndent || 'one';
+    if (style !== 'tab' && style !== 'one' && style !== 'mixed') {
+        throw new Error('Cannot serialize items with `' + style + '` for `options.listItemIndent`, expected `tab`, `one`, or `mixed`');
+    }
+    return style;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/list-item.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "listItem",
+    ()=>listItem
+]);
+/**
+ * @import {Info, Map, State} from 'mdast-util-to-markdown'
+ * @import {ListItem, Parents} from 'mdast'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$bullet$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-bullet.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$list$2d$item$2d$indent$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-list-item-indent.js [app-ssr] (ecmascript)");
+;
+;
+function listItem(node, parent, state, info) {
+    const listItemIndent = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$list$2d$item$2d$indent$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["checkListItemIndent"])(state);
+    let bullet = state.bulletCurrent || (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$bullet$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["checkBullet"])(state);
+    // Add the marker value for ordered lists.
+    if (parent && parent.type === 'list' && parent.ordered) {
+        bullet = (typeof parent.start === 'number' && parent.start > -1 ? parent.start : 1) + (state.options.incrementListMarker === false ? 0 : parent.children.indexOf(node)) + bullet;
+    }
+    let size = bullet.length + 1;
+    if (listItemIndent === 'tab' || listItemIndent === 'mixed' && (parent && parent.type === 'list' && parent.spread || node.spread)) {
+        size = Math.ceil(size / 4) * 4;
+    }
+    const tracker = state.createTracker(info);
+    tracker.move(bullet + ' '.repeat(size - bullet.length));
+    tracker.shift(size);
+    const exit = state.enter('listItem');
+    const value = state.indentLines(state.containerFlow(node, tracker.current()), map);
+    exit();
+    return value;
+    //TURBOPACK unreachable
+    ;
+    /** @type {Map} */ function map(line, index, blank) {
+        if (index) {
+            return (blank ? '' : ' '.repeat(size)) + line;
+        }
+        return (blank ? bullet : bullet + ' '.repeat(size - bullet.length)) + line;
+    }
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/paragraph.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * @import {Info, State} from 'mdast-util-to-markdown'
+ * @import {Paragraph, Parents} from 'mdast'
+ */ /**
+ * @param {Paragraph} node
+ * @param {Parents | undefined} _
+ * @param {State} state
+ * @param {Info} info
+ * @returns {string}
+ */ __turbopack_context__.s([
+    "paragraph",
+    ()=>paragraph
+]);
+function paragraph(node, _, state, info) {
+    const exit = state.enter('paragraph');
+    const subexit = state.enter('phrasing');
+    const value = state.containerPhrasing(node, info);
+    subexit();
+    exit();
+    return value;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/root.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "root",
+    ()=>root
+]);
+/**
+ * @import {Info, State} from 'mdast-util-to-markdown'
+ * @import {Parents, Root} from 'mdast'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$phrasing$40$4$2e$1$2e$0$2f$node_modules$2f$mdast$2d$util$2d$phrasing$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-phrasing@4.1.0/node_modules/mdast-util-phrasing/lib/index.js [app-ssr] (ecmascript)");
+;
+function root(node, _, state, info) {
+    // Note: `html` nodes are ambiguous.
+    const hasPhrasing = node.children.some(function(d) {
+        return (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$phrasing$40$4$2e$1$2e$0$2f$node_modules$2f$mdast$2d$util$2d$phrasing$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["phrasing"])(d);
+    });
+    const container = hasPhrasing ? state.containerPhrasing : state.containerFlow;
+    return container.call(state, node, info);
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-strong.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * @import {Options, State} from 'mdast-util-to-markdown'
+ */ /**
+ * @param {State} state
+ * @returns {Exclude<Options['strong'], null | undefined>}
+ */ __turbopack_context__.s([
+    "checkStrong",
+    ()=>checkStrong
+]);
+function checkStrong(state) {
+    const marker = state.options.strong || '*';
+    if (marker !== '*' && marker !== '_') {
+        throw new Error('Cannot serialize strong with `' + marker + '` for `options.strong`, expected `*`, or `_`');
+    }
+    return marker;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/strong.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "strong",
+    ()=>strong
+]);
+/**
+ * @import {Info, State} from 'mdast-util-to-markdown'
+ * @import {Parents, Strong} from 'mdast'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$strong$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-strong.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$encode$2d$character$2d$reference$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/encode-character-reference.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$encode$2d$info$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/encode-info.js [app-ssr] (ecmascript)");
+;
+;
+;
+strong.peek = strongPeek;
+function strong(node, _, state, info) {
+    const marker = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$strong$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["checkStrong"])(state);
+    const exit = state.enter('strong');
+    const tracker = state.createTracker(info);
+    const before = tracker.move(marker + marker);
+    let between = tracker.move(state.containerPhrasing(node, {
+        after: marker,
+        before,
+        ...tracker.current()
+    }));
+    const betweenHead = between.charCodeAt(0);
+    const open = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$encode$2d$info$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["encodeInfo"])(info.before.charCodeAt(info.before.length - 1), betweenHead, marker);
+    if (open.inside) {
+        between = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$encode$2d$character$2d$reference$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["encodeCharacterReference"])(betweenHead) + between.slice(1);
+    }
+    const betweenTail = between.charCodeAt(between.length - 1);
+    const close = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$encode$2d$info$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["encodeInfo"])(info.after.charCodeAt(0), betweenTail, marker);
+    if (close.inside) {
+        between = between.slice(0, -1) + (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$encode$2d$character$2d$reference$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["encodeCharacterReference"])(betweenTail);
+    }
+    const after = tracker.move(marker + marker);
+    exit();
+    state.attentionEncodeSurroundingInfo = {
+        after: close.outside,
+        before: open.outside
+    };
+    return before + between + after;
+}
+/**
+ * @param {Strong} _
+ * @param {Parents | undefined} _1
+ * @param {State} state
+ * @returns {string}
+ */ function strongPeek(_, _1, state) {
+    return state.options.strong || '*';
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/text.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * @import {Info, State} from 'mdast-util-to-markdown'
+ * @import {Parents, Text} from 'mdast'
+ */ /**
+ * @param {Text} node
+ * @param {Parents | undefined} _
+ * @param {State} state
+ * @param {Info} info
+ * @returns {string}
+ */ __turbopack_context__.s([
+    "text",
+    ()=>text
+]);
+function text(node, _, state, info) {
+    return state.safe(node.value, info);
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-rule-repetition.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * @import {Options, State} from 'mdast-util-to-markdown'
+ */ /**
+ * @param {State} state
+ * @returns {Exclude<Options['ruleRepetition'], null | undefined>}
+ */ __turbopack_context__.s([
+    "checkRuleRepetition",
+    ()=>checkRuleRepetition
+]);
+function checkRuleRepetition(state) {
+    const repetition = state.options.ruleRepetition || 3;
+    if (repetition < 3) {
+        throw new Error('Cannot serialize rules with repetition `' + repetition + '` for `options.ruleRepetition`, expected `3` or more');
+    }
+    return repetition;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/thematic-break.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "thematicBreak",
+    ()=>thematicBreak
+]);
+/**
+ * @import {State} from 'mdast-util-to-markdown'
+ * @import {Parents, ThematicBreak} from 'mdast'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$rule$2d$repetition$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-rule-repetition.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$rule$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-rule.js [app-ssr] (ecmascript)");
+;
+;
+function thematicBreak(_, _1, state) {
+    const value = ((0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$rule$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["checkRule"])(state) + (state.options.ruleSpaces ? ' ' : '')).repeat((0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$check$2d$rule$2d$repetition$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["checkRuleRepetition"])(state));
+    return state.options.ruleSpaces ? value.slice(0, -1) : value;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "handle",
+    ()=>handle
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$blockquote$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/blockquote.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$break$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/break.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$code$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/code.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$definition$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/definition.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$emphasis$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/emphasis.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$heading$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/heading.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$html$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/html.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/image.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$image$2d$reference$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/image-reference.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$inline$2d$code$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/inline-code.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/link.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$link$2d$reference$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/link-reference.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$list$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/list.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$list$2d$item$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/list-item.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$paragraph$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/paragraph.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$root$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/root.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$strong$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/strong.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$text$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/text.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$thematic$2d$break$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/thematic-break.js [app-ssr] (ecmascript)");
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+const handle = {
+    blockquote: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$blockquote$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["blockquote"],
+    break: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$break$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["hardBreak"],
+    code: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$code$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["code"],
+    definition: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$definition$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["definition"],
+    emphasis: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$emphasis$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["emphasis"],
+    hardBreak: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$break$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["hardBreak"],
+    heading: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$heading$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["heading"],
+    html: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$html$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["html"],
+    image: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["image"],
+    imageReference: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$image$2d$reference$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["imageReference"],
+    inlineCode: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$inline$2d$code$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["inlineCode"],
+    link: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["link"],
+    linkReference: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$link$2d$reference$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["linkReference"],
+    list: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$list$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["list"],
+    listItem: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$list$2d$item$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["listItem"],
+    paragraph: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$paragraph$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["paragraph"],
+    root: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$root$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["root"],
+    strong: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$strong$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["strong"],
+    text: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$text$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["text"],
+    thematicBreak: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$thematic$2d$break$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["thematicBreak"]
+};
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/join.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "join",
+    ()=>join
+]);
+/**
+ * @import {Join} from 'mdast-util-to-markdown'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$format$2d$code$2d$as$2d$indented$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/format-code-as-indented.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$format$2d$heading$2d$as$2d$setext$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/format-heading-as-setext.js [app-ssr] (ecmascript)");
+;
+;
+const join = [
+    joinDefaults
+];
+/** @type {Join} */ function joinDefaults(left, right, parent, state) {
+    // Indented code after list or another indented code.
+    if (right.type === 'code' && (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$format$2d$code$2d$as$2d$indented$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["formatCodeAsIndented"])(right, state) && (left.type === 'list' || left.type === right.type && (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$format$2d$code$2d$as$2d$indented$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["formatCodeAsIndented"])(left, state))) {
+        return false;
+    }
+    // Join children of a list or an item.
+    // In which case, `parent` has a `spread` field.
+    if ('spread' in parent && typeof parent.spread === 'boolean') {
+        if (left.type === 'paragraph' && // Two paragraphs.
+        (left.type === right.type || right.type === 'definition' || right.type === 'heading' && (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$format$2d$heading$2d$as$2d$setext$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["formatHeadingAsSetext"])(right, state))) {
+            return;
+        }
+        return parent.spread ? 1 : 0;
+    }
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/unsafe.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "unsafe",
+    ()=>unsafe
+]);
+/**
+ * @import {ConstructName, Unsafe} from 'mdast-util-to-markdown'
+ */ /**
+ * List of constructs that occur in phrasing (paragraphs, headings), but cannot
+ * contain things like attention (emphasis, strong), images, or links.
+ * So they sort of cancel each other out.
+ * Note: could use a better name.
+ *
+ * @type {Array<ConstructName>}
+ */ const fullPhrasingSpans = [
+    'autolink',
+    'destinationLiteral',
+    'destinationRaw',
+    'reference',
+    'titleQuote',
+    'titleApostrophe'
+];
+const unsafe = [
+    {
+        character: '\t',
+        after: '[\\r\\n]',
+        inConstruct: 'phrasing'
+    },
+    {
+        character: '\t',
+        before: '[\\r\\n]',
+        inConstruct: 'phrasing'
+    },
+    {
+        character: '\t',
+        inConstruct: [
+            'codeFencedLangGraveAccent',
+            'codeFencedLangTilde'
+        ]
+    },
+    {
+        character: '\r',
+        inConstruct: [
+            'codeFencedLangGraveAccent',
+            'codeFencedLangTilde',
+            'codeFencedMetaGraveAccent',
+            'codeFencedMetaTilde',
+            'destinationLiteral',
+            'headingAtx'
+        ]
+    },
+    {
+        character: '\n',
+        inConstruct: [
+            'codeFencedLangGraveAccent',
+            'codeFencedLangTilde',
+            'codeFencedMetaGraveAccent',
+            'codeFencedMetaTilde',
+            'destinationLiteral',
+            'headingAtx'
+        ]
+    },
+    {
+        character: ' ',
+        after: '[\\r\\n]',
+        inConstruct: 'phrasing'
+    },
+    {
+        character: ' ',
+        before: '[\\r\\n]',
+        inConstruct: 'phrasing'
+    },
+    {
+        character: ' ',
+        inConstruct: [
+            'codeFencedLangGraveAccent',
+            'codeFencedLangTilde'
+        ]
+    },
+    // An exclamation mark can start an image, if it is followed by a link or
+    // a link reference.
+    {
+        character: '!',
+        after: '\\[',
+        inConstruct: 'phrasing',
+        notInConstruct: fullPhrasingSpans
+    },
+    // A quote can break out of a title.
+    {
+        character: '"',
+        inConstruct: 'titleQuote'
+    },
+    // A number sign could start an ATX heading if it starts a line.
+    {
+        atBreak: true,
+        character: '#'
+    },
+    {
+        character: '#',
+        inConstruct: 'headingAtx',
+        after: '(?:[\r\n]|$)'
+    },
+    // Dollar sign and percentage are not used in markdown.
+    // An ampersand could start a character reference.
+    {
+        character: '&',
+        after: '[#A-Za-z]',
+        inConstruct: 'phrasing'
+    },
+    // An apostrophe can break out of a title.
+    {
+        character: "'",
+        inConstruct: 'titleApostrophe'
+    },
+    // A left paren could break out of a destination raw.
+    {
+        character: '(',
+        inConstruct: 'destinationRaw'
+    },
+    // A left paren followed by `]` could make something into a link or image.
+    {
+        before: '\\]',
+        character: '(',
+        inConstruct: 'phrasing',
+        notInConstruct: fullPhrasingSpans
+    },
+    // A right paren could start a list item or break out of a destination
+    // raw.
+    {
+        atBreak: true,
+        before: '\\d+',
+        character: ')'
+    },
+    {
+        character: ')',
+        inConstruct: 'destinationRaw'
+    },
+    // An asterisk can start thematic breaks, list items, emphasis, strong.
+    {
+        atBreak: true,
+        character: '*',
+        after: '(?:[ \t\r\n*])'
+    },
+    {
+        character: '*',
+        inConstruct: 'phrasing',
+        notInConstruct: fullPhrasingSpans
+    },
+    // A plus sign could start a list item.
+    {
+        atBreak: true,
+        character: '+',
+        after: '(?:[ \t\r\n])'
+    },
+    // A dash can start thematic breaks, list items, and setext heading
+    // underlines.
+    {
+        atBreak: true,
+        character: '-',
+        after: '(?:[ \t\r\n-])'
+    },
+    // A dot could start a list item.
+    {
+        atBreak: true,
+        before: '\\d+',
+        character: '.',
+        after: '(?:[ \t\r\n]|$)'
+    },
+    // Slash, colon, and semicolon are not used in markdown for constructs.
+    // A less than can start html (flow or text) or an autolink.
+    // HTML could start with an exclamation mark (declaration, cdata, comment),
+    // slash (closing tag), question mark (instruction), or a letter (tag).
+    // An autolink also starts with a letter.
+    // Finally, it could break out of a destination literal.
+    {
+        atBreak: true,
+        character: '<',
+        after: '[!/?A-Za-z]'
+    },
+    {
+        character: '<',
+        after: '[!/?A-Za-z]',
+        inConstruct: 'phrasing',
+        notInConstruct: fullPhrasingSpans
+    },
+    {
+        character: '<',
+        inConstruct: 'destinationLiteral'
+    },
+    // An equals to can start setext heading underlines.
+    {
+        atBreak: true,
+        character: '='
+    },
+    // A greater than can start block quotes and it can break out of a
+    // destination literal.
+    {
+        atBreak: true,
+        character: '>'
+    },
+    {
+        character: '>',
+        inConstruct: 'destinationLiteral'
+    },
+    // Question mark and at sign are not used in markdown for constructs.
+    // A left bracket can start definitions, references, labels,
+    {
+        atBreak: true,
+        character: '['
+    },
+    {
+        character: '[',
+        inConstruct: 'phrasing',
+        notInConstruct: fullPhrasingSpans
+    },
+    {
+        character: '[',
+        inConstruct: [
+            'label',
+            'reference'
+        ]
+    },
+    // A backslash can start an escape (when followed by punctuation) or a
+    // hard break (when followed by an eol).
+    // Note: typical escapes are handled in `safe`!
+    {
+        character: '\\',
+        after: '[\\r\\n]',
+        inConstruct: 'phrasing'
+    },
+    // A right bracket can exit labels.
+    {
+        character: ']',
+        inConstruct: [
+            'label',
+            'reference'
+        ]
+    },
+    // Caret is not used in markdown for constructs.
+    // An underscore can start emphasis, strong, or a thematic break.
+    {
+        atBreak: true,
+        character: '_'
+    },
+    {
+        character: '_',
+        inConstruct: 'phrasing',
+        notInConstruct: fullPhrasingSpans
+    },
+    // A grave accent can start code (fenced or text), or it can break out of
+    // a grave accent code fence.
+    {
+        atBreak: true,
+        character: '`'
+    },
+    {
+        character: '`',
+        inConstruct: [
+            'codeFencedLangGraveAccent',
+            'codeFencedMetaGraveAccent'
+        ]
+    },
+    {
+        character: '`',
+        inConstruct: 'phrasing',
+        notInConstruct: fullPhrasingSpans
+    },
+    // Left brace, vertical bar, right brace are not used in markdown for
+    // constructs.
+    // A tilde can start code (fenced).
+    {
+        atBreak: true,
+        character: '~'
+    }
+];
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/association.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "association",
+    ()=>association
+]);
+/**
+ * @import {AssociationId} from '../types.js'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$decode$2d$string$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$decode$2d$string$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/micromark-util-decode-string@2.0.1/node_modules/micromark-util-decode-string/dev/index.js [app-ssr] (ecmascript)");
+;
+function association(node) {
+    if (node.label || !node.identifier) {
+        return node.label || '';
+    }
+    return (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$micromark$2d$util$2d$decode$2d$string$40$2$2e$0$2e$1$2f$node_modules$2f$micromark$2d$util$2d$decode$2d$string$2f$dev$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["decodeString"])(node.identifier);
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/compile-pattern.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * @import {CompilePattern} from '../types.js'
+ */ /**
+ * @type {CompilePattern}
+ */ __turbopack_context__.s([
+    "compilePattern",
+    ()=>compilePattern
+]);
+function compilePattern(pattern) {
+    if (!pattern._compiled) {
+        const before = (pattern.atBreak ? '[\\r\\n][\\t ]*' : '') + (pattern.before ? '(?:' + pattern.before + ')' : '');
+        pattern._compiled = new RegExp((before ? '(' + before + ')' : '') + (/[|\\{}()[\]^$+*?.-]/.test(pattern.character) ? '\\' : '') + pattern.character + (pattern.after ? '(?:' + pattern.after + ')' : ''), 'g');
+    }
+    return pattern._compiled;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/container-phrasing.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "containerPhrasing",
+    ()=>containerPhrasing
+]);
+/**
+ * @import {Handle, Info, State} from 'mdast-util-to-markdown'
+ * @import {PhrasingParents} from '../types.js'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$encode$2d$character$2d$reference$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/encode-character-reference.js [app-ssr] (ecmascript)");
+;
+function containerPhrasing(parent, state, info) {
+    const indexStack = state.indexStack;
+    const children = parent.children || [];
+    /** @type {Array<string>} */ const results = [];
+    let index = -1;
+    let before = info.before;
+    /** @type {string | undefined} */ let encodeAfter;
+    indexStack.push(-1);
+    let tracker = state.createTracker(info);
+    while(++index < children.length){
+        const child = children[index];
+        /** @type {string} */ let after;
+        indexStack[indexStack.length - 1] = index;
+        if (index + 1 < children.length) {
+            /** @type {Handle} */ // @ts-expect-error: hush, it’s actually a `zwitch`.
+            let handle = state.handle.handlers[children[index + 1].type];
+            /** @type {Handle} */ // @ts-expect-error: hush, it’s actually a `zwitch`.
+            if (handle && handle.peek) handle = handle.peek;
+            after = handle ? handle(children[index + 1], parent, state, {
+                before: '',
+                after: '',
+                ...tracker.current()
+            }).charAt(0) : '';
+        } else {
+            after = info.after;
+        }
+        // In some cases, html (text) can be found in phrasing right after an eol.
+        // When we’d serialize that, in most cases that would be seen as html
+        // (flow).
+        // As we can’t escape or so to prevent it from happening, we take a somewhat
+        // reasonable approach: replace that eol with a space.
+        // See: <https://github.com/syntax-tree/mdast-util-to-markdown/issues/15>
+        if (results.length > 0 && (before === '\r' || before === '\n') && child.type === 'html') {
+            results[results.length - 1] = results[results.length - 1].replace(/(\r?\n|\r)$/, ' ');
+            before = ' ';
+            // To do: does this work to reset tracker?
+            tracker = state.createTracker(info);
+            tracker.move(results.join(''));
+        }
+        let value = state.handle(child, parent, state, {
+            ...tracker.current(),
+            after,
+            before
+        });
+        // If we had to encode the first character after the previous node and it’s
+        // still the same character,
+        // encode it.
+        if (encodeAfter && encodeAfter === value.slice(0, 1)) {
+            value = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$encode$2d$character$2d$reference$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["encodeCharacterReference"])(encodeAfter.charCodeAt(0)) + value.slice(1);
+        }
+        const encodingInfo = state.attentionEncodeSurroundingInfo;
+        state.attentionEncodeSurroundingInfo = undefined;
+        encodeAfter = undefined;
+        // If we have to encode the first character before the current node and
+        // it’s still the same character,
+        // encode it.
+        if (encodingInfo) {
+            if (results.length > 0 && encodingInfo.before && before === results[results.length - 1].slice(-1)) {
+                results[results.length - 1] = results[results.length - 1].slice(0, -1) + (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$encode$2d$character$2d$reference$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["encodeCharacterReference"])(before.charCodeAt(0));
+            }
+            if (encodingInfo.after) encodeAfter = after;
+        }
+        tracker.move(value);
+        results.push(value);
+        before = value.slice(-1);
+    }
+    indexStack.pop();
+    return results.join('');
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/container-flow.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * @import {State} from 'mdast-util-to-markdown'
+ * @import {FlowChildren, FlowParents, TrackFields} from '../types.js'
+ */ /**
+ * @param {FlowParents} parent
+ *   Parent of flow nodes.
+ * @param {State} state
+ *   Info passed around about the current state.
+ * @param {TrackFields} info
+ *   Info on where we are in the document we are generating.
+ * @returns {string}
+ *   Serialized children, joined by (blank) lines.
+ */ __turbopack_context__.s([
+    "containerFlow",
+    ()=>containerFlow
+]);
+function containerFlow(parent, state, info) {
+    const indexStack = state.indexStack;
+    const children = parent.children || [];
+    const tracker = state.createTracker(info);
+    /** @type {Array<string>} */ const results = [];
+    let index = -1;
+    indexStack.push(-1);
+    while(++index < children.length){
+        const child = children[index];
+        indexStack[indexStack.length - 1] = index;
+        results.push(tracker.move(state.handle(child, parent, state, {
+            before: '\n',
+            after: '\n',
+            ...tracker.current()
+        })));
+        if (child.type !== 'list') {
+            state.bulletLastUsed = undefined;
+        }
+        if (index < children.length - 1) {
+            results.push(tracker.move(between(child, children[index + 1], parent, state)));
+        }
+    }
+    indexStack.pop();
+    return results.join('');
+}
+/**
+ * @param {FlowChildren} left
+ * @param {FlowChildren} right
+ * @param {FlowParents} parent
+ * @param {State} state
+ * @returns {string}
+ */ function between(left, right, parent, state) {
+    let index = state.join.length;
+    while(index--){
+        const result = state.join[index](left, right, parent, state);
+        if (result === true || result === 1) {
+            break;
+        }
+        if (typeof result === 'number') {
+            return '\n'.repeat(1 + result);
+        }
+        if (result === false) {
+            return '\n\n<!---->\n\n';
+        }
+    }
+    return '\n\n';
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/indent-lines.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "indentLines",
+    ()=>indentLines
+]);
+/**
+ * @import {IndentLines} from '../types.js'
+ */ const eol = /\r?\n|\r/g;
+function indentLines(value, map) {
+    /** @type {Array<string>} */ const result = [];
+    let start = 0;
+    let line = 0;
+    /** @type {RegExpExecArray | null} */ let match;
+    while(match = eol.exec(value)){
+        one(value.slice(start, match.index));
+        result.push(match[0]);
+        start = match.index + match[0].length;
+        line++;
+    }
+    one(value.slice(start));
+    return result.join('');
+    //TURBOPACK unreachable
+    ;
+    /**
+   * @param {string} value
+   */ function one(value) {
+        result.push(map(value, line, !value));
+    }
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/safe.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "safe",
+    ()=>safe
+]);
+/**
+ * @import {SafeConfig, State} from 'mdast-util-to-markdown'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$encode$2d$character$2d$reference$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/encode-character-reference.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$pattern$2d$in$2d$scope$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/pattern-in-scope.js [app-ssr] (ecmascript)");
+;
+;
+function safe(state, input, config) {
+    const value = (config.before || '') + (input || '') + (config.after || '');
+    /** @type {Array<number>} */ const positions = [];
+    /** @type {Array<string>} */ const result = [];
+    /** @type {Record<number, {before: boolean, after: boolean}>} */ const infos = {};
+    let index = -1;
+    while(++index < state.unsafe.length){
+        const pattern = state.unsafe[index];
+        if (!(0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$pattern$2d$in$2d$scope$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["patternInScope"])(state.stack, pattern)) {
+            continue;
+        }
+        const expression = state.compilePattern(pattern);
+        /** @type {RegExpExecArray | null} */ let match;
+        while(match = expression.exec(value)){
+            const before = 'before' in pattern || Boolean(pattern.atBreak);
+            const after = 'after' in pattern;
+            const position = match.index + (before ? match[1].length : 0);
+            if (positions.includes(position)) {
+                if (infos[position].before && !before) {
+                    infos[position].before = false;
+                }
+                if (infos[position].after && !after) {
+                    infos[position].after = false;
+                }
+            } else {
+                positions.push(position);
+                infos[position] = {
+                    before,
+                    after
+                };
+            }
+        }
+    }
+    positions.sort(numerical);
+    let start = config.before ? config.before.length : 0;
+    const end = value.length - (config.after ? config.after.length : 0);
+    index = -1;
+    while(++index < positions.length){
+        const position = positions[index];
+        // Character before or after matched:
+        if (position < start || position >= end) {
+            continue;
+        }
+        // If this character is supposed to be escaped because it has a condition on
+        // the next character, and the next character is definitly being escaped,
+        // then skip this escape.
+        if (position + 1 < end && positions[index + 1] === position + 1 && infos[position].after && !infos[position + 1].before && !infos[position + 1].after || positions[index - 1] === position - 1 && infos[position].before && !infos[position - 1].before && !infos[position - 1].after) {
+            continue;
+        }
+        if (start !== position) {
+            // If we have to use a character reference, an ampersand would be more
+            // correct, but as backslashes only care about punctuation, either will
+            // do the trick
+            result.push(escapeBackslashes(value.slice(start, position), '\\'));
+        }
+        start = position;
+        if (/[!-/:-@[-`{-~]/.test(value.charAt(position)) && (!config.encode || !config.encode.includes(value.charAt(position)))) {
+            // Character escape.
+            result.push('\\');
+        } else {
+            // Character reference.
+            result.push((0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$encode$2d$character$2d$reference$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["encodeCharacterReference"])(value.charCodeAt(position)));
+            start++;
+        }
+    }
+    result.push(escapeBackslashes(value.slice(start, end), config.after));
+    return result.join('');
+}
+/**
+ * @param {number} a
+ * @param {number} b
+ * @returns {number}
+ */ function numerical(a, b) {
+    return a - b;
+}
+/**
+ * @param {string} value
+ * @param {string} after
+ * @returns {string}
+ */ function escapeBackslashes(value, after) {
+    const expression = /\\(?=[!-/:-@[-`{-~])/g;
+    /** @type {Array<number>} */ const positions = [];
+    /** @type {Array<string>} */ const results = [];
+    const whole = value + after;
+    let index = -1;
+    let start = 0;
+    /** @type {RegExpExecArray | null} */ let match;
+    while(match = expression.exec(whole)){
+        positions.push(match.index);
+    }
+    while(++index < positions.length){
+        if (start !== positions[index]) {
+            results.push(value.slice(start, positions[index]));
+        }
+        results.push('\\');
+        start = positions[index];
+    }
+    results.push(value.slice(start));
+    return results.join('');
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/track.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * @import {CreateTracker, TrackCurrent, TrackMove, TrackShift} from '../types.js'
+ */ /**
+ * Track positional info in the output.
+ *
+ * @type {CreateTracker}
+ */ __turbopack_context__.s([
+    "track",
+    ()=>track
+]);
+function track(config) {
+    // Defaults are used to prevent crashes when older utilities somehow activate
+    // this code.
+    /* c8 ignore next 5 */ const options = config || {};
+    const now = options.now || {};
+    let lineShift = options.lineShift || 0;
+    let line = now.line || 1;
+    let column = now.column || 1;
+    return {
+        move,
+        current,
+        shift
+    };
+    //TURBOPACK unreachable
+    ;
+    /**
+   * Get the current tracked info.
+   *
+   * @type {TrackCurrent}
+   */ function current() {
+        return {
+            now: {
+                line,
+                column
+            },
+            lineShift
+        };
+    }
+    /**
+   * Define an increased line shift (the typical indent for lines).
+   *
+   * @type {TrackShift}
+   */ function shift(value) {
+        lineShift += value;
+    }
+    /**
+   * Move past some generated markdown.
+   *
+   * @type {TrackMove}
+   */ function move(input) {
+        // eslint-disable-next-line unicorn/prefer-default-parameters
+        const value = input || '';
+        const chunks = value.split(/\r?\n|\r/g);
+        const tail = chunks[chunks.length - 1];
+        line += chunks.length - 1;
+        column = chunks.length === 1 ? column + tail.length : 1 + tail.length + lineShift;
+        return value;
+    }
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "toMarkdown",
+    ()=>toMarkdown
+]);
+/**
+ * @import {Info, Join, Options, SafeConfig, State} from 'mdast-util-to-markdown'
+ * @import {Nodes} from 'mdast'
+ * @import {Enter, FlowParents, PhrasingParents, TrackFields} from './types.js'
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$zwitch$40$2$2e$0$2e$4$2f$node_modules$2f$zwitch$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/zwitch@2.0.4/node_modules/zwitch/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$configure$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/configure.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$join$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/join.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$unsafe$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/unsafe.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$association$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/association.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$compile$2d$pattern$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/compile-pattern.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$container$2d$phrasing$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/container-phrasing.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$container$2d$flow$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/container-flow.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$indent$2d$lines$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/indent-lines.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$safe$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/safe.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$track$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/track.js [app-ssr] (ecmascript)");
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+function toMarkdown(tree, options) {
+    const settings = options || {};
+    /** @type {State} */ const state = {
+        associationId: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$association$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["association"],
+        containerPhrasing: containerPhrasingBound,
+        containerFlow: containerFlowBound,
+        createTracker: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$track$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["track"],
+        compilePattern: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$compile$2d$pattern$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["compilePattern"],
+        enter,
+        // @ts-expect-error: GFM / frontmatter are typed in `mdast` but not defined
+        // here.
+        handlers: {
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$handle$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["handle"]
+        },
+        // @ts-expect-error: add `handle` in a second.
+        handle: undefined,
+        indentLines: __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$indent$2d$lines$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["indentLines"],
+        indexStack: [],
+        join: [
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$join$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["join"]
+        ],
+        options: {},
+        safe: safeBound,
+        stack: [],
+        unsafe: [
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$unsafe$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["unsafe"]
+        ]
+    };
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$configure$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["configure"])(state, settings);
+    if (state.options.tightDefinitions) {
+        state.join.push(joinDefinition);
+    }
+    state.handle = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$zwitch$40$2$2e$0$2e$4$2f$node_modules$2f$zwitch$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["zwitch"])('type', {
+        invalid,
+        unknown,
+        handlers: state.handlers
+    });
+    let result = state.handle(tree, undefined, state, {
+        before: '\n',
+        after: '\n',
+        now: {
+            line: 1,
+            column: 1
+        },
+        lineShift: 0
+    });
+    if (result && result.charCodeAt(result.length - 1) !== 10 && result.charCodeAt(result.length - 1) !== 13) {
+        result += '\n';
+    }
+    return result;
+    //TURBOPACK unreachable
+    ;
+    /** @type {Enter} */ function enter(name) {
+        state.stack.push(name);
+        return exit;
+        //TURBOPACK unreachable
+        ;
+        /**
+     * @returns {undefined}
+     */ function exit() {
+            state.stack.pop();
+        }
+    }
+}
+/**
+ * @param {unknown} value
+ * @returns {never}
+ */ function invalid(value) {
+    throw new Error('Cannot handle value `' + value + '`, expected node');
+}
+/**
+ * @param {unknown} value
+ * @returns {never}
+ */ function unknown(value) {
+    // Always a node.
+    const node = value;
+    throw new Error('Cannot handle unknown node `' + node.type + '`');
+}
+/** @type {Join} */ function joinDefinition(left, right) {
+    // No blank line between adjacent definitions.
+    if (left.type === 'definition' && left.type === right.type) {
+        return 0;
+    }
+}
+/**
+ * Serialize the children of a parent that contains phrasing children.
+ *
+ * These children will be joined flush together.
+ *
+ * @this {State}
+ *   Info passed around about the current state.
+ * @param {PhrasingParents} parent
+ *   Parent of flow nodes.
+ * @param {Info} info
+ *   Info on where we are in the document we are generating.
+ * @returns {string}
+ *   Serialized children, joined together.
+ */ function containerPhrasingBound(parent, info) {
+    return (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$container$2d$phrasing$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["containerPhrasing"])(parent, this, info);
+}
+/**
+ * Serialize the children of a parent that contains flow children.
+ *
+ * These children will typically be joined by blank lines.
+ * What they are joined by exactly is defined by `Join` functions.
+ *
+ * @this {State}
+ *   Info passed around about the current state.
+ * @param {FlowParents} parent
+ *   Parent of flow nodes.
+ * @param {TrackFields} info
+ *   Info on where we are in the document we are generating.
+ * @returns {string}
+ *   Serialized children, joined by (blank) lines.
+ */ function containerFlowBound(parent, info) {
+    return (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$container$2d$flow$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["containerFlow"])(parent, this, info);
+}
+/**
+ * Make a string safe for embedding in markdown constructs.
+ *
+ * In markdown, almost all punctuation characters can, in certain cases,
+ * result in something.
+ * Whether they do is highly subjective to where they happen and in what
+ * they happen.
+ *
+ * To solve this, `mdast-util-to-markdown` tracks:
+ *
+ * * Characters before and after something;
+ * * What “constructs” we are in.
+ *
+ * This information is then used by this function to escape or encode
+ * special characters.
+ *
+ * @this {State}
+ *   Info passed around about the current state.
+ * @param {string | null | undefined} value
+ *   Raw value to make safe.
+ * @param {SafeConfig} config
+ *   Configuration.
+ * @returns {string}
+ *   Serialized markdown safe for embedding.
+ */ function safeBound(value, config) {
+    return (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$util$2f$safe$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["safe"])(this, value, config);
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/longest-streak@3.1.0/node_modules/longest-streak/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * Get the count of the longest repeating streak of `substring` in `value`.
+ *
+ * @param {string} value
+ *   Content to search in.
+ * @param {string} substring
+ *   Substring to look for, typically one character.
+ * @returns {number}
+ *   Count of most frequent adjacent `substring`s in `value`.
+ */ __turbopack_context__.s([
+    "longestStreak",
+    ()=>longestStreak
+]);
+function longestStreak(value, substring) {
+    const source = String(value);
+    let index = source.indexOf(substring);
+    let expected = index;
+    let count = 0;
+    let max = 0;
+    if (typeof substring !== 'string') {
+        throw new TypeError('Expected substring');
+    }
+    while(index !== -1){
+        if (index === expected) {
+            if (++count > max) {
+                max = count;
+            }
+        } else {
+            count = 1;
+        }
+        expected = index + substring.length;
+        index = source.indexOf(substring, expected);
+    }
+    return max;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/unist-util-is@6.0.1/node_modules/unist-util-is/lib/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * @import {Node, Parent} from 'unist'
+ */ /**
+ * @template Fn
+ * @template Fallback
+ * @typedef {Fn extends (value: any) => value is infer Thing ? Thing : Fallback} Predicate
+ */ /**
+ * @callback Check
+ *   Check that an arbitrary value is a node.
+ * @param {unknown} this
+ *   The given context.
+ * @param {unknown} [node]
+ *   Anything (typically a node).
+ * @param {number | null | undefined} [index]
+ *   The node’s position in its parent.
+ * @param {Parent | null | undefined} [parent]
+ *   The node’s parent.
+ * @returns {boolean}
+ *   Whether this is a node and passes a test.
+ *
+ * @typedef {Record<string, unknown> | Node} Props
+ *   Object to check for equivalence.
+ *
+ *   Note: `Node` is included as it is common but is not indexable.
+ *
+ * @typedef {Array<Props | TestFunction | string> | ReadonlyArray<Props | TestFunction | string> | Props | TestFunction | string | null | undefined} Test
+ *   Check for an arbitrary node.
+ *
+ * @callback TestFunction
+ *   Check if a node passes a test.
+ * @param {unknown} this
+ *   The given context.
+ * @param {Node} node
+ *   A node.
+ * @param {number | undefined} [index]
+ *   The node’s position in its parent.
+ * @param {Parent | undefined} [parent]
+ *   The node’s parent.
+ * @returns {boolean | undefined | void}
+ *   Whether this node passes the test.
+ *
+ *   Note: `void` is included until TS sees no return as `undefined`.
+ */ /**
+ * Check if `node` is a `Node` and whether it passes the given test.
+ *
+ * @param {unknown} node
+ *   Thing to check, typically `Node`.
+ * @param {Test} test
+ *   A check for a specific node.
+ * @param {number | null | undefined} index
+ *   The node’s position in its parent.
+ * @param {Parent | null | undefined} parent
+ *   The node’s parent.
+ * @param {unknown} context
+ *   Context object (`this`) to pass to `test` functions.
+ * @returns {boolean}
+ *   Whether `node` is a node and passes a test.
+ */ __turbopack_context__.s([
+    "convert",
+    ()=>convert,
+    "is",
+    ()=>is
+]);
+const is = /**
+     * @param {unknown} [node]
+     * @param {Test} [test]
+     * @param {number | null | undefined} [index]
+     * @param {Parent | null | undefined} [parent]
+     * @param {unknown} [context]
+     * @returns {boolean}
+     */ // eslint-disable-next-line max-params
+function(node, test, index, parent, context) {
+    const check = convert(test);
+    if (index !== undefined && index !== null && (typeof index !== 'number' || index < 0 || index === Number.POSITIVE_INFINITY)) {
+        throw new Error('Expected positive finite index');
+    }
+    if (parent !== undefined && parent !== null && (!is(parent) || !parent.children)) {
+        throw new Error('Expected parent node');
+    }
+    if ((parent === undefined || parent === null) !== (index === undefined || index === null)) {
+        throw new Error('Expected both parent and index');
+    }
+    return looksLikeANode(node) ? check.call(context, node, index, parent) : false;
+};
+const convert = /**
+     * @param {Test} [test]
+     * @returns {Check}
+     */ function(test) {
+    if (test === null || test === undefined) {
+        return ok;
+    }
+    if (typeof test === 'function') {
+        return castFactory(test);
+    }
+    if (typeof test === 'object') {
+        return Array.isArray(test) ? anyFactory(test) : // narrows to `Array`.
+        propertiesFactory(test);
+    }
+    if (typeof test === 'string') {
+        return typeFactory(test);
+    }
+    throw new Error('Expected function, string, or object as test');
+};
+/**
+ * @param {Array<Props | TestFunction | string>} tests
+ * @returns {Check}
+ */ function anyFactory(tests) {
+    /** @type {Array<Check>} */ const checks = [];
+    let index = -1;
+    while(++index < tests.length){
+        checks[index] = convert(tests[index]);
+    }
+    return castFactory(any);
+    //TURBOPACK unreachable
+    ;
+    /**
+   * @this {unknown}
+   * @type {TestFunction}
+   */ function any(...parameters) {
+        let index = -1;
+        while(++index < checks.length){
+            if (checks[index].apply(this, parameters)) return true;
+        }
+        return false;
+    }
+}
+/**
+ * Turn an object into a test for a node with a certain fields.
+ *
+ * @param {Props} check
+ * @returns {Check}
+ */ function propertiesFactory(check) {
+    const checkAsRecord = check;
+    return castFactory(all);
+    //TURBOPACK unreachable
+    ;
+    /**
+   * @param {Node} node
+   * @returns {boolean}
+   */ function all(node) {
+        const nodeAsRecord = node;
+        /** @type {string} */ let key;
+        for(key in check){
+            if (nodeAsRecord[key] !== checkAsRecord[key]) return false;
+        }
+        return true;
+    }
+}
+/**
+ * Turn a string into a test for a node with a certain type.
+ *
+ * @param {string} check
+ * @returns {Check}
+ */ function typeFactory(check) {
+    return castFactory(type);
+    //TURBOPACK unreachable
+    ;
+    /**
+   * @param {Node} node
+   */ function type(node) {
+        return node && node.type === check;
+    }
+}
+/**
+ * Turn a custom test into a test for a node that passes that test.
+ *
+ * @param {TestFunction} testFunction
+ * @returns {Check}
+ */ function castFactory(testFunction) {
+    return check;
+    //TURBOPACK unreachable
+    ;
+    /**
+   * @this {unknown}
+   * @type {Check}
+   */ function check(value, index, parent) {
+        return Boolean(looksLikeANode(value) && testFunction.call(this, value, typeof index === 'number' ? index : undefined, parent || undefined));
+    }
+}
+function ok() {
+    return true;
+}
+/**
+ * @param {unknown} value
+ * @returns {value is Node}
+ */ function looksLikeANode(value) {
+    return value !== null && typeof value === 'object' && 'type' in value;
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/unist-util-visit-parents@6.0.2/node_modules/unist-util-visit-parents/lib/color.node.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * @param {string} d
+ * @returns {string}
+ */ __turbopack_context__.s([
+    "color",
+    ()=>color
+]);
+function color(d) {
+    return '\u001B[33m' + d + '\u001B[39m';
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/unist-util-visit-parents@6.0.2/node_modules/unist-util-visit-parents/lib/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "CONTINUE",
+    ()=>CONTINUE,
+    "EXIT",
+    ()=>EXIT,
+    "SKIP",
+    ()=>SKIP,
+    "visitParents",
+    ()=>visitParents
+]);
+/**
+ * @import {Node as UnistNode, Parent as UnistParent} from 'unist'
+ */ /**
+ * @typedef {Exclude<import('unist-util-is').Test, undefined> | undefined} Test
+ *   Test from `unist-util-is`.
+ *
+ *   Note: we have remove and add `undefined`, because otherwise when generating
+ *   automatic `.d.ts` files, TS tries to flatten paths from a local perspective,
+ *   which doesn’t work when publishing on npm.
+ */ /**
+ * @typedef {(
+ *   Fn extends (value: any) => value is infer Thing
+ *   ? Thing
+ *   : Fallback
+ * )} Predicate
+ *   Get the value of a type guard `Fn`.
+ * @template Fn
+ *   Value; typically function that is a type guard (such as `(x): x is Y`).
+ * @template Fallback
+ *   Value to yield if `Fn` is not a type guard.
+ */ /**
+ * @typedef {(
+ *   Check extends null | undefined // No test.
+ *   ? Value
+ *   : Value extends {type: Check} // String (type) test.
+ *   ? Value
+ *   : Value extends Check // Partial test.
+ *   ? Value
+ *   : Check extends Function // Function test.
+ *   ? Predicate<Check, Value> extends Value
+ *     ? Predicate<Check, Value>
+ *     : never
+ *   : never // Some other test?
+ * )} MatchesOne
+ *   Check whether a node matches a primitive check in the type system.
+ * @template Value
+ *   Value; typically unist `Node`.
+ * @template Check
+ *   Value; typically `unist-util-is`-compatible test, but not arrays.
+ */ /**
+ * @typedef {(
+ *   Check extends ReadonlyArray<infer T>
+ *   ? MatchesOne<Value, T>
+ *   : Check extends Array<infer T>
+ *   ? MatchesOne<Value, T>
+ *   : MatchesOne<Value, Check>
+ * )} Matches
+ *   Check whether a node matches a check in the type system.
+ * @template Value
+ *   Value; typically unist `Node`.
+ * @template Check
+ *   Value; typically `unist-util-is`-compatible test.
+ */ /**
+ * @typedef {0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10} Uint
+ *   Number; capped reasonably.
+ */ /**
+ * @typedef {I extends 0 ? 1 : I extends 1 ? 2 : I extends 2 ? 3 : I extends 3 ? 4 : I extends 4 ? 5 : I extends 5 ? 6 : I extends 6 ? 7 : I extends 7 ? 8 : I extends 8 ? 9 : 10} Increment
+ *   Increment a number in the type system.
+ * @template {Uint} [I=0]
+ *   Index.
+ */ /**
+ * @typedef {(
+ *   Node extends UnistParent
+ *   ? Node extends {children: Array<infer Children>}
+ *     ? Child extends Children ? Node : never
+ *     : never
+ *   : never
+ * )} InternalParent
+ *   Collect nodes that can be parents of `Child`.
+ * @template {UnistNode} Node
+ *   All node types in a tree.
+ * @template {UnistNode} Child
+ *   Node to search for.
+ */ /**
+ * @typedef {InternalParent<InclusiveDescendant<Tree>, Child>} Parent
+ *   Collect nodes in `Tree` that can be parents of `Child`.
+ * @template {UnistNode} Tree
+ *   All node types in a tree.
+ * @template {UnistNode} Child
+ *   Node to search for.
+ */ /**
+ * @typedef {(
+ *   Depth extends Max
+ *   ? never
+ *   :
+ *     | InternalParent<Node, Child>
+ *     | InternalAncestor<Node, InternalParent<Node, Child>, Max, Increment<Depth>>
+ * )} InternalAncestor
+ *   Collect nodes in `Tree` that can be ancestors of `Child`.
+ * @template {UnistNode} Node
+ *   All node types in a tree.
+ * @template {UnistNode} Child
+ *   Node to search for.
+ * @template {Uint} [Max=10]
+ *   Max; searches up to this depth.
+ * @template {Uint} [Depth=0]
+ *   Current depth.
+ */ /**
+ * @typedef {InternalAncestor<InclusiveDescendant<Tree>, Child>} Ancestor
+ *   Collect nodes in `Tree` that can be ancestors of `Child`.
+ * @template {UnistNode} Tree
+ *   All node types in a tree.
+ * @template {UnistNode} Child
+ *   Node to search for.
+ */ /**
+ * @typedef {(
+ *   Tree extends UnistParent
+ *     ? Depth extends Max
+ *       ? Tree
+ *       : Tree | InclusiveDescendant<Tree['children'][number], Max, Increment<Depth>>
+ *     : Tree
+ * )} InclusiveDescendant
+ *   Collect all (inclusive) descendants of `Tree`.
+ *
+ *   > 👉 **Note**: for performance reasons, this seems to be the fastest way to
+ *   > recurse without actually running into an infinite loop, which the
+ *   > previous version did.
+ *   >
+ *   > Practically, a max of `2` is typically enough assuming a `Root` is
+ *   > passed, but it doesn’t improve performance.
+ *   > It gets higher with `List > ListItem > Table > TableRow > TableCell`.
+ *   > Using up to `10` doesn’t hurt or help either.
+ * @template {UnistNode} Tree
+ *   Tree type.
+ * @template {Uint} [Max=10]
+ *   Max; searches up to this depth.
+ * @template {Uint} [Depth=0]
+ *   Current depth.
+ */ /**
+ * @typedef {'skip' | boolean} Action
+ *   Union of the action types.
+ *
+ * @typedef {number} Index
+ *   Move to the sibling at `index` next (after node itself is completely
+ *   traversed).
+ *
+ *   Useful if mutating the tree, such as removing the node the visitor is
+ *   currently on, or any of its previous siblings.
+ *   Results less than 0 or greater than or equal to `children.length` stop
+ *   traversing the parent.
+ *
+ * @typedef {[(Action | null | undefined | void)?, (Index | null | undefined)?]} ActionTuple
+ *   List with one or two values, the first an action, the second an index.
+ *
+ * @typedef {Action | ActionTuple | Index | null | undefined | void} VisitorResult
+ *   Any value that can be returned from a visitor.
+ */ /**
+ * @callback Visitor
+ *   Handle a node (matching `test`, if given).
+ *
+ *   Visitors are free to transform `node`.
+ *   They can also transform the parent of node (the last of `ancestors`).
+ *
+ *   Replacing `node` itself, if `SKIP` is not returned, still causes its
+ *   descendants to be walked (which is a bug).
+ *
+ *   When adding or removing previous siblings of `node` (or next siblings, in
+ *   case of reverse), the `Visitor` should return a new `Index` to specify the
+ *   sibling to traverse after `node` is traversed.
+ *   Adding or removing next siblings of `node` (or previous siblings, in case
+ *   of reverse) is handled as expected without needing to return a new `Index`.
+ *
+ *   Removing the children property of an ancestor still results in them being
+ *   traversed.
+ * @param {Visited} node
+ *   Found node.
+ * @param {Array<VisitedParents>} ancestors
+ *   Ancestors of `node`.
+ * @returns {VisitorResult}
+ *   What to do next.
+ *
+ *   An `Index` is treated as a tuple of `[CONTINUE, Index]`.
+ *   An `Action` is treated as a tuple of `[Action]`.
+ *
+ *   Passing a tuple back only makes sense if the `Action` is `SKIP`.
+ *   When the `Action` is `EXIT`, that action can be returned.
+ *   When the `Action` is `CONTINUE`, `Index` can be returned.
+ * @template {UnistNode} [Visited=UnistNode]
+ *   Visited node type.
+ * @template {UnistParent} [VisitedParents=UnistParent]
+ *   Ancestor type.
+ */ /**
+ * @typedef {Visitor<Matches<InclusiveDescendant<Tree>, Check>, Ancestor<Tree, Matches<InclusiveDescendant<Tree>, Check>>>} BuildVisitor
+ *   Build a typed `Visitor` function from a tree and a test.
+ *
+ *   It will infer which values are passed as `node` and which as `parents`.
+ * @template {UnistNode} [Tree=UnistNode]
+ *   Tree type.
+ * @template {Test} [Check=Test]
+ *   Test type.
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unist$2d$util$2d$is$40$6$2e$0$2e$1$2f$node_modules$2f$unist$2d$util$2d$is$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/unist-util-is@6.0.1/node_modules/unist-util-is/lib/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unist$2d$util$2d$visit$2d$parents$40$6$2e$0$2e$2$2f$node_modules$2f$unist$2d$util$2d$visit$2d$parents$2f$lib$2f$color$2e$node$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/unist-util-visit-parents@6.0.2/node_modules/unist-util-visit-parents/lib/color.node.js [app-ssr] (ecmascript)");
+;
+;
+/** @type {Readonly<ActionTuple>} */ const empty = [];
+const CONTINUE = true;
+const EXIT = false;
+const SKIP = 'skip';
+function visitParents(tree, test, visitor, reverse) {
+    /** @type {Test} */ let check;
+    if (typeof test === 'function' && typeof visitor !== 'function') {
+        reverse = visitor;
+        // @ts-expect-error no visitor given, so `visitor` is test.
+        visitor = test;
+    } else {
+        // @ts-expect-error visitor given, so `test` isn’t a visitor.
+        check = test;
+    }
+    const is = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unist$2d$util$2d$is$40$6$2e$0$2e$1$2f$node_modules$2f$unist$2d$util$2d$is$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["convert"])(check);
+    const step = reverse ? -1 : 1;
+    factory(tree, undefined, [])();
+    /**
+   * @param {UnistNode} node
+   * @param {number | undefined} index
+   * @param {Array<UnistParent>} parents
+   */ function factory(node, index, parents) {
+        const value = node && typeof node === 'object' ? node : {};
+        if (typeof value.type === 'string') {
+            const name = // `hast`
+            typeof value.tagName === 'string' ? value.tagName : typeof value.name === 'string' ? value.name : undefined;
+            Object.defineProperty(visit, 'name', {
+                value: 'node (' + (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unist$2d$util$2d$visit$2d$parents$40$6$2e$0$2e$2$2f$node_modules$2f$unist$2d$util$2d$visit$2d$parents$2f$lib$2f$color$2e$node$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["color"])(node.type + (name ? '<' + name + '>' : '')) + ')'
+            });
+        }
+        return visit;
+        //TURBOPACK unreachable
+        ;
+        function visit() {
+            /** @type {Readonly<ActionTuple>} */ let result = empty;
+            /** @type {Readonly<ActionTuple>} */ let subresult;
+            /** @type {number} */ let offset;
+            /** @type {Array<UnistParent>} */ let grandparents;
+            if (!test || is(node, index, parents[parents.length - 1] || undefined)) {
+                // @ts-expect-error: `visitor` is now a visitor.
+                result = toResult(visitor(node, parents));
+                if (result[0] === EXIT) {
+                    return result;
+                }
+            }
+            if ('children' in node && node.children) {
+                const nodeAsParent = node;
+                if (nodeAsParent.children && result[0] !== SKIP) {
+                    offset = (reverse ? nodeAsParent.children.length : -1) + step;
+                    grandparents = parents.concat(nodeAsParent);
+                    while(offset > -1 && offset < nodeAsParent.children.length){
+                        const child = nodeAsParent.children[offset];
+                        subresult = factory(child, offset, grandparents)();
+                        if (subresult[0] === EXIT) {
+                            return subresult;
+                        }
+                        offset = typeof subresult[1] === 'number' ? subresult[1] : offset + step;
+                    }
+                }
+            }
+            return result;
+        }
+    }
+}
+/**
+ * Turn a return value into a clean result.
+ *
+ * @param {VisitorResult} value
+ *   Valid return values from visitors.
+ * @returns {Readonly<ActionTuple>}
+ *   Clean result.
+ */ function toResult(value) {
+    if (Array.isArray(value)) {
+        return value;
+    }
+    if (typeof value === 'number') {
+        return [
+            CONTINUE,
+            value
+        ];
+    }
+    return value === null || value === undefined ? empty : [
+        value
+    ];
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/unist-util-visit@5.1.0/node_modules/unist-util-visit/lib/index.js [app-ssr] (ecmascript) <locals>", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "visit",
+    ()=>visit
+]);
+/**
+ * @import {Node as UnistNode, Parent as UnistParent} from 'unist'
+ * @import {VisitorResult} from 'unist-util-visit-parents'
+ */ /**
+ * @typedef {Exclude<import('unist-util-is').Test, undefined> | undefined} Test
+ *   Test from `unist-util-is`.
+ *
+ *   Note: we have remove and add `undefined`, because otherwise when generating
+ *   automatic `.d.ts` files, TS tries to flatten paths from a local perspective,
+ *   which doesn’t work when publishing on npm.
+ */ // To do: use types from `unist-util-visit-parents` when it’s released.
+/**
+ * @typedef {(
+ *   Fn extends (value: any) => value is infer Thing
+ *   ? Thing
+ *   : Fallback
+ * )} Predicate
+ *   Get the value of a type guard `Fn`.
+ * @template Fn
+ *   Value; typically function that is a type guard (such as `(x): x is Y`).
+ * @template Fallback
+ *   Value to yield if `Fn` is not a type guard.
+ */ /**
+ * @typedef {(
+ *   Check extends null | undefined // No test.
+ *   ? Value
+ *   : Value extends {type: Check} // String (type) test.
+ *   ? Value
+ *   : Value extends Check // Partial test.
+ *   ? Value
+ *   : Check extends Function // Function test.
+ *   ? Predicate<Check, Value> extends Value
+ *     ? Predicate<Check, Value>
+ *     : never
+ *   : never // Some other test?
+ * )} MatchesOne
+ *   Check whether a node matches a primitive check in the type system.
+ * @template Value
+ *   Value; typically unist `Node`.
+ * @template Check
+ *   Value; typically `unist-util-is`-compatible test, but not arrays.
+ */ /**
+ * @typedef {(
+ *   Check extends ReadonlyArray<any>
+ *   ? MatchesOne<Value, Check[number]>
+ *   : MatchesOne<Value, Check>
+ * )} Matches
+ *   Check whether a node matches a check in the type system.
+ * @template Value
+ *   Value; typically unist `Node`.
+ * @template Check
+ *   Value; typically `unist-util-is`-compatible test.
+ */ /**
+ * @typedef {0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10} Uint
+ *   Number; capped reasonably.
+ */ /**
+ * @typedef {I extends 0 ? 1 : I extends 1 ? 2 : I extends 2 ? 3 : I extends 3 ? 4 : I extends 4 ? 5 : I extends 5 ? 6 : I extends 6 ? 7 : I extends 7 ? 8 : I extends 8 ? 9 : 10} Increment
+ *   Increment a number in the type system.
+ * @template {Uint} [I=0]
+ *   Index.
+ */ /**
+ * @typedef {(
+ *   Node extends UnistParent
+ *   ? Node extends {children: Array<infer Children>}
+ *     ? Child extends Children ? Node : never
+ *     : never
+ *   : never
+ * )} InternalParent
+ *   Collect nodes that can be parents of `Child`.
+ * @template {UnistNode} Node
+ *   All node types in a tree.
+ * @template {UnistNode} Child
+ *   Node to search for.
+ */ /**
+ * @typedef {InternalParent<InclusiveDescendant<Tree>, Child>} Parent
+ *   Collect nodes in `Tree` that can be parents of `Child`.
+ * @template {UnistNode} Tree
+ *   All node types in a tree.
+ * @template {UnistNode} Child
+ *   Node to search for.
+ */ /**
+ * @typedef {(
+ *   Depth extends Max
+ *   ? never
+ *   :
+ *     | InternalParent<Node, Child>
+ *     | InternalAncestor<Node, InternalParent<Node, Child>, Max, Increment<Depth>>
+ * )} InternalAncestor
+ *   Collect nodes in `Tree` that can be ancestors of `Child`.
+ * @template {UnistNode} Node
+ *   All node types in a tree.
+ * @template {UnistNode} Child
+ *   Node to search for.
+ * @template {Uint} [Max=10]
+ *   Max; searches up to this depth.
+ * @template {Uint} [Depth=0]
+ *   Current depth.
+ */ /**
+ * @typedef {(
+ *   Tree extends UnistParent
+ *     ? Depth extends Max
+ *       ? Tree
+ *       : Tree | InclusiveDescendant<Tree['children'][number], Max, Increment<Depth>>
+ *     : Tree
+ * )} InclusiveDescendant
+ *   Collect all (inclusive) descendants of `Tree`.
+ *
+ *   > 👉 **Note**: for performance reasons, this seems to be the fastest way to
+ *   > recurse without actually running into an infinite loop, which the
+ *   > previous version did.
+ *   >
+ *   > Practically, a max of `2` is typically enough assuming a `Root` is
+ *   > passed, but it doesn’t improve performance.
+ *   > It gets higher with `List > ListItem > Table > TableRow > TableCell`.
+ *   > Using up to `10` doesn’t hurt or help either.
+ * @template {UnistNode} Tree
+ *   Tree type.
+ * @template {Uint} [Max=10]
+ *   Max; searches up to this depth.
+ * @template {Uint} [Depth=0]
+ *   Current depth.
+ */ /**
+ * @callback Visitor
+ *   Handle a node (matching `test`, if given).
+ *
+ *   Visitors are free to transform `node`.
+ *   They can also transform `parent`.
+ *
+ *   Replacing `node` itself, if `SKIP` is not returned, still causes its
+ *   descendants to be walked (which is a bug).
+ *
+ *   When adding or removing previous siblings of `node` (or next siblings, in
+ *   case of reverse), the `Visitor` should return a new `Index` to specify the
+ *   sibling to traverse after `node` is traversed.
+ *   Adding or removing next siblings of `node` (or previous siblings, in case
+ *   of reverse) is handled as expected without needing to return a new `Index`.
+ *
+ *   Removing the children property of `parent` still results in them being
+ *   traversed.
+ * @param {Visited} node
+ *   Found node.
+ * @param {Visited extends UnistNode ? number | undefined : never} index
+ *   Index of `node` in `parent`.
+ * @param {Ancestor extends UnistParent ? Ancestor | undefined : never} parent
+ *   Parent of `node`.
+ * @returns {VisitorResult}
+ *   What to do next.
+ *
+ *   An `Index` is treated as a tuple of `[CONTINUE, Index]`.
+ *   An `Action` is treated as a tuple of `[Action]`.
+ *
+ *   Passing a tuple back only makes sense if the `Action` is `SKIP`.
+ *   When the `Action` is `EXIT`, that action can be returned.
+ *   When the `Action` is `CONTINUE`, `Index` can be returned.
+ * @template {UnistNode} [Visited=UnistNode]
+ *   Visited node type.
+ * @template {UnistParent} [Ancestor=UnistParent]
+ *   Ancestor type.
+ */ /**
+ * @typedef {Visitor<Visited, Parent<Ancestor, Visited>>} BuildVisitorFromMatch
+ *   Build a typed `Visitor` function from a node and all possible parents.
+ *
+ *   It will infer which values are passed as `node` and which as `parent`.
+ * @template {UnistNode} Visited
+ *   Node type.
+ * @template {UnistParent} Ancestor
+ *   Parent type.
+ */ /**
+ * @typedef {(
+ *   BuildVisitorFromMatch<
+ *     Matches<Descendant, Check>,
+ *     Extract<Descendant, UnistParent>
+ *   >
+ * )} BuildVisitorFromDescendants
+ *   Build a typed `Visitor` function from a list of descendants and a test.
+ *
+ *   It will infer which values are passed as `node` and which as `parent`.
+ * @template {UnistNode} Descendant
+ *   Node type.
+ * @template {Test} Check
+ *   Test type.
+ */ /**
+ * @typedef {(
+ *   BuildVisitorFromDescendants<
+ *     InclusiveDescendant<Tree>,
+ *     Check
+ *   >
+ * )} BuildVisitor
+ *   Build a typed `Visitor` function from a tree and a test.
+ *
+ *   It will infer which values are passed as `node` and which as `parent`.
+ * @template {UnistNode} [Tree=UnistNode]
+ *   Node type.
+ * @template {Test} [Check=Test]
+ *   Test type.
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unist$2d$util$2d$visit$2d$parents$40$6$2e$0$2e$2$2f$node_modules$2f$unist$2d$util$2d$visit$2d$parents$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/unist-util-visit-parents@6.0.2/node_modules/unist-util-visit-parents/lib/index.js [app-ssr] (ecmascript)");
+;
+;
+function visit(tree, testOrVisitor, visitorOrReverse, maybeReverse) {
+    /** @type {boolean | null | undefined} */ let reverse;
+    /** @type {Test} */ let test;
+    /** @type {Visitor} */ let visitor;
+    if (typeof testOrVisitor === 'function' && typeof visitorOrReverse !== 'function') {
+        test = undefined;
+        visitor = testOrVisitor;
+        reverse = visitorOrReverse;
+    } else {
+        // @ts-expect-error: assume the overload with test was given.
+        test = testOrVisitor;
+        // @ts-expect-error: assume the overload with test was given.
+        visitor = visitorOrReverse;
+        reverse = maybeReverse;
+    }
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unist$2d$util$2d$visit$2d$parents$40$6$2e$0$2e$2$2f$node_modules$2f$unist$2d$util$2d$visit$2d$parents$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["visitParents"])(tree, test, overload, reverse);
+    /**
+   * @param {UnistNode} node
+   * @param {Array<UnistParent>} parents
+   */ function overload(node, parents) {
+        const parent = parents[parents.length - 1];
+        const index = parent ? parent.children.indexOf(node) : undefined;
+        return visitor(node, index, parent);
+    }
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-phrasing@4.1.0/node_modules/mdast-util-phrasing/lib/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "phrasing",
+    ()=>phrasing
+]);
+/**
+ * @typedef {import('mdast').Html} Html
+ * @typedef {import('mdast').PhrasingContent} PhrasingContent
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unist$2d$util$2d$is$40$6$2e$0$2e$1$2f$node_modules$2f$unist$2d$util$2d$is$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/unist-util-is@6.0.1/node_modules/unist-util-is/lib/index.js [app-ssr] (ecmascript)");
+;
+const phrasing = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unist$2d$util$2d$is$40$6$2e$0$2e$1$2f$node_modules$2f$unist$2d$util$2d$is$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["convert"])([
+    'break',
+    'delete',
+    'emphasis',
+    // To do: next major: removed since footnotes were added to GFM.
+    'footnote',
+    'footnoteReference',
+    'image',
+    'imageReference',
+    'inlineCode',
+    // Enabled by `mdast-util-math`:
+    'inlineMath',
+    'link',
+    'linkReference',
+    // Enabled by `mdast-util-mdx`:
+    'mdxJsxTextElement',
+    // Enabled by `mdast-util-mdx`:
+    'mdxTextExpression',
+    'strong',
+    'text',
+    // Enabled by `mdast-util-directive`:
+    'textDirective'
+]);
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/remark-stringify@11.0.0/node_modules/remark-stringify/lib/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>remarkStringify
+]);
+/**
+ * @typedef {import('mdast').Root} Root
+ * @typedef {import('mdast-util-to-markdown').Options} ToMarkdownOptions
+ * @typedef {import('unified').Compiler<Root, string>} Compiler
+ * @typedef {import('unified').Processor<undefined, undefined, undefined, Root, string>} Processor
+ */ /**
+ * @typedef {Omit<ToMarkdownOptions, 'extensions'>} Options
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/index.js [app-ssr] (ecmascript)");
+;
+function remarkStringify(options) {
+    /** @type {Processor} */ // @ts-expect-error: TS in JSDoc generates wrong types if `this` is typed regularly.
+    const self = this;
+    self.compiler = compiler;
+    /**
+   * @type {Compiler}
+   */ function compiler(tree) {
+        return (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$mdast$2d$util$2d$to$2d$markdown$40$2$2e$1$2e$2$2f$node_modules$2f$mdast$2d$util$2d$to$2d$markdown$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["toMarkdown"])(tree, {
+            ...self.data('settings'),
+            ...options,
+            // Note: this option is not in the readme.
+            // The goal is for it to be set by plugins on `data` instead of being
+            // passed by users.
+            extensions: self.data('toMarkdownExtensions') || []
+        });
+    }
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/bail@2.0.2/node_modules/bail/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * Throw a given error.
+ *
+ * @param {Error|null|undefined} [error]
+ *   Maybe error.
+ * @returns {asserts error is null|undefined}
+ */ __turbopack_context__.s([
+    "bail",
+    ()=>bail
+]);
+function bail(error) {
+    if (error) {
+        throw error;
+    }
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/extend@3.0.2/node_modules/extend/index.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+var hasOwn = Object.prototype.hasOwnProperty;
+var toStr = Object.prototype.toString;
+var defineProperty = Object.defineProperty;
+var gOPD = Object.getOwnPropertyDescriptor;
+var isArray = function isArray(arr) {
+    if (typeof Array.isArray === 'function') {
+        return Array.isArray(arr);
+    }
+    return toStr.call(arr) === '[object Array]';
+};
+var isPlainObject = function isPlainObject(obj) {
+    if (!obj || toStr.call(obj) !== '[object Object]') {
+        return false;
+    }
+    var hasOwnConstructor = hasOwn.call(obj, 'constructor');
+    var hasIsPrototypeOf = obj.constructor && obj.constructor.prototype && hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
+    // Not own constructor property must be Object
+    if (obj.constructor && !hasOwnConstructor && !hasIsPrototypeOf) {
+        return false;
+    }
+    // Own properties are enumerated firstly, so to speed up,
+    // if last one is own, then all properties are own.
+    var key;
+    for(key in obj){}
+    return typeof key === 'undefined' || hasOwn.call(obj, key);
+};
+// If name is '__proto__', and Object.defineProperty is available, define __proto__ as an own property on target
+var setProperty = function setProperty(target, options) {
+    if (defineProperty && options.name === '__proto__') {
+        defineProperty(target, options.name, {
+            enumerable: true,
+            configurable: true,
+            value: options.newValue,
+            writable: true
+        });
+    } else {
+        target[options.name] = options.newValue;
+    }
+};
+// Return undefined instead of __proto__ if '__proto__' is not an own property
+var getProperty = function getProperty(obj, name) {
+    if (name === '__proto__') {
+        if (!hasOwn.call(obj, name)) {
+            return void 0;
+        } else if (gOPD) {
+            // In early versions of node, obj['__proto__'] is buggy when obj has
+            // __proto__ as an own property. Object.getOwnPropertyDescriptor() works.
+            return gOPD(obj, name).value;
+        }
+    }
+    return obj[name];
+};
+module.exports = function extend() {
+    var options, name, src, copy, copyIsArray, clone;
+    var target = arguments[0];
+    var i = 1;
+    var length = arguments.length;
+    var deep = false;
+    // Handle a deep copy situation
+    if (typeof target === 'boolean') {
+        deep = target;
+        target = arguments[1] || {};
+        // skip the boolean and the target
+        i = 2;
+    }
+    if (target == null || typeof target !== 'object' && typeof target !== 'function') {
+        target = {};
+    }
+    for(; i < length; ++i){
+        options = arguments[i];
+        // Only deal with non-null/undefined values
+        if (options != null) {
+            // Extend the base object
+            for(name in options){
+                src = getProperty(target, name);
+                copy = getProperty(options, name);
+                // Prevent never-ending loop
+                if (target !== copy) {
+                    // Recurse if we're merging plain objects or arrays
+                    if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
+                        if (copyIsArray) {
+                            copyIsArray = false;
+                            clone = src && isArray(src) ? src : [];
+                        } else {
+                            clone = src && isPlainObject(src) ? src : {};
+                        }
+                        // Never move original objects, clone them
+                        setProperty(target, {
+                            name: name,
+                            newValue: extend(deep, clone, copy)
+                        });
+                    // Don't bring in undefined values
+                    } else if (typeof copy !== 'undefined') {
+                        setProperty(target, {
+                            name: name,
+                            newValue: copy
+                        });
+                    }
+                }
+            }
+        }
+    }
+    // Return the modified object
+    return target;
+};
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/is-plain-obj@4.1.0/node_modules/is-plain-obj/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>isPlainObject
+]);
+function isPlainObject(value) {
+    if (typeof value !== 'object' || value === null) {
+        return false;
+    }
+    const prototype = Object.getPrototypeOf(value);
+    return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/trough@2.2.0/node_modules/trough/lib/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+// To do: remove `void`s
+// To do: remove `null` from output of our APIs, allow it as user APIs.
+/**
+ * @typedef {(error?: Error | null | undefined, ...output: Array<any>) => void} Callback
+ *   Callback.
+ *
+ * @typedef {(...input: Array<any>) => any} Middleware
+ *   Ware.
+ *
+ * @typedef Pipeline
+ *   Pipeline.
+ * @property {Run} run
+ *   Run the pipeline.
+ * @property {Use} use
+ *   Add middleware.
+ *
+ * @typedef {(...input: Array<any>) => void} Run
+ *   Call all middleware.
+ *
+ *   Calls `done` on completion with either an error or the output of the
+ *   last middleware.
+ *
+ *   > 👉 **Note**: as the length of input defines whether async functions get a
+ *   > `next` function,
+ *   > it’s recommended to keep `input` at one value normally.
+
+ *
+ * @typedef {(fn: Middleware) => Pipeline} Use
+ *   Add middleware.
+ */ /**
+ * Create new middleware.
+ *
+ * @returns {Pipeline}
+ *   Pipeline.
+ */ __turbopack_context__.s([
+    "trough",
+    ()=>trough,
+    "wrap",
+    ()=>wrap
+]);
+function trough() {
+    /** @type {Array<Middleware>} */ const fns = [];
+    /** @type {Pipeline} */ const pipeline = {
+        run,
+        use
+    };
+    return pipeline;
+    //TURBOPACK unreachable
+    ;
+    /** @type {Run} */ function run(...values) {
+        let middlewareIndex = -1;
+        /** @type {Callback} */ const callback = values.pop();
+        if (typeof callback !== 'function') {
+            throw new TypeError('Expected function as last argument, not ' + callback);
+        }
+        next(null, ...values);
+        /**
+     * Run the next `fn`, or we’re done.
+     *
+     * @param {Error | null | undefined} error
+     * @param {Array<any>} output
+     */ function next(error, ...output) {
+            const fn = fns[++middlewareIndex];
+            let index = -1;
+            if (error) {
+                callback(error);
+                return;
+            }
+            // Copy non-nullish input into values.
+            while(++index < values.length){
+                if (output[index] === null || output[index] === undefined) {
+                    output[index] = values[index];
+                }
+            }
+            // Save the newly created `output` for the next call.
+            values = output;
+            // Next or done.
+            if (fn) {
+                wrap(fn, next)(...output);
+            } else {
+                callback(null, ...output);
+            }
+        }
+    }
+    /** @type {Use} */ function use(middelware) {
+        if (typeof middelware !== 'function') {
+            throw new TypeError('Expected `middelware` to be a function, not ' + middelware);
+        }
+        fns.push(middelware);
+        return pipeline;
+    }
+}
+function wrap(middleware, callback) {
+    /** @type {boolean} */ let called;
+    return wrapped;
+    //TURBOPACK unreachable
+    ;
+    /**
+   * Call `middleware`.
+   * @this {any}
+   * @param {Array<any>} parameters
+   * @returns {void}
+   */ function wrapped(...parameters) {
+        const fnExpectsCallback = middleware.length > parameters.length;
+        /** @type {any} */ let result;
+        if (fnExpectsCallback) {
+            parameters.push(done);
+        }
+        try {
+            result = middleware.apply(this, parameters);
+        } catch (error) {
+            const exception = error;
+            // Well, this is quite the pickle.
+            // `middleware` received a callback and called it synchronously, but that
+            // threw an error.
+            // The only thing left to do is to throw the thing instead.
+            if (fnExpectsCallback && called) {
+                throw exception;
+            }
+            return done(exception);
+        }
+        if (!fnExpectsCallback) {
+            if (result && result.then && typeof result.then === 'function') {
+                result.then(then, done);
+            } else if (result instanceof Error) {
+                done(result);
+            } else {
+                then(result);
+            }
+        }
+    }
+    /**
+   * Call `callback`, only once.
+   *
+   * @type {Callback}
+   */ function done(error, ...output) {
+        if (!called) {
+            called = true;
+            callback(error, ...output);
+        }
+    }
+    /**
+   * Call `done` with one value.
+   *
+   * @param {any} [value]
+   */ function then(value) {
+        done(null, value);
+    }
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/vfile-message@4.0.3/node_modules/vfile-message/lib/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "VFileMessage",
+    ()=>VFileMessage
+]);
+/**
+ * @import {Node, Point, Position} from 'unist'
+ */ /**
+ * @typedef {object & {type: string, position?: Position | undefined}} NodeLike
+ *
+ * @typedef Options
+ *   Configuration.
+ * @property {Array<Node> | null | undefined} [ancestors]
+ *   Stack of (inclusive) ancestor nodes surrounding the message (optional).
+ * @property {Error | null | undefined} [cause]
+ *   Original error cause of the message (optional).
+ * @property {Point | Position | null | undefined} [place]
+ *   Place of message (optional).
+ * @property {string | null | undefined} [ruleId]
+ *   Category of message (optional, example: `'my-rule'`).
+ * @property {string | null | undefined} [source]
+ *   Namespace of who sent the message (optional, example: `'my-package'`).
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unist$2d$util$2d$stringify$2d$position$40$4$2e$0$2e$0$2f$node_modules$2f$unist$2d$util$2d$stringify$2d$position$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/unist-util-stringify-position@4.0.0/node_modules/unist-util-stringify-position/lib/index.js [app-ssr] (ecmascript)");
+;
+class VFileMessage extends Error {
+    /**
+   * Create a message for `reason`.
+   *
+   * > 🪦 **Note**: also has obsolete signatures.
+   *
+   * @overload
+   * @param {string} reason
+   * @param {Options | null | undefined} [options]
+   * @returns
+   *
+   * @overload
+   * @param {string} reason
+   * @param {Node | NodeLike | null | undefined} parent
+   * @param {string | null | undefined} [origin]
+   * @returns
+   *
+   * @overload
+   * @param {string} reason
+   * @param {Point | Position | null | undefined} place
+   * @param {string | null | undefined} [origin]
+   * @returns
+   *
+   * @overload
+   * @param {string} reason
+   * @param {string | null | undefined} [origin]
+   * @returns
+   *
+   * @overload
+   * @param {Error | VFileMessage} cause
+   * @param {Node | NodeLike | null | undefined} parent
+   * @param {string | null | undefined} [origin]
+   * @returns
+   *
+   * @overload
+   * @param {Error | VFileMessage} cause
+   * @param {Point | Position | null | undefined} place
+   * @param {string | null | undefined} [origin]
+   * @returns
+   *
+   * @overload
+   * @param {Error | VFileMessage} cause
+   * @param {string | null | undefined} [origin]
+   * @returns
+   *
+   * @param {Error | VFileMessage | string} causeOrReason
+   *   Reason for message, should use markdown.
+   * @param {Node | NodeLike | Options | Point | Position | string | null | undefined} [optionsOrParentOrPlace]
+   *   Configuration (optional).
+   * @param {string | null | undefined} [origin]
+   *   Place in code where the message originates (example:
+   *   `'my-package:my-rule'` or `'my-rule'`).
+   * @returns
+   *   Instance of `VFileMessage`.
+   */ // eslint-disable-next-line complexity
+    constructor(causeOrReason, optionsOrParentOrPlace, origin){
+        super();
+        if (typeof optionsOrParentOrPlace === 'string') {
+            origin = optionsOrParentOrPlace;
+            optionsOrParentOrPlace = undefined;
+        }
+        /** @type {string} */ let reason = '';
+        /** @type {Options} */ let options = {};
+        let legacyCause = false;
+        if (optionsOrParentOrPlace) {
+            // Point.
+            if ('line' in optionsOrParentOrPlace && 'column' in optionsOrParentOrPlace) {
+                options = {
+                    place: optionsOrParentOrPlace
+                };
+            } else if ('start' in optionsOrParentOrPlace && 'end' in optionsOrParentOrPlace) {
+                options = {
+                    place: optionsOrParentOrPlace
+                };
+            } else if ('type' in optionsOrParentOrPlace) {
+                options = {
+                    ancestors: [
+                        optionsOrParentOrPlace
+                    ],
+                    place: optionsOrParentOrPlace.position
+                };
+            } else {
+                options = {
+                    ...optionsOrParentOrPlace
+                };
+            }
+        }
+        if (typeof causeOrReason === 'string') {
+            reason = causeOrReason;
+        } else if (!options.cause && causeOrReason) {
+            legacyCause = true;
+            reason = causeOrReason.message;
+            options.cause = causeOrReason;
+        }
+        if (!options.ruleId && !options.source && typeof origin === 'string') {
+            const index = origin.indexOf(':');
+            if (index === -1) {
+                options.ruleId = origin;
+            } else {
+                options.source = origin.slice(0, index);
+                options.ruleId = origin.slice(index + 1);
+            }
+        }
+        if (!options.place && options.ancestors && options.ancestors) {
+            const parent = options.ancestors[options.ancestors.length - 1];
+            if (parent) {
+                options.place = parent.position;
+            }
+        }
+        const start = options.place && 'start' in options.place ? options.place.start : options.place;
+        /**
+     * Stack of ancestor nodes surrounding the message.
+     *
+     * @type {Array<Node> | undefined}
+     */ this.ancestors = options.ancestors || undefined;
+        /**
+     * Original error cause of the message.
+     *
+     * @type {Error | undefined}
+     */ this.cause = options.cause || undefined;
+        /**
+     * Starting column of message.
+     *
+     * @type {number | undefined}
+     */ this.column = start ? start.column : undefined;
+        /**
+     * State of problem.
+     *
+     * * `true` — error, file not usable
+     * * `false` — warning, change may be needed
+     * * `undefined` — change likely not needed
+     *
+     * @type {boolean | null | undefined}
+     */ this.fatal = undefined;
+        /**
+     * Path of a file (used throughout the `VFile` ecosystem).
+     *
+     * @type {string | undefined}
+     */ this.file = '';
+        // Field from `Error`.
+        /**
+     * Reason for message.
+     *
+     * @type {string}
+     */ this.message = reason;
+        /**
+     * Starting line of error.
+     *
+     * @type {number | undefined}
+     */ this.line = start ? start.line : undefined;
+        // Field from `Error`.
+        /**
+     * Serialized positional info of message.
+     *
+     * On normal errors, this would be something like `ParseError`, buit in
+     * `VFile` messages we use this space to show where an error happened.
+     */ this.name = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unist$2d$util$2d$stringify$2d$position$40$4$2e$0$2e$0$2f$node_modules$2f$unist$2d$util$2d$stringify$2d$position$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["stringifyPosition"])(options.place) || '1:1';
+        /**
+     * Place of message.
+     *
+     * @type {Point | Position | undefined}
+     */ this.place = options.place || undefined;
+        /**
+     * Reason for message, should use markdown.
+     *
+     * @type {string}
+     */ this.reason = this.message;
+        /**
+     * Category of message (example: `'my-rule'`).
+     *
+     * @type {string | undefined}
+     */ this.ruleId = options.ruleId || undefined;
+        /**
+     * Namespace of message (example: `'my-package'`).
+     *
+     * @type {string | undefined}
+     */ this.source = options.source || undefined;
+        // Field from `Error`.
+        /**
+     * Stack of message.
+     *
+     * This is used by normal errors to show where something happened in
+     * programming code, irrelevant for `VFile` messages,
+     *
+     * @type {string}
+     */ this.stack = legacyCause && options.cause && typeof options.cause.stack === 'string' ? options.cause.stack : '';
+        // The following fields are “well known”.
+        // Not standard.
+        // Feel free to add other non-standard fields to your messages.
+        /**
+     * Specify the source value that’s being reported, which is deemed
+     * incorrect.
+     *
+     * @type {string | undefined}
+     */ this.actual = undefined;
+        /**
+     * Suggest acceptable values that can be used instead of `actual`.
+     *
+     * @type {Array<string> | undefined}
+     */ this.expected = undefined;
+        /**
+     * Long form description of the message (you should use markdown).
+     *
+     * @type {string | undefined}
+     */ this.note = undefined;
+        /**
+     * Link to docs for the message.
+     *
+     * > 👉 **Note**: this must be an absolute URL that can be passed as `x`
+     * > to `new URL(x)`.
+     *
+     * @type {string | undefined}
+     */ this.url = undefined;
+    }
+}
+VFileMessage.prototype.file = '';
+VFileMessage.prototype.name = '';
+VFileMessage.prototype.reason = '';
+VFileMessage.prototype.message = '';
+VFileMessage.prototype.stack = '';
+VFileMessage.prototype.column = undefined;
+VFileMessage.prototype.line = undefined;
+VFileMessage.prototype.ancestors = undefined;
+VFileMessage.prototype.cause = undefined;
+VFileMessage.prototype.fatal = undefined;
+VFileMessage.prototype.place = undefined;
+VFileMessage.prototype.ruleId = undefined;
+VFileMessage.prototype.source = undefined;
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/vfile@6.0.3/node_modules/vfile/lib/minurl.shared.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * Checks if a value has the shape of a WHATWG URL object.
+ *
+ * Using a symbol or instanceof would not be able to recognize URL objects
+ * coming from other implementations (e.g. in Electron), so instead we are
+ * checking some well known properties for a lack of a better test.
+ *
+ * We use `href` and `protocol` as they are the only properties that are
+ * easy to retrieve and calculate due to the lazy nature of the getters.
+ *
+ * We check for auth attribute to distinguish legacy url instance with
+ * WHATWG URL instance.
+ *
+ * @param {unknown} fileUrlOrPath
+ *   File path or URL.
+ * @returns {fileUrlOrPath is URL}
+ *   Whether it’s a URL.
+ */ // From: <https://github.com/nodejs/node/blob/6a3403c/lib/internal/url.js#L720>
+__turbopack_context__.s([
+    "isUrl",
+    ()=>isUrl
+]);
+function isUrl(fileUrlOrPath) {
+    return Boolean(fileUrlOrPath !== null && typeof fileUrlOrPath === 'object' && 'href' in fileUrlOrPath && fileUrlOrPath.href && 'protocol' in fileUrlOrPath && fileUrlOrPath.protocol && // @ts-expect-error: indexing is fine.
+    fileUrlOrPath.auth === undefined);
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/vfile@6.0.3/node_modules/vfile/lib/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "VFile",
+    ()=>VFile
+]);
+/**
+ * @import {Node, Point, Position} from 'unist'
+ * @import {Options as MessageOptions} from 'vfile-message'
+ * @import {Compatible, Data, Map, Options, Value} from 'vfile'
+ */ /**
+ * @typedef {object & {type: string, position?: Position | undefined}} NodeLike
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$vfile$2d$message$40$4$2e$0$2e$3$2f$node_modules$2f$vfile$2d$message$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/vfile-message@4.0.3/node_modules/vfile-message/lib/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$path__$5b$external$5d$__$28$node$3a$path$2c$__cjs$29$__$3c$export__default__as__minpath$3e$__ = __turbopack_context__.i("[externals]/node:path [external] (node:path, cjs) <export default as minpath>");
+var __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$process__$5b$external$5d$__$28$node$3a$process$2c$__cjs$29$__$3c$export__default__as__minproc$3e$__ = __turbopack_context__.i("[externals]/node:process [external] (node:process, cjs) <export default as minproc>");
+var __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$url__$5b$external$5d$__$28$node$3a$url$2c$__cjs$29$__$3c$export__fileURLToPath__as__urlToPath$3e$__ = __turbopack_context__.i("[externals]/node:url [external] (node:url, cjs) <export fileURLToPath as urlToPath>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$vfile$40$6$2e$0$2e$3$2f$node_modules$2f$vfile$2f$lib$2f$minurl$2e$shared$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/vfile@6.0.3/node_modules/vfile/lib/minurl.shared.js [app-ssr] (ecmascript)");
+;
+;
+;
+;
+/**
+ * Order of setting (least specific to most), we need this because otherwise
+ * `{stem: 'a', path: '~/b.js'}` would throw, as a path is needed before a
+ * stem can be set.
+ */ const order = [
+    'history',
+    'path',
+    'basename',
+    'stem',
+    'extname',
+    'dirname'
+];
+class VFile {
+    /**
+   * Create a new virtual file.
+   *
+   * `options` is treated as:
+   *
+   * *   `string` or `Uint8Array` — `{value: options}`
+   * *   `URL` — `{path: options}`
+   * *   `VFile` — shallow copies its data over to the new file
+   * *   `object` — all fields are shallow copied over to the new file
+   *
+   * Path related fields are set in the following order (least specific to
+   * most specific): `history`, `path`, `basename`, `stem`, `extname`,
+   * `dirname`.
+   *
+   * You cannot set `dirname` or `extname` without setting either `history`,
+   * `path`, `basename`, or `stem` too.
+   *
+   * @param {Compatible | null | undefined} [value]
+   *   File value.
+   * @returns
+   *   New instance.
+   */ constructor(value){
+        /** @type {Options | VFile} */ let options;
+        if (!value) {
+            options = {};
+        } else if ((0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$vfile$40$6$2e$0$2e$3$2f$node_modules$2f$vfile$2f$lib$2f$minurl$2e$shared$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["isUrl"])(value)) {
+            options = {
+                path: value
+            };
+        } else if (typeof value === 'string' || isUint8Array(value)) {
+            options = {
+                value
+            };
+        } else {
+            options = value;
+        }
+        /* eslint-disable no-unused-expressions */ /**
+     * Base of `path` (default: `process.cwd()` or `'/'` in browsers).
+     *
+     * @type {string}
+     */ // Prevent calling `cwd` (which could be expensive) if it’s not needed;
+        // the empty string will be overridden in the next block.
+        this.cwd = 'cwd' in options ? '' : __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$process__$5b$external$5d$__$28$node$3a$process$2c$__cjs$29$__$3c$export__default__as__minproc$3e$__["minproc"].cwd();
+        /**
+     * Place to store custom info (default: `{}`).
+     *
+     * It’s OK to store custom data directly on the file but moving it to
+     * `data` is recommended.
+     *
+     * @type {Data}
+     */ this.data = {};
+        /**
+     * List of file paths the file moved between.
+     *
+     * The first is the original path and the last is the current path.
+     *
+     * @type {Array<string>}
+     */ this.history = [];
+        /**
+     * List of messages associated with the file.
+     *
+     * @type {Array<VFileMessage>}
+     */ this.messages = [];
+        /**
+     * Raw value.
+     *
+     * @type {Value}
+     */ this.value;
+        // The below are non-standard, they are “well-known”.
+        // As in, used in several tools.
+        /**
+     * Source map.
+     *
+     * This type is equivalent to the `RawSourceMap` type from the `source-map`
+     * module.
+     *
+     * @type {Map | null | undefined}
+     */ this.map;
+        /**
+     * Custom, non-string, compiled, representation.
+     *
+     * This is used by unified to store non-string results.
+     * One example is when turning markdown into React nodes.
+     *
+     * @type {unknown}
+     */ this.result;
+        /**
+     * Whether a file was saved to disk.
+     *
+     * This is used by vfile reporters.
+     *
+     * @type {boolean}
+     */ this.stored;
+        /* eslint-enable no-unused-expressions */ // Set path related properties in the correct order.
+        let index = -1;
+        while(++index < order.length){
+            const field = order[index];
+            // Note: we specifically use `in` instead of `hasOwnProperty` to accept
+            // `vfile`s too.
+            if (field in options && options[field] !== undefined && options[field] !== null) {
+                // @ts-expect-error: TS doesn’t understand basic reality.
+                this[field] = field === 'history' ? [
+                    ...options[field]
+                ] : options[field];
+            }
+        }
+        /** @type {string} */ let field;
+        // Set non-path related properties.
+        for(field in options){
+            // @ts-expect-error: fine to set other things.
+            if (!order.includes(field)) {
+                // @ts-expect-error: fine to set other things.
+                this[field] = options[field];
+            }
+        }
+    }
+    /**
+   * Get the basename (including extname) (example: `'index.min.js'`).
+   *
+   * @returns {string | undefined}
+   *   Basename.
+   */ get basename() {
+        return typeof this.path === 'string' ? __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$path__$5b$external$5d$__$28$node$3a$path$2c$__cjs$29$__$3c$export__default__as__minpath$3e$__["minpath"].basename(this.path) : undefined;
+    }
+    /**
+   * Set basename (including extname) (`'index.min.js'`).
+   *
+   * Cannot contain path separators (`'/'` on unix, macOS, and browsers, `'\'`
+   * on windows).
+   * Cannot be nullified (use `file.path = file.dirname` instead).
+   *
+   * @param {string} basename
+   *   Basename.
+   * @returns {undefined}
+   *   Nothing.
+   */ set basename(basename) {
+        assertNonEmpty(basename, 'basename');
+        assertPart(basename, 'basename');
+        this.path = __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$path__$5b$external$5d$__$28$node$3a$path$2c$__cjs$29$__$3c$export__default__as__minpath$3e$__["minpath"].join(this.dirname || '', basename);
+    }
+    /**
+   * Get the parent path (example: `'~'`).
+   *
+   * @returns {string | undefined}
+   *   Dirname.
+   */ get dirname() {
+        return typeof this.path === 'string' ? __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$path__$5b$external$5d$__$28$node$3a$path$2c$__cjs$29$__$3c$export__default__as__minpath$3e$__["minpath"].dirname(this.path) : undefined;
+    }
+    /**
+   * Set the parent path (example: `'~'`).
+   *
+   * Cannot be set if there’s no `path` yet.
+   *
+   * @param {string | undefined} dirname
+   *   Dirname.
+   * @returns {undefined}
+   *   Nothing.
+   */ set dirname(dirname) {
+        assertPath(this.basename, 'dirname');
+        this.path = __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$path__$5b$external$5d$__$28$node$3a$path$2c$__cjs$29$__$3c$export__default__as__minpath$3e$__["minpath"].join(dirname || '', this.basename);
+    }
+    /**
+   * Get the extname (including dot) (example: `'.js'`).
+   *
+   * @returns {string | undefined}
+   *   Extname.
+   */ get extname() {
+        return typeof this.path === 'string' ? __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$path__$5b$external$5d$__$28$node$3a$path$2c$__cjs$29$__$3c$export__default__as__minpath$3e$__["minpath"].extname(this.path) : undefined;
+    }
+    /**
+   * Set the extname (including dot) (example: `'.js'`).
+   *
+   * Cannot contain path separators (`'/'` on unix, macOS, and browsers, `'\'`
+   * on windows).
+   * Cannot be set if there’s no `path` yet.
+   *
+   * @param {string | undefined} extname
+   *   Extname.
+   * @returns {undefined}
+   *   Nothing.
+   */ set extname(extname) {
+        assertPart(extname, 'extname');
+        assertPath(this.dirname, 'extname');
+        if (extname) {
+            if (extname.codePointAt(0) !== 46 /* `.` */ ) {
+                throw new Error('`extname` must start with `.`');
+            }
+            if (extname.includes('.', 1)) {
+                throw new Error('`extname` cannot contain multiple dots');
+            }
+        }
+        this.path = __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$path__$5b$external$5d$__$28$node$3a$path$2c$__cjs$29$__$3c$export__default__as__minpath$3e$__["minpath"].join(this.dirname, this.stem + (extname || ''));
+    }
+    /**
+   * Get the full path (example: `'~/index.min.js'`).
+   *
+   * @returns {string}
+   *   Path.
+   */ get path() {
+        return this.history[this.history.length - 1];
+    }
+    /**
+   * Set the full path (example: `'~/index.min.js'`).
+   *
+   * Cannot be nullified.
+   * You can set a file URL (a `URL` object with a `file:` protocol) which will
+   * be turned into a path with `url.fileURLToPath`.
+   *
+   * @param {URL | string} path
+   *   Path.
+   * @returns {undefined}
+   *   Nothing.
+   */ set path(path) {
+        if ((0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$vfile$40$6$2e$0$2e$3$2f$node_modules$2f$vfile$2f$lib$2f$minurl$2e$shared$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["isUrl"])(path)) {
+            path = (0, __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$url__$5b$external$5d$__$28$node$3a$url$2c$__cjs$29$__$3c$export__fileURLToPath__as__urlToPath$3e$__["urlToPath"])(path);
+        }
+        assertNonEmpty(path, 'path');
+        if (this.path !== path) {
+            this.history.push(path);
+        }
+    }
+    /**
+   * Get the stem (basename w/o extname) (example: `'index.min'`).
+   *
+   * @returns {string | undefined}
+   *   Stem.
+   */ get stem() {
+        return typeof this.path === 'string' ? __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$path__$5b$external$5d$__$28$node$3a$path$2c$__cjs$29$__$3c$export__default__as__minpath$3e$__["minpath"].basename(this.path, this.extname) : undefined;
+    }
+    /**
+   * Set the stem (basename w/o extname) (example: `'index.min'`).
+   *
+   * Cannot contain path separators (`'/'` on unix, macOS, and browsers, `'\'`
+   * on windows).
+   * Cannot be nullified (use `file.path = file.dirname` instead).
+   *
+   * @param {string} stem
+   *   Stem.
+   * @returns {undefined}
+   *   Nothing.
+   */ set stem(stem) {
+        assertNonEmpty(stem, 'stem');
+        assertPart(stem, 'stem');
+        this.path = __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$path__$5b$external$5d$__$28$node$3a$path$2c$__cjs$29$__$3c$export__default__as__minpath$3e$__["minpath"].join(this.dirname || '', stem + (this.extname || ''));
+    }
+    // Normal prototypal methods.
+    /**
+   * Create a fatal message for `reason` associated with the file.
+   *
+   * The `fatal` field of the message is set to `true` (error; file not usable)
+   * and the `file` field is set to the current file path.
+   * The message is added to the `messages` field on `file`.
+   *
+   * > 🪦 **Note**: also has obsolete signatures.
+   *
+   * @overload
+   * @param {string} reason
+   * @param {MessageOptions | null | undefined} [options]
+   * @returns {never}
+   *
+   * @overload
+   * @param {string} reason
+   * @param {Node | NodeLike | null | undefined} parent
+   * @param {string | null | undefined} [origin]
+   * @returns {never}
+   *
+   * @overload
+   * @param {string} reason
+   * @param {Point | Position | null | undefined} place
+   * @param {string | null | undefined} [origin]
+   * @returns {never}
+   *
+   * @overload
+   * @param {string} reason
+   * @param {string | null | undefined} [origin]
+   * @returns {never}
+   *
+   * @overload
+   * @param {Error | VFileMessage} cause
+   * @param {Node | NodeLike | null | undefined} parent
+   * @param {string | null | undefined} [origin]
+   * @returns {never}
+   *
+   * @overload
+   * @param {Error | VFileMessage} cause
+   * @param {Point | Position | null | undefined} place
+   * @param {string | null | undefined} [origin]
+   * @returns {never}
+   *
+   * @overload
+   * @param {Error | VFileMessage} cause
+   * @param {string | null | undefined} [origin]
+   * @returns {never}
+   *
+   * @param {Error | VFileMessage | string} causeOrReason
+   *   Reason for message, should use markdown.
+   * @param {Node | NodeLike | MessageOptions | Point | Position | string | null | undefined} [optionsOrParentOrPlace]
+   *   Configuration (optional).
+   * @param {string | null | undefined} [origin]
+   *   Place in code where the message originates (example:
+   *   `'my-package:my-rule'` or `'my-rule'`).
+   * @returns {never}
+   *   Never.
+   * @throws {VFileMessage}
+   *   Message.
+   */ fail(causeOrReason, optionsOrParentOrPlace, origin) {
+        // @ts-expect-error: the overloads are fine.
+        const message = this.message(causeOrReason, optionsOrParentOrPlace, origin);
+        message.fatal = true;
+        throw message;
+    }
+    /**
+   * Create an info message for `reason` associated with the file.
+   *
+   * The `fatal` field of the message is set to `undefined` (info; change
+   * likely not needed) and the `file` field is set to the current file path.
+   * The message is added to the `messages` field on `file`.
+   *
+   * > 🪦 **Note**: also has obsolete signatures.
+   *
+   * @overload
+   * @param {string} reason
+   * @param {MessageOptions | null | undefined} [options]
+   * @returns {VFileMessage}
+   *
+   * @overload
+   * @param {string} reason
+   * @param {Node | NodeLike | null | undefined} parent
+   * @param {string | null | undefined} [origin]
+   * @returns {VFileMessage}
+   *
+   * @overload
+   * @param {string} reason
+   * @param {Point | Position | null | undefined} place
+   * @param {string | null | undefined} [origin]
+   * @returns {VFileMessage}
+   *
+   * @overload
+   * @param {string} reason
+   * @param {string | null | undefined} [origin]
+   * @returns {VFileMessage}
+   *
+   * @overload
+   * @param {Error | VFileMessage} cause
+   * @param {Node | NodeLike | null | undefined} parent
+   * @param {string | null | undefined} [origin]
+   * @returns {VFileMessage}
+   *
+   * @overload
+   * @param {Error | VFileMessage} cause
+   * @param {Point | Position | null | undefined} place
+   * @param {string | null | undefined} [origin]
+   * @returns {VFileMessage}
+   *
+   * @overload
+   * @param {Error | VFileMessage} cause
+   * @param {string | null | undefined} [origin]
+   * @returns {VFileMessage}
+   *
+   * @param {Error | VFileMessage | string} causeOrReason
+   *   Reason for message, should use markdown.
+   * @param {Node | NodeLike | MessageOptions | Point | Position | string | null | undefined} [optionsOrParentOrPlace]
+   *   Configuration (optional).
+   * @param {string | null | undefined} [origin]
+   *   Place in code where the message originates (example:
+   *   `'my-package:my-rule'` or `'my-rule'`).
+   * @returns {VFileMessage}
+   *   Message.
+   */ info(causeOrReason, optionsOrParentOrPlace, origin) {
+        // @ts-expect-error: the overloads are fine.
+        const message = this.message(causeOrReason, optionsOrParentOrPlace, origin);
+        message.fatal = undefined;
+        return message;
+    }
+    /**
+   * Create a message for `reason` associated with the file.
+   *
+   * The `fatal` field of the message is set to `false` (warning; change may be
+   * needed) and the `file` field is set to the current file path.
+   * The message is added to the `messages` field on `file`.
+   *
+   * > 🪦 **Note**: also has obsolete signatures.
+   *
+   * @overload
+   * @param {string} reason
+   * @param {MessageOptions | null | undefined} [options]
+   * @returns {VFileMessage}
+   *
+   * @overload
+   * @param {string} reason
+   * @param {Node | NodeLike | null | undefined} parent
+   * @param {string | null | undefined} [origin]
+   * @returns {VFileMessage}
+   *
+   * @overload
+   * @param {string} reason
+   * @param {Point | Position | null | undefined} place
+   * @param {string | null | undefined} [origin]
+   * @returns {VFileMessage}
+   *
+   * @overload
+   * @param {string} reason
+   * @param {string | null | undefined} [origin]
+   * @returns {VFileMessage}
+   *
+   * @overload
+   * @param {Error | VFileMessage} cause
+   * @param {Node | NodeLike | null | undefined} parent
+   * @param {string | null | undefined} [origin]
+   * @returns {VFileMessage}
+   *
+   * @overload
+   * @param {Error | VFileMessage} cause
+   * @param {Point | Position | null | undefined} place
+   * @param {string | null | undefined} [origin]
+   * @returns {VFileMessage}
+   *
+   * @overload
+   * @param {Error | VFileMessage} cause
+   * @param {string | null | undefined} [origin]
+   * @returns {VFileMessage}
+   *
+   * @param {Error | VFileMessage | string} causeOrReason
+   *   Reason for message, should use markdown.
+   * @param {Node | NodeLike | MessageOptions | Point | Position | string | null | undefined} [optionsOrParentOrPlace]
+   *   Configuration (optional).
+   * @param {string | null | undefined} [origin]
+   *   Place in code where the message originates (example:
+   *   `'my-package:my-rule'` or `'my-rule'`).
+   * @returns {VFileMessage}
+   *   Message.
+   */ message(causeOrReason, optionsOrParentOrPlace, origin) {
+        const message = new __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$vfile$2d$message$40$4$2e$0$2e$3$2f$node_modules$2f$vfile$2d$message$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["VFileMessage"](// @ts-expect-error: the overloads are fine.
+        causeOrReason, optionsOrParentOrPlace, origin);
+        if (this.path) {
+            message.name = this.path + ':' + message.name;
+            message.file = this.path;
+        }
+        message.fatal = false;
+        this.messages.push(message);
+        return message;
+    }
+    /**
+   * Serialize the file.
+   *
+   * > **Note**: which encodings are supported depends on the engine.
+   * > For info on Node.js, see:
+   * > <https://nodejs.org/api/util.html#whatwg-supported-encodings>.
+   *
+   * @param {string | null | undefined} [encoding='utf8']
+   *   Character encoding to understand `value` as when it’s a `Uint8Array`
+   *   (default: `'utf-8'`).
+   * @returns {string}
+   *   Serialized file.
+   */ toString(encoding) {
+        if (this.value === undefined) {
+            return '';
+        }
+        if (typeof this.value === 'string') {
+            return this.value;
+        }
+        const decoder = new TextDecoder(encoding || undefined);
+        return decoder.decode(this.value);
+    }
+}
+/**
+ * Assert that `part` is not a path (as in, does not contain `path.sep`).
+ *
+ * @param {string | null | undefined} part
+ *   File path part.
+ * @param {string} name
+ *   Part name.
+ * @returns {undefined}
+ *   Nothing.
+ */ function assertPart(part, name) {
+    if (part && part.includes(__TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$path__$5b$external$5d$__$28$node$3a$path$2c$__cjs$29$__$3c$export__default__as__minpath$3e$__["minpath"].sep)) {
+        throw new Error('`' + name + '` cannot be a path: did not expect `' + __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$path__$5b$external$5d$__$28$node$3a$path$2c$__cjs$29$__$3c$export__default__as__minpath$3e$__["minpath"].sep + '`');
+    }
+}
+/**
+ * Assert that `part` is not empty.
+ *
+ * @param {string | undefined} part
+ *   Thing.
+ * @param {string} name
+ *   Part name.
+ * @returns {asserts part is string}
+ *   Nothing.
+ */ function assertNonEmpty(part, name) {
+    if (!part) {
+        throw new Error('`' + name + '` cannot be empty');
+    }
+}
+/**
+ * Assert `path` exists.
+ *
+ * @param {string | undefined} path
+ *   Path.
+ * @param {string} name
+ *   Dependency name.
+ * @returns {asserts path is string}
+ *   Nothing.
+ */ function assertPath(path, name) {
+    if (!path) {
+        throw new Error('Setting `' + name + '` requires `path` to be set too');
+    }
+}
+/**
+ * Assert `value` is an `Uint8Array`.
+ *
+ * @param {unknown} value
+ *   thing.
+ * @returns {value is Uint8Array}
+ *   Whether `value` is an `Uint8Array`.
+ */ function isUint8Array(value) {
+    return Boolean(value && typeof value === 'object' && 'byteLength' in value && 'byteOffset' in value);
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/unified@11.0.5/node_modules/unified/lib/callable-instance.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "CallableInstance",
+    ()=>CallableInstance
+]);
+const CallableInstance = /**
+       * @this {Function}
+       * @param {string | symbol} property
+       * @returns {(...parameters: Array<unknown>) => unknown}
+       */ function(property) {
+    const self = this;
+    const constr = self.constructor;
+    const proto = // Prototypes do exist.
+    // type-coverage:ignore-next-line
+    constr.prototype;
+    const value = proto[property];
+    /** @type {(...parameters: Array<unknown>) => unknown} */ const apply = function() {
+        return value.apply(apply, arguments);
+    };
+    Object.setPrototypeOf(apply, proto);
+    // Not needed for us in `unified`: we only call this on the `copy`
+    // function,
+    // and we don't need to add its fields (`length`, `name`)
+    // over.
+    // See also: GH-246.
+    // const names = Object.getOwnPropertyNames(value)
+    //
+    // for (const p of names) {
+    //   const descriptor = Object.getOwnPropertyDescriptor(value, p)
+    //   if (descriptor) Object.defineProperty(apply, p, descriptor)
+    // }
+    return apply;
+};
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/unified@11.0.5/node_modules/unified/lib/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "Processor",
+    ()=>Processor,
+    "unified",
+    ()=>unified
+]);
+/**
+ * @typedef {import('trough').Pipeline} Pipeline
+ *
+ * @typedef {import('unist').Node} Node
+ *
+ * @typedef {import('vfile').Compatible} Compatible
+ * @typedef {import('vfile').Value} Value
+ *
+ * @typedef {import('../index.js').CompileResultMap} CompileResultMap
+ * @typedef {import('../index.js').Data} Data
+ * @typedef {import('../index.js').Settings} Settings
+ */ /**
+ * @typedef {CompileResultMap[keyof CompileResultMap]} CompileResults
+ *   Acceptable results from compilers.
+ *
+ *   To register custom results, add them to
+ *   {@linkcode CompileResultMap}.
+ */ /**
+ * @template {Node} [Tree=Node]
+ *   The node that the compiler receives (default: `Node`).
+ * @template {CompileResults} [Result=CompileResults]
+ *   The thing that the compiler yields (default: `CompileResults`).
+ * @callback Compiler
+ *   A **compiler** handles the compiling of a syntax tree to something else
+ *   (in most cases, text) (TypeScript type).
+ *
+ *   It is used in the stringify phase and called with a {@linkcode Node}
+ *   and {@linkcode VFile} representation of the document to compile.
+ *   It should return the textual representation of the given tree (typically
+ *   `string`).
+ *
+ *   > **Note**: unified typically compiles by serializing: most compilers
+ *   > return `string` (or `Uint8Array`).
+ *   > Some compilers, such as the one configured with
+ *   > [`rehype-react`][rehype-react], return other values (in this case, a
+ *   > React tree).
+ *   > If you’re using a compiler that doesn’t serialize, expect different
+ *   > result values.
+ *   >
+ *   > To register custom results in TypeScript, add them to
+ *   > {@linkcode CompileResultMap}.
+ *
+ *   [rehype-react]: https://github.com/rehypejs/rehype-react
+ * @param {Tree} tree
+ *   Tree to compile.
+ * @param {VFile} file
+ *   File associated with `tree`.
+ * @returns {Result}
+ *   New content: compiled text (`string` or `Uint8Array`, for `file.value`) or
+ *   something else (for `file.result`).
+ */ /**
+ * @template {Node} [Tree=Node]
+ *   The node that the parser yields (default: `Node`)
+ * @callback Parser
+ *   A **parser** handles the parsing of text to a syntax tree.
+ *
+ *   It is used in the parse phase and is called with a `string` and
+ *   {@linkcode VFile} of the document to parse.
+ *   It must return the syntax tree representation of the given file
+ *   ({@linkcode Node}).
+ * @param {string} document
+ *   Document to parse.
+ * @param {VFile} file
+ *   File associated with `document`.
+ * @returns {Tree}
+ *   Node representing the given file.
+ */ /**
+ * @typedef {(
+ *   Plugin<Array<any>, any, any> |
+ *   PluginTuple<Array<any>, any, any> |
+ *   Preset
+ * )} Pluggable
+ *   Union of the different ways to add plugins and settings.
+ */ /**
+ * @typedef {Array<Pluggable>} PluggableList
+ *   List of plugins and presets.
+ */ // Note: we can’t use `callback` yet as it messes up `this`:
+//  <https://github.com/microsoft/TypeScript/issues/55197>.
+/**
+ * @template {Array<unknown>} [PluginParameters=[]]
+ *   Arguments passed to the plugin (default: `[]`, the empty tuple).
+ * @template {Node | string | undefined} [Input=Node]
+ *   Value that is expected as input (default: `Node`).
+ *
+ *   *   If the plugin returns a {@linkcode Transformer}, this
+ *       should be the node it expects.
+ *   *   If the plugin sets a {@linkcode Parser}, this should be
+ *       `string`.
+ *   *   If the plugin sets a {@linkcode Compiler}, this should be the
+ *       node it expects.
+ * @template [Output=Input]
+ *   Value that is yielded as output (default: `Input`).
+ *
+ *   *   If the plugin returns a {@linkcode Transformer}, this
+ *       should be the node that that yields.
+ *   *   If the plugin sets a {@linkcode Parser}, this should be the
+ *       node that it yields.
+ *   *   If the plugin sets a {@linkcode Compiler}, this should be
+ *       result it yields.
+ * @typedef {(
+ *   (this: Processor, ...parameters: PluginParameters) =>
+ *     Input extends string ? // Parser.
+ *        Output extends Node | undefined ? undefined | void : never :
+ *     Output extends CompileResults ? // Compiler.
+ *        Input extends Node | undefined ? undefined | void : never :
+ *     Transformer<
+ *       Input extends Node ? Input : Node,
+ *       Output extends Node ? Output : Node
+ *     > | undefined | void
+ * )} Plugin
+ *   Single plugin.
+ *
+ *   Plugins configure the processors they are applied on in the following
+ *   ways:
+ *
+ *   *   they change the processor, such as the parser, the compiler, or by
+ *       configuring data
+ *   *   they specify how to handle trees and files
+ *
+ *   In practice, they are functions that can receive options and configure the
+ *   processor (`this`).
+ *
+ *   > **Note**: plugins are called when the processor is *frozen*, not when
+ *   > they are applied.
+ */ /**
+ * Tuple of a plugin and its configuration.
+ *
+ * The first item is a plugin, the rest are its parameters.
+ *
+ * @template {Array<unknown>} [TupleParameters=[]]
+ *   Arguments passed to the plugin (default: `[]`, the empty tuple).
+ * @template {Node | string | undefined} [Input=undefined]
+ *   Value that is expected as input (optional).
+ *
+ *   *   If the plugin returns a {@linkcode Transformer}, this
+ *       should be the node it expects.
+ *   *   If the plugin sets a {@linkcode Parser}, this should be
+ *       `string`.
+ *   *   If the plugin sets a {@linkcode Compiler}, this should be the
+ *       node it expects.
+ * @template [Output=undefined] (optional).
+ *   Value that is yielded as output.
+ *
+ *   *   If the plugin returns a {@linkcode Transformer}, this
+ *       should be the node that that yields.
+ *   *   If the plugin sets a {@linkcode Parser}, this should be the
+ *       node that it yields.
+ *   *   If the plugin sets a {@linkcode Compiler}, this should be
+ *       result it yields.
+ * @typedef {(
+ *   [
+ *     plugin: Plugin<TupleParameters, Input, Output>,
+ *     ...parameters: TupleParameters
+ *   ]
+ * )} PluginTuple
+ */ /**
+ * @typedef Preset
+ *   Sharable configuration.
+ *
+ *   They can contain plugins and settings.
+ * @property {PluggableList | undefined} [plugins]
+ *   List of plugins and presets (optional).
+ * @property {Settings | undefined} [settings]
+ *   Shared settings for parsers and compilers (optional).
+ */ /**
+ * @template {VFile} [File=VFile]
+ *   The file that the callback receives (default: `VFile`).
+ * @callback ProcessCallback
+ *   Callback called when the process is done.
+ *
+ *   Called with either an error or a result.
+ * @param {Error | undefined} [error]
+ *   Fatal error (optional).
+ * @param {File | undefined} [file]
+ *   Processed file (optional).
+ * @returns {undefined}
+ *   Nothing.
+ */ /**
+ * @template {Node} [Tree=Node]
+ *   The tree that the callback receives (default: `Node`).
+ * @callback RunCallback
+ *   Callback called when transformers are done.
+ *
+ *   Called with either an error or results.
+ * @param {Error | undefined} [error]
+ *   Fatal error (optional).
+ * @param {Tree | undefined} [tree]
+ *   Transformed tree (optional).
+ * @param {VFile | undefined} [file]
+ *   File (optional).
+ * @returns {undefined}
+ *   Nothing.
+ */ /**
+ * @template {Node} [Output=Node]
+ *   Node type that the transformer yields (default: `Node`).
+ * @callback TransformCallback
+ *   Callback passed to transforms.
+ *
+ *   If the signature of a `transformer` accepts a third argument, the
+ *   transformer may perform asynchronous operations, and must call it.
+ * @param {Error | undefined} [error]
+ *   Fatal error to stop the process (optional).
+ * @param {Output | undefined} [tree]
+ *   New, changed, tree (optional).
+ * @param {VFile | undefined} [file]
+ *   New, changed, file (optional).
+ * @returns {undefined}
+ *   Nothing.
+ */ /**
+ * @template {Node} [Input=Node]
+ *   Node type that the transformer expects (default: `Node`).
+ * @template {Node} [Output=Input]
+ *   Node type that the transformer yields (default: `Input`).
+ * @callback Transformer
+ *   Transformers handle syntax trees and files.
+ *
+ *   They are functions that are called each time a syntax tree and file are
+ *   passed through the run phase.
+ *   When an error occurs in them (either because it’s thrown, returned,
+ *   rejected, or passed to `next`), the process stops.
+ *
+ *   The run phase is handled by [`trough`][trough], see its documentation for
+ *   the exact semantics of these functions.
+ *
+ *   > **Note**: you should likely ignore `next`: don’t accept it.
+ *   > it supports callback-style async work.
+ *   > But promises are likely easier to reason about.
+ *
+ *   [trough]: https://github.com/wooorm/trough#function-fninput-next
+ * @param {Input} tree
+ *   Tree to handle.
+ * @param {VFile} file
+ *   File to handle.
+ * @param {TransformCallback<Output>} next
+ *   Callback.
+ * @returns {(
+ *   Promise<Output | undefined | void> |
+ *   Promise<never> | // For some reason this is needed separately.
+ *   Output |
+ *   Error |
+ *   undefined |
+ *   void
+ * )}
+ *   If you accept `next`, nothing.
+ *   Otherwise:
+ *
+ *   *   `Error` — fatal error to stop the process
+ *   *   `Promise<undefined>` or `undefined` — the next transformer keeps using
+ *       same tree
+ *   *   `Promise<Node>` or `Node` — new, changed, tree
+ */ /**
+ * @template {Node | undefined} ParseTree
+ *   Output of `parse`.
+ * @template {Node | undefined} HeadTree
+ *   Input for `run`.
+ * @template {Node | undefined} TailTree
+ *   Output for `run`.
+ * @template {Node | undefined} CompileTree
+ *   Input of `stringify`.
+ * @template {CompileResults | undefined} CompileResult
+ *   Output of `stringify`.
+ * @template {Node | string | undefined} Input
+ *   Input of plugin.
+ * @template Output
+ *   Output of plugin (optional).
+ * @typedef {(
+ *   Input extends string
+ *     ? Output extends Node | undefined
+ *       ? // Parser.
+ *         Processor<
+ *           Output extends undefined ? ParseTree : Output,
+ *           HeadTree,
+ *           TailTree,
+ *           CompileTree,
+ *           CompileResult
+ *         >
+ *       : // Unknown.
+ *         Processor<ParseTree, HeadTree, TailTree, CompileTree, CompileResult>
+ *     : Output extends CompileResults
+ *     ? Input extends Node | undefined
+ *       ? // Compiler.
+ *         Processor<
+ *           ParseTree,
+ *           HeadTree,
+ *           TailTree,
+ *           Input extends undefined ? CompileTree : Input,
+ *           Output extends undefined ? CompileResult : Output
+ *         >
+ *       : // Unknown.
+ *         Processor<ParseTree, HeadTree, TailTree, CompileTree, CompileResult>
+ *     : Input extends Node | undefined
+ *     ? Output extends Node | undefined
+ *       ? // Transform.
+ *         Processor<
+ *           ParseTree,
+ *           HeadTree extends undefined ? Input : HeadTree,
+ *           Output extends undefined ? TailTree : Output,
+ *           CompileTree,
+ *           CompileResult
+ *         >
+ *       : // Unknown.
+ *         Processor<ParseTree, HeadTree, TailTree, CompileTree, CompileResult>
+ *     : // Unknown.
+ *       Processor<ParseTree, HeadTree, TailTree, CompileTree, CompileResult>
+ * )} UsePlugin
+ *   Create a processor based on the input/output of a {@link Plugin plugin}.
+ */ /**
+ * @template {CompileResults | undefined} Result
+ *   Node type that the transformer yields.
+ * @typedef {(
+ *   Result extends Value | undefined ?
+ *     VFile :
+ *     VFile & {result: Result}
+ *   )} VFileWithOutput
+ *   Type to generate a {@linkcode VFile} corresponding to a compiler result.
+ *
+ *   If a result that is not acceptable on a `VFile` is used, that will
+ *   be stored on the `result` field of {@linkcode VFile}.
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$bail$40$2$2e$0$2e$2$2f$node_modules$2f$bail$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/bail@2.0.2/node_modules/bail/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$extend$40$3$2e$0$2e$2$2f$node_modules$2f$extend$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/extend@3.0.2/node_modules/extend/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/devlop@1.1.0/node_modules/devlop/lib/development.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$is$2d$plain$2d$obj$40$4$2e$1$2e$0$2f$node_modules$2f$is$2d$plain$2d$obj$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/is-plain-obj@4.1.0/node_modules/is-plain-obj/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$trough$40$2$2e$2$2e$0$2f$node_modules$2f$trough$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/trough@2.2.0/node_modules/trough/lib/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$vfile$40$6$2e$0$2e$3$2f$node_modules$2f$vfile$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/vfile@6.0.3/node_modules/vfile/lib/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unified$40$11$2e$0$2e$5$2f$node_modules$2f$unified$2f$lib$2f$callable$2d$instance$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/unified@11.0.5/node_modules/unified/lib/callable-instance.js [app-ssr] (ecmascript)");
+;
+;
+;
+;
+;
+;
+;
+// To do: next major: drop `Compiler`, `Parser`: prefer lowercase.
+// To do: we could start yielding `never` in TS when a parser is missing and
+// `parse` is called.
+// Currently, we allow directly setting `processor.parser`, which is untyped.
+const own = {}.hasOwnProperty;
+class Processor extends __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unified$40$11$2e$0$2e$5$2f$node_modules$2f$unified$2f$lib$2f$callable$2d$instance$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CallableInstance"] {
+    /**
+   * Create a processor.
+   */ constructor(){
+        // If `Processor()` is called (w/o new), `copy` is called instead.
+        super('copy');
+        /**
+     * Compiler to use (deprecated).
+     *
+     * @deprecated
+     *   Use `compiler` instead.
+     * @type {(
+     *   Compiler<
+     *     CompileTree extends undefined ? Node : CompileTree,
+     *     CompileResult extends undefined ? CompileResults : CompileResult
+     *   > |
+     *   undefined
+     * )}
+     */ this.Compiler = undefined;
+        /**
+     * Parser to use (deprecated).
+     *
+     * @deprecated
+     *   Use `parser` instead.
+     * @type {(
+     *   Parser<ParseTree extends undefined ? Node : ParseTree> |
+     *   undefined
+     * )}
+     */ this.Parser = undefined;
+        // Note: the following fields are considered private.
+        // However, they are needed for tests, and TSC generates an untyped
+        // `private freezeIndex` field for, which trips `type-coverage` up.
+        // Instead, we use `@deprecated` to visualize that they shouldn’t be used.
+        /**
+     * Internal list of configured plugins.
+     *
+     * @deprecated
+     *   This is a private internal property and should not be used.
+     * @type {Array<PluginTuple<Array<unknown>>>}
+     */ this.attachers = [];
+        /**
+     * Compiler to use.
+     *
+     * @type {(
+     *   Compiler<
+     *     CompileTree extends undefined ? Node : CompileTree,
+     *     CompileResult extends undefined ? CompileResults : CompileResult
+     *   > |
+     *   undefined
+     * )}
+     */ this.compiler = undefined;
+        /**
+     * Internal state to track where we are while freezing.
+     *
+     * @deprecated
+     *   This is a private internal property and should not be used.
+     * @type {number}
+     */ this.freezeIndex = -1;
+        /**
+     * Internal state to track whether we’re frozen.
+     *
+     * @deprecated
+     *   This is a private internal property and should not be used.
+     * @type {boolean | undefined}
+     */ this.frozen = undefined;
+        /**
+     * Internal state.
+     *
+     * @deprecated
+     *   This is a private internal property and should not be used.
+     * @type {Data}
+     */ this.namespace = {};
+        /**
+     * Parser to use.
+     *
+     * @type {(
+     *   Parser<ParseTree extends undefined ? Node : ParseTree> |
+     *   undefined
+     * )}
+     */ this.parser = undefined;
+        /**
+     * Internal list of configured transformers.
+     *
+     * @deprecated
+     *   This is a private internal property and should not be used.
+     * @type {Pipeline}
+     */ this.transformers = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$trough$40$2$2e$2$2e$0$2f$node_modules$2f$trough$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["trough"])();
+    }
+    /**
+   * Copy a processor.
+   *
+   * @deprecated
+   *   This is a private internal method and should not be used.
+   * @returns {Processor<ParseTree, HeadTree, TailTree, CompileTree, CompileResult>}
+   *   New *unfrozen* processor ({@linkcode Processor}) that is
+   *   configured to work the same as its ancestor.
+   *   When the descendant processor is configured in the future it does not
+   *   affect the ancestral processor.
+   */ copy() {
+        // Cast as the type parameters will be the same after attaching.
+        const destination = new Processor();
+        let index = -1;
+        while(++index < this.attachers.length){
+            const attacher = this.attachers[index];
+            destination.use(...attacher);
+        }
+        destination.data((0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$extend$40$3$2e$0$2e$2$2f$node_modules$2f$extend$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"])(true, {}, this.namespace));
+        return destination;
+    }
+    /**
+   * Configure the processor with info available to all plugins.
+   * Information is stored in an object.
+   *
+   * Typically, options can be given to a specific plugin, but sometimes it
+   * makes sense to have information shared with several plugins.
+   * For example, a list of HTML elements that are self-closing, which is
+   * needed during all phases.
+   *
+   * > **Note**: setting information cannot occur on *frozen* processors.
+   * > Call the processor first to create a new unfrozen processor.
+   *
+   * > **Note**: to register custom data in TypeScript, augment the
+   * > {@linkcode Data} interface.
+   *
+   * @example
+   *   This example show how to get and set info:
+   *
+   *   ```js
+   *   import {unified} from 'unified'
+   *
+   *   const processor = unified().data('alpha', 'bravo')
+   *
+   *   processor.data('alpha') // => 'bravo'
+   *
+   *   processor.data() // => {alpha: 'bravo'}
+   *
+   *   processor.data({charlie: 'delta'})
+   *
+   *   processor.data() // => {charlie: 'delta'}
+   *   ```
+   *
+   * @template {keyof Data} Key
+   *
+   * @overload
+   * @returns {Data}
+   *
+   * @overload
+   * @param {Data} dataset
+   * @returns {Processor<ParseTree, HeadTree, TailTree, CompileTree, CompileResult>}
+   *
+   * @overload
+   * @param {Key} key
+   * @returns {Data[Key]}
+   *
+   * @overload
+   * @param {Key} key
+   * @param {Data[Key]} value
+   * @returns {Processor<ParseTree, HeadTree, TailTree, CompileTree, CompileResult>}
+   *
+   * @param {Data | Key} [key]
+   *   Key to get or set, or entire dataset to set, or nothing to get the
+   *   entire dataset (optional).
+   * @param {Data[Key]} [value]
+   *   Value to set (optional).
+   * @returns {unknown}
+   *   The current processor when setting, the value at `key` when getting, or
+   *   the entire dataset when getting without key.
+   */ data(key, value) {
+        if (typeof key === 'string') {
+            // Set `key`.
+            if (arguments.length === 2) {
+                assertUnfrozen('data', this.frozen);
+                this.namespace[key] = value;
+                return this;
+            }
+            // Get `key`.
+            return own.call(this.namespace, key) && this.namespace[key] || undefined;
+        }
+        // Set space.
+        if (key) {
+            assertUnfrozen('data', this.frozen);
+            this.namespace = key;
+            return this;
+        }
+        // Get space.
+        return this.namespace;
+    }
+    /**
+   * Freeze a processor.
+   *
+   * Frozen processors are meant to be extended and not to be configured
+   * directly.
+   *
+   * When a processor is frozen it cannot be unfrozen.
+   * New processors working the same way can be created by calling the
+   * processor.
+   *
+   * It’s possible to freeze processors explicitly by calling `.freeze()`.
+   * Processors freeze automatically when `.parse()`, `.run()`, `.runSync()`,
+   * `.stringify()`, `.process()`, or `.processSync()` are called.
+   *
+   * @returns {Processor<ParseTree, HeadTree, TailTree, CompileTree, CompileResult>}
+   *   The current processor.
+   */ freeze() {
+        if (this.frozen) {
+            return this;
+        }
+        // Cast so that we can type plugins easier.
+        // Plugins are supposed to be usable on different processors, not just on
+        // this exact processor.
+        const self = this;
+        while(++this.freezeIndex < this.attachers.length){
+            const [attacher, ...options] = this.attachers[this.freezeIndex];
+            if (options[0] === false) {
+                continue;
+            }
+            if (options[0] === true) {
+                options[0] = undefined;
+            }
+            const transformer = attacher.call(self, ...options);
+            if (typeof transformer === 'function') {
+                this.transformers.use(transformer);
+            }
+        }
+        this.frozen = true;
+        this.freezeIndex = Number.POSITIVE_INFINITY;
+        return this;
+    }
+    /**
+   * Parse text to a syntax tree.
+   *
+   * > **Note**: `parse` freezes the processor if not already *frozen*.
+   *
+   * > **Note**: `parse` performs the parse phase, not the run phase or other
+   * > phases.
+   *
+   * @param {Compatible | undefined} [file]
+   *   file to parse (optional); typically `string` or `VFile`; any value
+   *   accepted as `x` in `new VFile(x)`.
+   * @returns {ParseTree extends undefined ? Node : ParseTree}
+   *   Syntax tree representing `file`.
+   */ parse(file) {
+        this.freeze();
+        const realFile = vfile(file);
+        const parser = this.parser || this.Parser;
+        assertParser('parse', parser);
+        return parser(String(realFile), realFile);
+    }
+    /**
+   * Process the given file as configured on the processor.
+   *
+   * > **Note**: `process` freezes the processor if not already *frozen*.
+   *
+   * > **Note**: `process` performs the parse, run, and stringify phases.
+   *
+   * @overload
+   * @param {Compatible | undefined} file
+   * @param {ProcessCallback<VFileWithOutput<CompileResult>>} done
+   * @returns {undefined}
+   *
+   * @overload
+   * @param {Compatible | undefined} [file]
+   * @returns {Promise<VFileWithOutput<CompileResult>>}
+   *
+   * @param {Compatible | undefined} [file]
+   *   File (optional); typically `string` or `VFile`]; any value accepted as
+   *   `x` in `new VFile(x)`.
+   * @param {ProcessCallback<VFileWithOutput<CompileResult>> | undefined} [done]
+   *   Callback (optional).
+   * @returns {Promise<VFile> | undefined}
+   *   Nothing if `done` is given.
+   *   Otherwise a promise, rejected with a fatal error or resolved with the
+   *   processed file.
+   *
+   *   The parsed, transformed, and compiled value is available at
+   *   `file.value` (see note).
+   *
+   *   > **Note**: unified typically compiles by serializing: most
+   *   > compilers return `string` (or `Uint8Array`).
+   *   > Some compilers, such as the one configured with
+   *   > [`rehype-react`][rehype-react], return other values (in this case, a
+   *   > React tree).
+   *   > If you’re using a compiler that doesn’t serialize, expect different
+   *   > result values.
+   *   >
+   *   > To register custom results in TypeScript, add them to
+   *   > {@linkcode CompileResultMap}.
+   *
+   *   [rehype-react]: https://github.com/rehypejs/rehype-react
+   */ process(file, done) {
+        const self = this;
+        this.freeze();
+        assertParser('process', this.parser || this.Parser);
+        assertCompiler('process', this.compiler || this.Compiler);
+        return done ? executor(undefined, done) : new Promise(executor);
+        //TURBOPACK unreachable
+        ;
+        // Note: `void`s needed for TS.
+        /**
+     * @param {((file: VFileWithOutput<CompileResult>) => undefined | void) | undefined} resolve
+     * @param {(error: Error | undefined) => undefined | void} reject
+     * @returns {undefined}
+     */ function executor(resolve, reject) {
+            const realFile = vfile(file);
+            // Assume `ParseTree` (the result of the parser) matches `HeadTree` (the
+            // input of the first transform).
+            const parseTree = self.parse(realFile);
+            self.run(parseTree, realFile, function(error, tree, file) {
+                if (error || !tree || !file) {
+                    return realDone(error);
+                }
+                // Assume `TailTree` (the output of the last transform) matches
+                // `CompileTree` (the input of the compiler).
+                const compileTree = tree;
+                const compileResult = self.stringify(compileTree, file);
+                if (looksLikeAValue(compileResult)) {
+                    file.value = compileResult;
+                } else {
+                    file.result = compileResult;
+                }
+                realDone(error, file);
+            });
+            /**
+       * @param {Error | undefined} error
+       * @param {VFileWithOutput<CompileResult> | undefined} [file]
+       * @returns {undefined}
+       */ function realDone(error, file) {
+                if (error || !file) {
+                    reject(error);
+                } else if (resolve) {
+                    resolve(file);
+                } else {
+                    (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(done, '`done` is defined if `resolve` is not');
+                    done(undefined, file);
+                }
+            }
+        }
+    }
+    /**
+   * Process the given file as configured on the processor.
+   *
+   * An error is thrown if asynchronous transforms are configured.
+   *
+   * > **Note**: `processSync` freezes the processor if not already *frozen*.
+   *
+   * > **Note**: `processSync` performs the parse, run, and stringify phases.
+   *
+   * @param {Compatible | undefined} [file]
+   *   File (optional); typically `string` or `VFile`; any value accepted as
+   *   `x` in `new VFile(x)`.
+   * @returns {VFileWithOutput<CompileResult>}
+   *   The processed file.
+   *
+   *   The parsed, transformed, and compiled value is available at
+   *   `file.value` (see note).
+   *
+   *   > **Note**: unified typically compiles by serializing: most
+   *   > compilers return `string` (or `Uint8Array`).
+   *   > Some compilers, such as the one configured with
+   *   > [`rehype-react`][rehype-react], return other values (in this case, a
+   *   > React tree).
+   *   > If you’re using a compiler that doesn’t serialize, expect different
+   *   > result values.
+   *   >
+   *   > To register custom results in TypeScript, add them to
+   *   > {@linkcode CompileResultMap}.
+   *
+   *   [rehype-react]: https://github.com/rehypejs/rehype-react
+   */ processSync(file) {
+        /** @type {boolean} */ let complete = false;
+        /** @type {VFileWithOutput<CompileResult> | undefined} */ let result;
+        this.freeze();
+        assertParser('processSync', this.parser || this.Parser);
+        assertCompiler('processSync', this.compiler || this.Compiler);
+        this.process(file, realDone);
+        assertDone('processSync', 'process', complete);
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(result, 'we either bailed on an error or have a tree');
+        return result;
+        //TURBOPACK unreachable
+        ;
+        /**
+     * @type {ProcessCallback<VFileWithOutput<CompileResult>>}
+     */ function realDone(error, file) {
+            complete = true;
+            (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$bail$40$2$2e$0$2e$2$2f$node_modules$2f$bail$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["bail"])(error);
+            result = file;
+        }
+    }
+    /**
+   * Run *transformers* on a syntax tree.
+   *
+   * > **Note**: `run` freezes the processor if not already *frozen*.
+   *
+   * > **Note**: `run` performs the run phase, not other phases.
+   *
+   * @overload
+   * @param {HeadTree extends undefined ? Node : HeadTree} tree
+   * @param {RunCallback<TailTree extends undefined ? Node : TailTree>} done
+   * @returns {undefined}
+   *
+   * @overload
+   * @param {HeadTree extends undefined ? Node : HeadTree} tree
+   * @param {Compatible | undefined} file
+   * @param {RunCallback<TailTree extends undefined ? Node : TailTree>} done
+   * @returns {undefined}
+   *
+   * @overload
+   * @param {HeadTree extends undefined ? Node : HeadTree} tree
+   * @param {Compatible | undefined} [file]
+   * @returns {Promise<TailTree extends undefined ? Node : TailTree>}
+   *
+   * @param {HeadTree extends undefined ? Node : HeadTree} tree
+   *   Tree to transform and inspect.
+   * @param {(
+   *   RunCallback<TailTree extends undefined ? Node : TailTree> |
+   *   Compatible
+   * )} [file]
+   *   File associated with `node` (optional); any value accepted as `x` in
+   *   `new VFile(x)`.
+   * @param {RunCallback<TailTree extends undefined ? Node : TailTree>} [done]
+   *   Callback (optional).
+   * @returns {Promise<TailTree extends undefined ? Node : TailTree> | undefined}
+   *   Nothing if `done` is given.
+   *   Otherwise, a promise rejected with a fatal error or resolved with the
+   *   transformed tree.
+   */ run(tree, file, done) {
+        assertNode(tree);
+        this.freeze();
+        const transformers = this.transformers;
+        if (!done && typeof file === 'function') {
+            done = file;
+            file = undefined;
+        }
+        return done ? executor(undefined, done) : new Promise(executor);
+        //TURBOPACK unreachable
+        ;
+        // Note: `void`s needed for TS.
+        /**
+     * @param {(
+     *   ((tree: TailTree extends undefined ? Node : TailTree) => undefined | void) |
+     *   undefined
+     * )} resolve
+     * @param {(error: Error) => undefined | void} reject
+     * @returns {undefined}
+     */ function executor(resolve, reject) {
+            (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(typeof file !== 'function', '`file` can’t be a `done` anymore, we checked');
+            const realFile = vfile(file);
+            transformers.run(tree, realFile, realDone);
+            /**
+       * @param {Error | undefined} error
+       * @param {Node} outputTree
+       * @param {VFile} file
+       * @returns {undefined}
+       */ function realDone(error, outputTree, file) {
+                const resultingTree = outputTree || tree;
+                if (error) {
+                    reject(error);
+                } else if (resolve) {
+                    resolve(resultingTree);
+                } else {
+                    (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(done, '`done` is defined if `resolve` is not');
+                    done(undefined, resultingTree, file);
+                }
+            }
+        }
+    }
+    /**
+   * Run *transformers* on a syntax tree.
+   *
+   * An error is thrown if asynchronous transforms are configured.
+   *
+   * > **Note**: `runSync` freezes the processor if not already *frozen*.
+   *
+   * > **Note**: `runSync` performs the run phase, not other phases.
+   *
+   * @param {HeadTree extends undefined ? Node : HeadTree} tree
+   *   Tree to transform and inspect.
+   * @param {Compatible | undefined} [file]
+   *   File associated with `node` (optional); any value accepted as `x` in
+   *   `new VFile(x)`.
+   * @returns {TailTree extends undefined ? Node : TailTree}
+   *   Transformed tree.
+   */ runSync(tree, file) {
+        /** @type {boolean} */ let complete = false;
+        /** @type {(TailTree extends undefined ? Node : TailTree) | undefined} */ let result;
+        this.run(tree, file, realDone);
+        assertDone('runSync', 'run', complete);
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$devlop$40$1$2e$1$2e$0$2f$node_modules$2f$devlop$2f$lib$2f$development$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ok"])(result, 'we either bailed on an error or have a tree');
+        return result;
+        //TURBOPACK unreachable
+        ;
+        /**
+     * @type {RunCallback<TailTree extends undefined ? Node : TailTree>}
+     */ function realDone(error, tree) {
+            (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$bail$40$2$2e$0$2e$2$2f$node_modules$2f$bail$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["bail"])(error);
+            result = tree;
+            complete = true;
+        }
+    }
+    /**
+   * Compile a syntax tree.
+   *
+   * > **Note**: `stringify` freezes the processor if not already *frozen*.
+   *
+   * > **Note**: `stringify` performs the stringify phase, not the run phase
+   * > or other phases.
+   *
+   * @param {CompileTree extends undefined ? Node : CompileTree} tree
+   *   Tree to compile.
+   * @param {Compatible | undefined} [file]
+   *   File associated with `node` (optional); any value accepted as `x` in
+   *   `new VFile(x)`.
+   * @returns {CompileResult extends undefined ? Value : CompileResult}
+   *   Textual representation of the tree (see note).
+   *
+   *   > **Note**: unified typically compiles by serializing: most compilers
+   *   > return `string` (or `Uint8Array`).
+   *   > Some compilers, such as the one configured with
+   *   > [`rehype-react`][rehype-react], return other values (in this case, a
+   *   > React tree).
+   *   > If you’re using a compiler that doesn’t serialize, expect different
+   *   > result values.
+   *   >
+   *   > To register custom results in TypeScript, add them to
+   *   > {@linkcode CompileResultMap}.
+   *
+   *   [rehype-react]: https://github.com/rehypejs/rehype-react
+   */ stringify(tree, file) {
+        this.freeze();
+        const realFile = vfile(file);
+        const compiler = this.compiler || this.Compiler;
+        assertCompiler('stringify', compiler);
+        assertNode(tree);
+        return compiler(tree, realFile);
+    }
+    /**
+   * Configure the processor to use a plugin, a list of usable values, or a
+   * preset.
+   *
+   * If the processor is already using a plugin, the previous plugin
+   * configuration is changed based on the options that are passed in.
+   * In other words, the plugin is not added a second time.
+   *
+   * > **Note**: `use` cannot be called on *frozen* processors.
+   * > Call the processor first to create a new unfrozen processor.
+   *
+   * @example
+   *   There are many ways to pass plugins to `.use()`.
+   *   This example gives an overview:
+   *
+   *   ```js
+   *   import {unified} from 'unified'
+   *
+   *   unified()
+   *     // Plugin with options:
+   *     .use(pluginA, {x: true, y: true})
+   *     // Passing the same plugin again merges configuration (to `{x: true, y: false, z: true}`):
+   *     .use(pluginA, {y: false, z: true})
+   *     // Plugins:
+   *     .use([pluginB, pluginC])
+   *     // Two plugins, the second with options:
+   *     .use([pluginD, [pluginE, {}]])
+   *     // Preset with plugins and settings:
+   *     .use({plugins: [pluginF, [pluginG, {}]], settings: {position: false}})
+   *     // Settings only:
+   *     .use({settings: {position: false}})
+   *   ```
+   *
+   * @template {Array<unknown>} [Parameters=[]]
+   * @template {Node | string | undefined} [Input=undefined]
+   * @template [Output=Input]
+   *
+   * @overload
+   * @param {Preset | null | undefined} [preset]
+   * @returns {Processor<ParseTree, HeadTree, TailTree, CompileTree, CompileResult>}
+   *
+   * @overload
+   * @param {PluggableList} list
+   * @returns {Processor<ParseTree, HeadTree, TailTree, CompileTree, CompileResult>}
+   *
+   * @overload
+   * @param {Plugin<Parameters, Input, Output>} plugin
+   * @param {...(Parameters | [boolean])} parameters
+   * @returns {UsePlugin<ParseTree, HeadTree, TailTree, CompileTree, CompileResult, Input, Output>}
+   *
+   * @param {PluggableList | Plugin | Preset | null | undefined} value
+   *   Usable value.
+   * @param {...unknown} parameters
+   *   Parameters, when a plugin is given as a usable value.
+   * @returns {Processor<ParseTree, HeadTree, TailTree, CompileTree, CompileResult>}
+   *   Current processor.
+   */ use(value, ...parameters) {
+        const attachers = this.attachers;
+        const namespace = this.namespace;
+        assertUnfrozen('use', this.frozen);
+        if (value === null || value === undefined) {
+        // Empty.
+        } else if (typeof value === 'function') {
+            addPlugin(value, parameters);
+        } else if (typeof value === 'object') {
+            if (Array.isArray(value)) {
+                addList(value);
+            } else {
+                addPreset(value);
+            }
+        } else {
+            throw new TypeError('Expected usable value, not `' + value + '`');
+        }
+        return this;
+        //TURBOPACK unreachable
+        ;
+        /**
+     * @param {Pluggable} value
+     * @returns {undefined}
+     */ function add(value) {
+            if (typeof value === 'function') {
+                addPlugin(value, []);
+            } else if (typeof value === 'object') {
+                if (Array.isArray(value)) {
+                    const [plugin, ...parameters] = value;
+                    addPlugin(plugin, parameters);
+                } else {
+                    addPreset(value);
+                }
+            } else {
+                throw new TypeError('Expected usable value, not `' + value + '`');
+            }
+        }
+        /**
+     * @param {Preset} result
+     * @returns {undefined}
+     */ function addPreset(result) {
+            if (!('plugins' in result) && !('settings' in result)) {
+                throw new Error('Expected usable value but received an empty preset, which is probably a mistake: presets typically come with `plugins` and sometimes with `settings`, but this has neither');
+            }
+            addList(result.plugins);
+            if (result.settings) {
+                namespace.settings = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$extend$40$3$2e$0$2e$2$2f$node_modules$2f$extend$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"])(true, namespace.settings, result.settings);
+            }
+        }
+        /**
+     * @param {PluggableList | null | undefined} plugins
+     * @returns {undefined}
+     */ function addList(plugins) {
+            let index = -1;
+            if (plugins === null || plugins === undefined) {
+            // Empty.
+            } else if (Array.isArray(plugins)) {
+                while(++index < plugins.length){
+                    const thing = plugins[index];
+                    add(thing);
+                }
+            } else {
+                throw new TypeError('Expected a list of plugins, not `' + plugins + '`');
+            }
+        }
+        /**
+     * @param {Plugin} plugin
+     * @param {Array<unknown>} parameters
+     * @returns {undefined}
+     */ function addPlugin(plugin, parameters) {
+            let index = -1;
+            let entryIndex = -1;
+            while(++index < attachers.length){
+                if (attachers[index][0] === plugin) {
+                    entryIndex = index;
+                    break;
+                }
+            }
+            if (entryIndex === -1) {
+                attachers.push([
+                    plugin,
+                    ...parameters
+                ]);
+            } else if (parameters.length > 0) {
+                let [primary, ...rest] = parameters;
+                const currentPrimary = attachers[entryIndex][1];
+                if ((0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$is$2d$plain$2d$obj$40$4$2e$1$2e$0$2f$node_modules$2f$is$2d$plain$2d$obj$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"])(currentPrimary) && (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$is$2d$plain$2d$obj$40$4$2e$1$2e$0$2f$node_modules$2f$is$2d$plain$2d$obj$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"])(primary)) {
+                    primary = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$extend$40$3$2e$0$2e$2$2f$node_modules$2f$extend$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"])(true, currentPrimary, primary);
+                }
+                attachers[entryIndex] = [
+                    plugin,
+                    primary,
+                    ...rest
+                ];
+            }
+        }
+    }
+}
+const unified = new Processor().freeze();
+/**
+ * Assert a parser is available.
+ *
+ * @param {string} name
+ * @param {unknown} value
+ * @returns {asserts value is Parser}
+ */ function assertParser(name, value) {
+    if (typeof value !== 'function') {
+        throw new TypeError('Cannot `' + name + '` without `parser`');
+    }
+}
+/**
+ * Assert a compiler is available.
+ *
+ * @param {string} name
+ * @param {unknown} value
+ * @returns {asserts value is Compiler}
+ */ function assertCompiler(name, value) {
+    if (typeof value !== 'function') {
+        throw new TypeError('Cannot `' + name + '` without `compiler`');
+    }
+}
+/**
+ * Assert the processor is not frozen.
+ *
+ * @param {string} name
+ * @param {unknown} frozen
+ * @returns {asserts frozen is false}
+ */ function assertUnfrozen(name, frozen) {
+    if (frozen) {
+        throw new Error('Cannot call `' + name + '` on a frozen processor.\nCreate a new processor first, by calling it: use `processor()` instead of `processor`.');
+    }
+}
+/**
+ * Assert `node` is a unist node.
+ *
+ * @param {unknown} node
+ * @returns {asserts node is Node}
+ */ function assertNode(node) {
+    // `isPlainObj` unfortunately uses `any` instead of `unknown`.
+    // type-coverage:ignore-next-line
+    if (!(0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$is$2d$plain$2d$obj$40$4$2e$1$2e$0$2f$node_modules$2f$is$2d$plain$2d$obj$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"])(node) || typeof node.type !== 'string') {
+        throw new TypeError('Expected node, got `' + node + '`');
+    // Fine.
+    }
+}
+/**
+ * Assert that `complete` is `true`.
+ *
+ * @param {string} name
+ * @param {string} asyncName
+ * @param {unknown} complete
+ * @returns {asserts complete is true}
+ */ function assertDone(name, asyncName, complete) {
+    if (!complete) {
+        throw new Error('`' + name + '` finished async. Use `' + asyncName + '` instead');
+    }
+}
+/**
+ * @param {Compatible | undefined} [value]
+ * @returns {VFile}
+ */ function vfile(value) {
+    return looksLikeAVFile(value) ? value : new __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$vfile$40$6$2e$0$2e$3$2f$node_modules$2f$vfile$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["VFile"](value);
+}
+/**
+ * @param {Compatible | undefined} [value]
+ * @returns {value is VFile}
+ */ function looksLikeAVFile(value) {
+    return Boolean(value && typeof value === 'object' && 'message' in value && 'messages' in value);
+}
+/**
+ * @param {unknown} [value]
+ * @returns {value is Value}
+ */ function looksLikeAValue(value) {
+    return typeof value === 'string' || isUint8Array(value);
+}
+/**
+ * Assert `value` is an `Uint8Array`.
+ *
+ * @param {unknown} value
+ *   thing.
+ * @returns {value is Uint8Array}
+ *   Whether `value` is an `Uint8Array`.
+ */ function isUint8Array(value) {
+    return Boolean(value && typeof value === 'object' && 'byteLength' in value && 'byteOffset' in value);
+}
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/remark@15.0.1/node_modules/remark/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "remark",
+    ()=>remark
+]);
+// Note: types exposed from `index.d.ts`
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$remark$2d$parse$40$11$2e$0$2e$0$2f$node_modules$2f$remark$2d$parse$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/remark-parse@11.0.0/node_modules/remark-parse/lib/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$remark$2d$stringify$40$11$2e$0$2e$0$2f$node_modules$2f$remark$2d$stringify$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/remark-stringify@11.0.0/node_modules/remark-stringify/lib/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unified$40$11$2e$0$2e$5$2f$node_modules$2f$unified$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/unified@11.0.5/node_modules/unified/lib/index.js [app-ssr] (ecmascript)");
+;
+;
+;
+const remark = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unified$40$11$2e$0$2e$5$2f$node_modules$2f$unified$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["unified"])().use(__TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$remark$2d$parse$40$11$2e$0$2e$0$2f$node_modules$2f$remark$2d$parse$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"]).use(__TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$remark$2d$stringify$40$11$2e$0$2e$0$2f$node_modules$2f$remark$2d$stringify$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"]).freeze();
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/fumadocs-core@16.6.9_@mdx-js+mdx@3.1.1_@types+estree-jsx@1.0.5_@types+hast@3.0.4_@types+mdast_f4xt32s5hihysvwj3f5h46n6yi/node_modules/fumadocs-core/dist/search/index.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "createContentHighlighter",
+    ()=>createContentHighlighter
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$remark$40$15$2e$0$2e$1$2f$node_modules$2f$remark$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/remark@15.0.1/node_modules/remark/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unist$2d$util$2d$visit$40$5$2e$1$2e$0$2f$node_modules$2f$unist$2d$util$2d$visit$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/unist-util-visit@5.1.0/node_modules/unist-util-visit/lib/index.js [app-ssr] (ecmascript) <locals>");
+;
+;
+//#region src/search/index.ts
+function escapeRegExp(input) {
+    return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+function buildRegexFromQuery(q) {
+    const trimmed = q.trim();
+    if (trimmed.length === 0) return null;
+    const terms = Array.from(new Set(trimmed.split(/\s+/).map((t)=>t.trim()).filter(Boolean)));
+    if (terms.length === 0) return null;
+    const escaped = terms.map(escapeRegExp).join("|");
+    return new RegExp(`(${escaped})`, "gi");
+}
+function createContentHighlighter(query) {
+    let processor = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$remark$40$15$2e$0$2e$1$2f$node_modules$2f$remark$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["remark"])();
+    const regex = typeof query === "string" ? buildRegexFromQuery(query) : query;
+    if (regex) processor = processor.use(remarkHighlight, regex);
+    return {
+        highlight (content) {
+            if (!regex) return [
+                {
+                    type: "text",
+                    content
+                }
+            ];
+            const out = [];
+            let i = 0;
+            for (const match of content.matchAll(regex)){
+                if (i < match.index) out.push({
+                    type: "text",
+                    content: content.substring(i, match.index)
+                });
+                out.push({
+                    type: "text",
+                    content: match[0],
+                    styles: {
+                        highlight: true
+                    }
+                });
+                i = match.index + match[0].length;
+            }
+            if (i < content.length) out.push({
+                type: "text",
+                content: content.substring(i)
+            });
+            return out;
+        },
+        highlightMarkdown (content) {
+            if (!regex) return content;
+            return String(processor.processSync(content).value);
+        }
+    };
+}
+function remarkHighlight(regex) {
+    return (tree)=>{
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$unist$2d$util$2d$visit$40$5$2e$1$2e$0$2f$node_modules$2f$unist$2d$util$2d$visit$2f$lib$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["visit"])(tree, "text", (node)=>{
+            let out = "";
+            const content = node.value;
+            let i = 0;
+            for (const match of content.matchAll(regex)){
+                if (i < match.index) out += content.substring(i, match.index);
+                out += `<mark>${match[0]}</mark>`;
+                i = match.index + match[0].length;
+            }
+            if (i < content.length) out += content.substring(i);
+            node.type = "html";
+            node.value = out;
+        });
+    };
+}
+;
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/fumadocs-core@16.6.9_@mdx-js+mdx@3.1.1_@types+estree-jsx@1.0.5_@types+hast@3.0.4_@types+mdast_f4xt32s5hihysvwj3f5h46n6yi/node_modules/fumadocs-core/dist/remove-undefined-CM-o9RdZ.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "t",
+    ()=>removeUndefined
+]);
+//#region src/utils/remove-undefined.ts
+function removeUndefined(value, deep = false) {
+    const obj = value;
+    for(const key in obj){
+        if (obj[key] === void 0) delete obj[key];
+        if (!deep) continue;
+        const entry = obj[key];
+        if (typeof entry === "object" && entry !== null) {
+            removeUndefined(entry, deep);
+            continue;
+        }
+        if (Array.isArray(entry)) for (const item of entry)removeUndefined(item, deep);
+    }
+    return value;
+}
+;
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/fumadocs-core@16.6.9_@mdx-js+mdx@3.1.1_@types+estree-jsx@1.0.5_@types+hast@3.0.4_@types+mdast_f4xt32s5hihysvwj3f5h46n6yi/node_modules/fumadocs-core/dist/advanced-D8-Cn2tE.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "n",
+    ()=>searchSimple,
+    "t",
+    ()=>searchAdvanced
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$fumadocs$2d$core$40$16$2e$6$2e$9_$40$mdx$2d$js$2b$mdx$40$3$2e$1$2e$1_$40$types$2b$estree$2d$jsx$40$1$2e$0$2e$5_$40$types$2b$hast$40$3$2e$0$2e$4_$40$types$2b$mdast_f4xt32s5hihysvwj3f5h46n6yi$2f$node_modules$2f$fumadocs$2d$core$2f$dist$2f$search$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/fumadocs-core@16.6.9_@mdx-js+mdx@3.1.1_@types+estree-jsx@1.0.5_@types+hast@3.0.4_@types+mdast_f4xt32s5hihysvwj3f5h46n6yi/node_modules/fumadocs-core/dist/search/index.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$fumadocs$2d$core$40$16$2e$6$2e$9_$40$mdx$2d$js$2b$mdx$40$3$2e$1$2e$1_$40$types$2b$estree$2d$jsx$40$1$2e$0$2e$5_$40$types$2b$hast$40$3$2e$0$2e$4_$40$types$2b$mdast_f4xt32s5hihysvwj3f5h46n6yi$2f$node_modules$2f$fumadocs$2d$core$2f$dist$2f$remove$2d$undefined$2d$CM$2d$o9RdZ$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/fumadocs-core@16.6.9_@mdx-js+mdx@3.1.1_@types+estree-jsx@1.0.5_@types+hast@3.0.4_@types+mdast_f4xt32s5hihysvwj3f5h46n6yi/node_modules/fumadocs-core/dist/remove-undefined-CM-o9RdZ.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f40$orama$2b$orama$40$3$2e$1$2e$18$2f$node_modules$2f40$orama$2f$orama$2f$dist$2f$esm$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/@orama+orama@3.1.18/node_modules/@orama/orama/dist/esm/index.js [app-ssr] (ecmascript) <locals>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f40$orama$2b$orama$40$3$2e$1$2e$18$2f$node_modules$2f40$orama$2f$orama$2f$dist$2f$esm$2f$methods$2f$docs$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/@orama+orama@3.1.18/node_modules/@orama/orama/dist/esm/methods/docs.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f40$orama$2b$orama$40$3$2e$1$2e$18$2f$node_modules$2f40$orama$2f$orama$2f$dist$2f$esm$2f$methods$2f$search$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/@orama+orama@3.1.18/node_modules/@orama/orama/dist/esm/methods/search.js [app-ssr] (ecmascript)");
+;
+;
+;
+//#region src/search/orama/search/simple.ts
+async function searchSimple(db, query, params = {}) {
+    const highlighter = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$fumadocs$2d$core$40$16$2e$6$2e$9_$40$mdx$2d$js$2b$mdx$40$3$2e$1$2e$1_$40$types$2b$estree$2d$jsx$40$1$2e$0$2e$5_$40$types$2b$hast$40$3$2e$0$2e$4_$40$types$2b$mdast_f4xt32s5hihysvwj3f5h46n6yi$2f$node_modules$2f$fumadocs$2d$core$2f$dist$2f$search$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createContentHighlighter"])(query);
+    return (await (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f40$orama$2b$orama$40$3$2e$1$2e$18$2f$node_modules$2f40$orama$2f$orama$2f$dist$2f$esm$2f$methods$2f$search$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["search"])(db, {
+        term: query,
+        tolerance: 1,
+        ...params,
+        boost: {
+            title: 2,
+            ..."boost" in params ? params.boost : void 0
+        }
+    })).hits.map((hit)=>({
+            type: "page",
+            content: highlighter.highlightMarkdown(hit.document.title),
+            breadcrumbs: hit.document.breadcrumbs,
+            id: hit.document.url,
+            url: hit.document.url
+        }));
+}
+//#endregion
+//#region src/search/orama/search/advanced.ts
+async function searchAdvanced(db, query, tag = [], { mode = "fulltext", ...override } = {}) {
+    if (typeof tag === "string") tag = [
+        tag
+    ];
+    const params = {
+        ...override,
+        mode,
+        where: (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$fumadocs$2d$core$40$16$2e$6$2e$9_$40$mdx$2d$js$2b$mdx$40$3$2e$1$2e$1_$40$types$2b$estree$2d$jsx$40$1$2e$0$2e$5_$40$types$2b$hast$40$3$2e$0$2e$4_$40$types$2b$mdast_f4xt32s5hihysvwj3f5h46n6yi$2f$node_modules$2f$fumadocs$2d$core$2f$dist$2f$remove$2d$undefined$2d$CM$2d$o9RdZ$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["t"])({
+            tags: tag.length > 0 ? {
+                containsAll: tag
+            } : void 0,
+            ...override.where
+        }),
+        limit: 10,
+        groupBy: {
+            properties: [
+                "page_id"
+            ],
+            maxResult: 8,
+            ...override.groupBy
+        }
+    };
+    if (query.length > 0) Object.assign(params, {
+        term: query,
+        properties: mode === "fulltext" ? [
+            "content"
+        ] : [
+            "content",
+            "embeddings"
+        ]
+    });
+    const highlighter = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$fumadocs$2d$core$40$16$2e$6$2e$9_$40$mdx$2d$js$2b$mdx$40$3$2e$1$2e$1_$40$types$2b$estree$2d$jsx$40$1$2e$0$2e$5_$40$types$2b$hast$40$3$2e$0$2e$4_$40$types$2b$mdast_f4xt32s5hihysvwj3f5h46n6yi$2f$node_modules$2f$fumadocs$2d$core$2f$dist$2f$search$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createContentHighlighter"])(query);
+    const result = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f40$orama$2b$orama$40$3$2e$1$2e$18$2f$node_modules$2f40$orama$2f$orama$2f$dist$2f$esm$2f$methods$2f$search$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["search"])(db, params);
+    const list = [];
+    for (const item of result.groups ?? []){
+        const pageId = item.values[0];
+        const page = (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f40$orama$2b$orama$40$3$2e$1$2e$18$2f$node_modules$2f40$orama$2f$orama$2f$dist$2f$esm$2f$methods$2f$docs$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getByID"])(db, pageId);
+        if (!page) continue;
+        list.push({
+            id: pageId,
+            type: "page",
+            content: highlighter.highlightMarkdown(page.content),
+            breadcrumbs: page.breadcrumbs,
+            url: page.url
+        });
+        for (const hit of item.result){
+            if (hit.document.type === "page") continue;
+            list.push({
+                id: hit.document.id.toString(),
+                content: highlighter.highlightMarkdown(hit.document.content),
+                breadcrumbs: hit.document.breadcrumbs,
+                type: hit.document.type,
+                url: hit.document.url
+            });
+        }
+    }
+    return list.length > 80 ? list.slice(0, 80) : list;
+}
+;
+}),
+"[project]/projects/open-plugin/docs/node_modules/.pnpm/fumadocs-core@16.6.9_@mdx-js+mdx@3.1.1_@types+estree-jsx@1.0.5_@types+hast@3.0.4_@types+mdast_f4xt32s5hihysvwj3f5h46n6yi/node_modules/fumadocs-core/dist/static-dXiDJ_Bs.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "search",
+    ()=>search
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$fumadocs$2d$core$40$16$2e$6$2e$9_$40$mdx$2d$js$2b$mdx$40$3$2e$1$2e$1_$40$types$2b$estree$2d$jsx$40$1$2e$0$2e$5_$40$types$2b$hast$40$3$2e$0$2e$4_$40$types$2b$mdast_f4xt32s5hihysvwj3f5h46n6yi$2f$node_modules$2f$fumadocs$2d$core$2f$dist$2f$advanced$2d$D8$2d$Cn2tE$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/fumadocs-core@16.6.9_@mdx-js+mdx@3.1.1_@types+estree-jsx@1.0.5_@types+hast@3.0.4_@types+mdast_f4xt32s5hihysvwj3f5h46n6yi/node_modules/fumadocs-core/dist/advanced-D8-Cn2tE.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f40$orama$2b$orama$40$3$2e$1$2e$18$2f$node_modules$2f40$orama$2f$orama$2f$dist$2f$esm$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/@orama+orama@3.1.18/node_modules/@orama/orama/dist/esm/index.js [app-ssr] (ecmascript) <locals>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f40$orama$2b$orama$40$3$2e$1$2e$18$2f$node_modules$2f40$orama$2f$orama$2f$dist$2f$esm$2f$methods$2f$create$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/@orama+orama@3.1.18/node_modules/@orama/orama/dist/esm/methods/create.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f40$orama$2b$orama$40$3$2e$1$2e$18$2f$node_modules$2f40$orama$2f$orama$2f$dist$2f$esm$2f$methods$2f$serialization$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/projects/open-plugin/docs/node_modules/.pnpm/@orama+orama@3.1.18/node_modules/@orama/orama/dist/esm/methods/serialization.js [app-ssr] (ecmascript)");
+;
+;
+//#region src/search/client/static.ts
+const cache = /* @__PURE__ */ new Map();
+async function loadDB({ from = "/api/search", initOrama = (locale)=>(0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f40$orama$2b$orama$40$3$2e$1$2e$18$2f$node_modules$2f40$orama$2f$orama$2f$dist$2f$esm$2f$methods$2f$create$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["create"])({
+        schema: {
+            _: "string"
+        },
+        language: locale
+    }) }) {
+    const cacheKey = from;
+    const cached = cache.get(cacheKey);
+    if (cached) return cached;
+    async function init() {
+        const res = await fetch(from);
+        if (!res.ok) throw new Error(`failed to fetch exported search indexes from ${from}, make sure the search database is exported and available for client.`);
+        const data = await res.json();
+        const dbs = /* @__PURE__ */ new Map();
+        if (data.type === "i18n") {
+            await Promise.all(Object.entries(data.data).map(async ([k, v])=>{
+                const db = await initOrama(k);
+                (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f40$orama$2b$orama$40$3$2e$1$2e$18$2f$node_modules$2f40$orama$2f$orama$2f$dist$2f$esm$2f$methods$2f$serialization$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["load"])(db, v);
+                dbs.set(k, {
+                    type: v.type,
+                    db
+                });
+            }));
+            return dbs;
+        }
+        const db = await initOrama();
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f40$orama$2b$orama$40$3$2e$1$2e$18$2f$node_modules$2f40$orama$2f$orama$2f$dist$2f$esm$2f$methods$2f$serialization$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["load"])(db, data);
+        dbs.set("", {
+            type: data.type,
+            db
+        });
+        return dbs;
+    }
+    const result = init();
+    cache.set(cacheKey, result);
+    return result;
+}
+async function search(query, options) {
+    const { tag, locale } = options;
+    const db = (await loadDB(options)).get(locale ?? "");
+    if (!db) return [];
+    if (db.type === "simple") return (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$fumadocs$2d$core$40$16$2e$6$2e$9_$40$mdx$2d$js$2b$mdx$40$3$2e$1$2e$1_$40$types$2b$estree$2d$jsx$40$1$2e$0$2e$5_$40$types$2b$hast$40$3$2e$0$2e$4_$40$types$2b$mdast_f4xt32s5hihysvwj3f5h46n6yi$2f$node_modules$2f$fumadocs$2d$core$2f$dist$2f$advanced$2d$D8$2d$Cn2tE$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["n"])(db, query);
+    return (0, __TURBOPACK__imported__module__$5b$project$5d2f$projects$2f$open$2d$plugin$2f$docs$2f$node_modules$2f2e$pnpm$2f$fumadocs$2d$core$40$16$2e$6$2e$9_$40$mdx$2d$js$2b$mdx$40$3$2e$1$2e$1_$40$types$2b$estree$2d$jsx$40$1$2e$0$2e$5_$40$types$2b$hast$40$3$2e$0$2e$4_$40$types$2b$mdast_f4xt32s5hihysvwj3f5h46n6yi$2f$node_modules$2f$fumadocs$2d$core$2f$dist$2f$advanced$2d$D8$2d$Cn2tE$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["t"])(db.db, query, tag);
+}
+;
+}),
+];
+
+//# sourceMappingURL=18966__pnpm_c1a28b57._.js.map

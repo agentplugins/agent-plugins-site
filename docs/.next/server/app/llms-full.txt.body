@@ -1,0 +1,1388 @@
+# Open Plugin
+
+
+
+Open Plugin is a standard for packaging agent extensions into distributable plugins that any conformant tool can install and run.
+
+What are plugins? [#what-are-plugins]
+
+AI coding agents are extensible through skills, hooks, and tool servers — but each is configured separately, with no standard way to package, share, or version them together.
+
+A plugin is a directory that bundles related extensions into a single installable unit:
+
+```
+my-plugin/
+├── .plugin/
+│   └── plugin.json       # Manifest: name, version, metadata
+├── skills/                # Agent Skills (SKILL.md format)
+├── agents/                # Specialized sub-agents
+├── hooks/                 # Event-driven automation
+├── rules/                 # Coding standards (.mdc files)
+├── .mcp.json              # MCP tool servers
+└── .lsp.json              # Language server configs
+```
+
+A single plugin can include any combination of these components:
+
+A single plugin can include any combination of these components:
+
+**[Skills](/agent-builders/components/skills)** give agents new capabilities — from processing PDFs to reviewing code. Skills follow the [Agent Skills](https://agentskills.io) format and are loaded on demand based on task context.
+
+**[Agents](/agent-builders/components/agents)** are specialized sub-agents with focused expertise. A security reviewer, a performance tester, a documentation writer. The host tool can invoke them automatically or users can call them directly.
+
+**[Hooks](/agent-builders/components/hooks)** automate responses to events. Format code after every edit. Run a linter when files are written. Enforce policies before commits.
+
+**[MCP Servers](/agent-builders/components/mcp-servers)** connect agents to external tools and data via the [Model Context Protocol](https://modelcontextprotocol.io/).
+
+**[LSP Servers](/agent-builders/components/lsp-servers)** provide real-time code intelligence — diagnostics, go-to-definition, find references.
+
+How plugins work [#how-plugins-work]
+
+1. **Install**: A user installs a plugin or loads it from a directory.
+2. **Discover**: The host tool scans the plugin directory, discovers components in their default locations, and registers them.
+3. **Namespace**: All components are prefixed with the plugin name (e.g., `/deploy-tools:status`) to prevent conflicts.
+4. **Activate**: Skills become available, hooks start listening, servers start running.
+
+When to use plugins [#when-to-use-plugins]
+
+* **Share functionality** with teammates or the community
+* **Reuse the same extensions** across multiple projects
+* **Distribute versioned releases** that can be updated
+* **Bundle related components** that work together (e.g., a skill + hook + MCP server)
+
+For personal, project-specific customizations that don't need sharing, you can configure skills and hooks directly in your project without a plugin.
+
+Get started [#get-started]
+
+<Cards>
+  <Card title="Supported Agents" href="/supported-agents" />
+
+  <Card title="Build a Plugin" href="/plugin-builders" />
+
+  <Card title="Add Plugin Support to Your Tool" href="/agent-builders" />
+
+  <Card title="Specification" href="/plugin-builders/specification" />
+</Cards>
+
+
+# Supported Agents
+
+
+
+Open Plugin is designed to work across AI coding agents. Support varies by component type — some agents support skills and MCP servers today, while other component types are newer.
+
+export const Yes = () => <span style={{ display: 'inline-block', padding: '2px 10px', borderRadius: '9999px', fontSize: '13px', fontWeight: 500, backgroundColor: 'rgba(34, 197, 94, 0.15)', color: 'rgb(34, 197, 94)' }}>Yes</span>
+
+export const No = () => <span style={{ display: 'inline-block', padding: '2px 10px', borderRadius: '9999px', fontSize: '13px', fontWeight: 500, backgroundColor: 'rgba(239, 68, 68, 0.15)', color: 'rgb(239, 68, 68)' }}>No</span>
+
+Compatibility matrix [#compatibility-matrix]
+
+| Component                                   |  Cursor | Claude Code |  Codex  | OpenCode |
+| ------------------------------------------- | :-----: | :---------: | :-----: | :------: |
+| [Skills](/docs/components/skills)           | <Yes /> |   <Yes />   |  <No /> |  <Yes /> |
+| [Agents](/docs/components/agents)           |  <No /> |   <Yes />   |  <No /> |  <Yes /> |
+| [Rules](/docs/components/rules)             | <Yes /> |   <Yes />   | <Yes /> |  <Yes /> |
+| [Hooks](/docs/components/hooks)             | <Yes /> |   <Yes />   |  <No /> |  <Yes /> |
+| [MCP Servers](/docs/components/mcp-servers) | <Yes /> |   <Yes />   |  <No /> |  <Yes /> |
+| [LSP Servers](/docs/components/lsp-servers) | <Yes /> |    <No />   |  <No /> |  <No />  |
+
+***
+
+Want to add Open Plugin support to your tool? See [Integrate Plugins](/docs/integrate-plugins).
+
+
+# Integrate Plugins Into Your Tool
+
+
+
+This guide explains how to add Open Plugin support to an AI agent or development tool.
+
+Overview [#overview]
+
+A plugin-compatible tool needs to:
+
+1. **Discover** plugins in configured locations
+2. **Parse** the manifest and discover components
+3. **Register** components (skills, agents, hooks, servers)
+4. **Namespace** components to prevent conflicts
+5. **Manage** plugin lifecycle (enable, disable, update, cache)
+
+Minimal implementation [#minimal-implementation]
+
+You don't need to support every component type. A minimal conformant implementation needs to:
+
+1. Load a plugin from a directory
+2. Parse `.plugin/plugin.json` if present
+3. Discover components in default locations
+4. Expand `${PLUGIN_ROOT}` in configuration values
+5. Namespace components with the plugin name
+6. Support at least one component type
+
+Step-by-step integration [#step-by-step-integration]
+
+1. Plugin discovery [#1-plugin-discovery]
+
+Plugins can come from two sources:
+
+**Direct directory**: A path specified by the user (e.g., `--plugin-dir ./my-plugin`). Used for development.
+
+**Installed plugin**: A plugin installed and copied to a local cache.
+
+```
+function discoverPlugin(pluginPath):
+    manifest = null
+
+    // Try to load manifest
+    manifestPath = pluginPath + "/.plugin/plugin.json"
+    if exists(manifestPath):
+        manifest = parseJSON(readFile(manifestPath))
+
+    // Derive name from manifest or directory name
+    name = manifest?.name ?? basename(pluginPath)
+
+    return { name, manifest, path: pluginPath }
+```
+
+2. Component discovery [#2-component-discovery]
+
+Scan default locations for each component type:
+
+```
+function discoverComponents(pluginPath, manifest):
+    components = {}
+
+    // Skills (Agent Skills format)
+    skillsDir = pluginPath + "/skills"
+    if exists(skillsDir):
+        for dir in subdirectories(skillsDir):
+            if exists(dir + "/SKILL.md"):
+                components.skills.push(parseSkill(dir))
+
+    // Commands (flat markdown files)
+    commandsDir = pluginPath + "/commands"
+    if exists(commandsDir):
+        for file in glob(commandsDir + "/*.md"):
+            components.commands.push(parseCommand(file))
+
+    // Agents
+    agentsDir = pluginPath + "/agents"
+    if exists(agentsDir):
+        for file in glob(agentsDir + "/*.md"):
+            components.agents.push(parseAgent(file))
+
+    // Hooks
+    hooksFile = pluginPath + "/hooks/hooks.json"
+    if exists(hooksFile):
+        components.hooks = parseJSON(readFile(hooksFile))
+
+    // MCP servers
+    mcpFile = pluginPath + "/.mcp.json"
+    if exists(mcpFile):
+        components.mcpServers = parseJSON(readFile(mcpFile))
+
+    // LSP servers
+    lspFile = pluginPath + "/.lsp.json"
+    if exists(lspFile):
+        components.lspServers = parseJSON(readFile(lspFile))
+
+    // Also load from custom paths in manifest
+    if manifest?.commands:
+        // Load additional commands from manifest paths
+    // ... same for other component types
+
+    return components
+```
+
+3. Path expansion [#3-path-expansion]
+
+All configuration values that may contain `${PLUGIN_ROOT}` must be expanded:
+
+```
+function expandPaths(config, pluginRoot):
+    return deepReplace(config, "${PLUGIN_ROOT}", pluginRoot)
+```
+
+This applies to:
+
+* Hook command strings
+* MCP server `command`, `args`, `env`, and `cwd` fields
+* LSP server configuration fields
+
+4. Namespacing [#4-namespacing]
+
+All user-facing component names must be prefixed:
+
+```
+function namespace(pluginName, componentName):
+    return pluginName + ":" + componentName
+```
+
+This produces names like `/deploy-tools:status` for skills and `deploy-tools:security-reviewer` for agents.
+
+5. Component registration [#5-component-registration]
+
+How you register components depends on your tool's architecture:
+
+**Skills**: Add to the list of available skills/commands. Include metadata (name, description) in the agent's system prompt for auto-invocation.
+
+**Agents**: Add to the agent registry. Make available for both auto-invocation (based on description matching) and manual invocation.
+
+**Hooks**: Register event listeners for each hook rule. When an event fires, check matchers and execute matching hook actions.
+
+**MCP servers**: Start server processes and connect to them via the MCP protocol. Register their tools alongside built-in tools.
+
+**LSP servers**: Start language server processes for matching file types. Connect via stdio or socket transport.
+
+6. Plugin caching [#6-plugin-caching]
+
+For installed plugins, copy to a local cache:
+
+```
+function installPlugin(pluginName, sourcePath):
+    cachePath = getCachePath(pluginName)
+
+    // Copy plugin directory to cache (follow symlinks)
+    copyDirectory(sourcePath, cachePath, followSymlinks=true)
+
+    // Add to enabled plugins
+    addToSettings("enabledPlugins", pluginName)
+```
+
+Security considerations [#security-considerations]
+
+Script execution [#script-execution]
+
+Hook scripts and MCP server commands run with the user's permissions. Consider:
+
+* **Sandboxing**: Run scripts in isolated environments where possible
+* **Allowlisting**: Only execute scripts from trusted/installed plugins
+* **Confirmation**: Ask users before enabling plugins with hooks
+* **Logging**: Record all script executions for auditing
+
+Plugin review [#plugin-review]
+
+Before installing plugins, tools SHOULD:
+
+* Display the plugin's components (especially hooks and MCP servers)
+* Warn about plugins that include executable hooks
+* Allow users to review plugin contents before enabling
+
+Path restrictions [#path-restrictions]
+
+* Reject any paths containing `../` that escape the plugin root
+* Validate that `${PLUGIN_ROOT}` expansion produces paths within the plugin directory
+* Cached plugins must be self-contained
+
+Testing your integration [#testing-your-integration]
+
+Use the reference library to validate plugins:
+
+```bash
+# Validate a plugin's structure
+npx plugin-ref validate ./test-plugin
+
+# Inspect discovered components
+npx plugin-ref inspect ./test-plugin
+```
+
+Create test plugins that exercise each component type and edge case:
+
+* Plugin with no manifest (convention-only discovery)
+* Plugin with custom component paths in manifest
+* Plugin with all component types
+* Plugin with invalid manifest (should fail gracefully)
+* Plugin with hooks that reference `${PLUGIN_ROOT}`
+
+
+# Getting Started
+
+
+
+This guide walks you through creating a plugin and testing it.
+
+Prerequisites [#prerequisites]
+
+* A conformant plugin host tool installed (e.g., [Claude Code](https://code.claude.com), [Cursor](https://cursor.com), [OpenCode](https://opencode.ai))
+
+Overview [#overview]
+
+The workflow is:
+
+1. **Create a plugin** — a directory with a manifest and components
+2. **Test** — load the plugin directly during development
+3. **Distribute** — push the plugin repo to GitHub; users install from it
+
+Step 1: Create a plugin [#step-1-create-a-plugin]
+
+Create the directory structure [#create-the-directory-structure]
+
+```bash
+mkdir -p my-plugin/.plugin
+mkdir -p my-plugin/skills/hello
+```
+
+Write the manifest [#write-the-manifest]
+
+Create `my-plugin/.plugin/plugin.json`:
+
+```json
+{
+  "name": "my-plugin",
+  "description": "My first plugin",
+  "version": "1.0.0",
+  "author": {
+    "name": "Your Name"
+  }
+}
+```
+
+Add a skill [#add-a-skill]
+
+Create `my-plugin/skills/hello/SKILL.md`:
+
+```markdown
+---
+name: hello
+description: Greet the user with a friendly message.
+---
+
+Greet the user warmly and ask how you can help them today.
+```
+
+Step 2: Test it [#step-2-test-it]
+
+During development, load the plugin directly:
+
+```bash
+claude --plugin-dir ./my-plugin
+
+# Then invoke the skill
+/my-plugin:hello
+```
+
+Step 3: Distribute [#step-3-distribute]
+
+Push your plugin to GitHub. Users can then install it through their tool's plugin installation mechanism.
+
+Add more components [#add-more-components]
+
+Once your basic plugin works, you can add more component types.
+
+Add an agent [#add-an-agent]
+
+Create `my-plugin/agents/reviewer.md`:
+
+```markdown
+---
+name: reviewer
+description: Reviews code changes for correctness, style, and potential bugs.
+---
+
+You are a thorough code reviewer. When reviewing changes:
+
+1. Check for logical errors and edge cases
+2. Verify error handling is complete
+3. Look for performance issues
+4. Ensure naming and style are consistent
+5. Suggest specific improvements with examples
+```
+
+Add a rule [#add-a-rule]
+
+Create `my-plugin/rules/prefer-const.mdc`:
+
+```markdown
+---
+description: Prefer const over let. Never use var.
+alwaysApply: true
+globs: "**/*.{js,ts,jsx,tsx}"
+---
+
+Always use `const` for variables that are never reassigned.
+Use `let` only when reassignment is necessary. Never use `var`.
+```
+
+Add a hook [#add-a-hook]
+
+Create `my-plugin/hooks/hooks.json`:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${PLUGIN_ROOT}/scripts/lint.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Create the script:
+
+```bash
+mkdir -p my-plugin/scripts
+cat > my-plugin/scripts/lint.sh << 'EOF'
+#!/bin/bash
+FILE=$(jq -r '.tool_input.file_path // empty')
+if [ -n "$FILE" ] && [ -f "$FILE" ]; then
+  echo "Linting $FILE..." >&2
+fi
+EOF
+chmod +x my-plugin/scripts/lint.sh
+```
+
+Add an MCP server [#add-an-mcp-server]
+
+Create `my-plugin/.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "my-tools": {
+      "command": "npx",
+      "args": ["@my-org/mcp-server"],
+      "cwd": "${PLUGIN_ROOT}"
+    }
+  }
+}
+```
+
+Full plugin structure [#full-plugin-structure]
+
+After adding all components:
+
+```
+my-plugin/
+├── .plugin/
+│   └── plugin.json          # Manifest
+├── skills/
+│   └── hello/
+│       └── SKILL.md         # Agent skill
+├── agents/
+│   └── reviewer.md          # Sub-agent
+├── rules/
+│   └── prefer-const.mdc     # Coding standard
+├── hooks/
+│   └── hooks.json           # Event hooks
+├── scripts/
+│   └── lint.sh              # Hook script
+├── .mcp.json                # MCP servers
+└── README.md                # Documentation
+```
+
+Next steps [#next-steps]
+
+* [Specification](/plugin-builders/specification) — Full spec for all fields and behaviors
+* [Component specs](/agent-builders/components/skills) — Deep dive into each component type
+
+
+# Installation
+
+
+
+This document defines how plugins are installed, scoped, cached, and resolved by conformant tools.
+
+Installation Scopes [#installation-scopes]
+
+When a plugin is installed, it is associated with a **scope** that determines where it is available and who can use it.
+
+| Scope     | Typical Settings File                                | Use Case                                                       |
+| --------- | ---------------------------------------------------- | -------------------------------------------------------------- |
+| `user`    | `~/.config/<tool>/settings.json`                     | Personal plugins available across all projects. Default scope. |
+| `project` | `.config/<tool>/settings.json` in project root       | Team plugins shared via version control.                       |
+| `local`   | `.config/<tool>/settings.local.json` in project root | Project-specific plugins, not committed to version control.    |
+| `managed` | Managed by external tooling                          | Organization-managed plugins. Read-only for end users.         |
+
+Tools MUST support at least the `user` scope. Tools SHOULD support `project` and `local` scopes. The `managed` scope is OPTIONAL.
+
+Scope Precedence [#scope-precedence]
+
+When the same plugin is installed at multiple scopes, tools MUST apply the following precedence (highest to lowest):
+
+1. `local`
+2. `project`
+3. `managed`
+4. `user`
+
+A plugin disabled at a higher-precedence scope overrides it being enabled at a lower-precedence scope.
+
+Settings File Format [#settings-file-format]
+
+```json
+{
+  "enabledPlugins": [
+    "plugin-name",
+    "another-plugin"
+  ],
+  "disabledPlugins": [
+    "disabled-plugin"
+  ]
+}
+```
+
+Recommended Storage Paths [#recommended-storage-paths]
+
+Installed plugins SHOULD be stored in `.agents/plugins/` at the appropriate scope level.
+
+| Scope   | Recommended Path                                |
+| ------- | ----------------------------------------------- |
+| User    | `~/.agents/plugins/<plugin-name>/`              |
+| Project | `<project-root>/.agents/plugins/<plugin-name>/` |
+
+Plugin Caching [#plugin-caching]
+
+Tools SHOULD copy installed plugins to a local **plugin cache** rather than using them in-place.
+
+1. When a plugin is installed, the tool copies the plugin directory to the cache.
+2. Subsequent loads use the cached copy.
+3. The `version` field determines whether the cache is stale.
+4. Symlinks MUST be followed when copying to the cache.
+5. Paths containing `../` that escape the plugin root MUST be rejected.
+
+Plugin Resolution [#plugin-resolution]
+
+When loading plugins, tools resolve them in this order:
+
+1. **Direct directory** (`--plugin-dir`): Load directly, no caching. Used for development.
+2. **Cache**: Load from cache if up-to-date.
+3. **Source**: Copy to cache, then load from cache.
+
+Development Mode [#development-mode]
+
+```bash
+# Load a plugin in development
+<tool> --plugin-dir ./my-plugin
+```
+
+In development mode, the plugin is loaded directly — no caching, changes take effect on restart.
+
+Uninstallation [#uninstallation]
+
+When a plugin is uninstalled:
+
+1. It is removed from `enabledPlugins`.
+2. The cached copy MAY be deleted.
+3. Any running MCP or LSP servers MUST be stopped.
+
+Update Flow [#update-flow]
+
+1. The tool checks the source for a newer version.
+2. If newer, the cache is refreshed.
+3. Running servers MAY need to be restarted.
+
+
+# Marketplace
+
+
+
+A **marketplace** is a named collection of one or more plugins. It acts as an index: it declares which plugins are available, where they live, and basic metadata about each one.
+
+Marketplaces solve the multi-plugin distribution problem. A single GitHub repository can contain multiple plugins. The marketplace index tells tools what's inside without scanning the filesystem.
+
+Marketplace Index [#marketplace-index]
+
+The marketplace index is a `marketplace.json` file.
+
+Location [#location]
+
+Tools MUST check for the marketplace index in this order:
+
+| Path                                   | Priority                                |
+| -------------------------------------- | --------------------------------------- |
+| `marketplace.json`                     | First (root of repository or directory) |
+| `.plugin/marketplace.json`             | Second                                  |
+| `.<tool-name>-plugin/marketplace.json` | Third (vendor-specific)                 |
+
+Schema [#schema]
+
+```json
+{
+  "name": "my-marketplace",
+  "owner": {
+    "name": "Author or Organization"
+  },
+  "metadata": {
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "plugin-one",
+      "source": "./plugin-one/",
+      "description": "First plugin in the collection.",
+      "version": "1.0.0"
+    },
+    {
+      "name": "plugin-two",
+      "source": "./plugin-two/",
+      "description": "Second plugin in the collection.",
+      "version": "2.1.0"
+    }
+  ]
+}
+```
+
+Required Fields [#required-fields]
+
+| Field     | Type   | Description                                              |
+| --------- | ------ | -------------------------------------------------------- |
+| `name`    | string | Name of the marketplace.                                 |
+| `plugins` | array  | List of plugin entries. Must contain at least one entry. |
+
+Optional Fields [#optional-fields]
+
+| Field                 | Type   | Description                                                       |
+| --------------------- | ------ | ----------------------------------------------------------------- |
+| `owner`               | object | Author or organization (`name`, `email`, `url`).                  |
+| `metadata.pluginRoot` | string | Base path for resolving plugin `source` paths. Defaults to `"."`. |
+
+Plugin Entry Fields [#plugin-entry-fields]
+
+| Field         | Required | Type      | Description                                                                                |
+| ------------- | -------- | --------- | ------------------------------------------------------------------------------------------ |
+| `name`        | Yes      | string    | Plugin name (follows [name constraints](/plugin-builders/specification#name-constraints)). |
+| `source`      | Yes      | string    | Relative path to the plugin directory. Must start with `./`.                               |
+| `description` | No       | string    | Brief description. Overrides the plugin manifest's description for display.                |
+| `version`     | No       | string    | Semantic version. Overrides the manifest's version for update checks.                      |
+| `author`      | No       | object    | Author information.                                                                        |
+| `license`     | No       | string    | SPDX license identifier.                                                                   |
+| `keywords`    | No       | string\[] | Tags for discovery and search.                                                             |
+
+Multi-Plugin Repositories [#multi-plugin-repositories]
+
+```
+my-org-plugins/
+├── marketplace.json
+├── code-quality/
+│   ├── .plugin/plugin.json
+│   ├── skills/
+│   └── rules/
+├── deployment/
+│   ├── .plugin/plugin.json
+│   ├── skills/
+│   └── hooks/
+└── documentation/
+    ├── .plugin/plugin.json
+    ├── agents/
+    └── skills/
+```
+
+```json
+{
+  "name": "my-org-plugins",
+  "owner": { "name": "My Organization" },
+  "plugins": [
+    { "name": "code-quality", "source": "./code-quality/", "description": "Linting, review, and code standards." },
+    { "name": "deployment", "source": "./deployment/", "description": "Deploy workflows and automation." },
+    { "name": "documentation", "source": "./documentation/", "description": "Doc generation and maintenance." }
+  ]
+}
+```
+
+Using pluginRoot [#using-pluginroot]
+
+For repositories where plugins are nested under a subdirectory, use `metadata.pluginRoot`:
+
+```json
+{
+  "name": "my-repo",
+  "metadata": { "pluginRoot": "./plugins" },
+  "plugins": [
+    { "name": "plugin-a", "source": "./plugin-a/" },
+    { "name": "plugin-b", "source": "./plugin-b/" }
+  ]
+}
+```
+
+The `source` paths are resolved relative to `pluginRoot`, so `plugin-a` resolves to `./plugins/plugin-a/`.
+
+Discovery Without a Marketplace Index [#discovery-without-a-marketplace-index]
+
+If no `marketplace.json` is found, tools SHOULD fall back to filesystem-based discovery:
+
+1. Check if the root directory itself is a plugin.
+2. Scan immediate subdirectories (up to 2 levels deep) for plugin directories.
+
+
+# Specification
+
+
+
+**Spec Version: 1.0.0**
+
+This document defines the Open Plugin format — a standard for packaging agent extensions into distributable units.
+
+Overview [#overview]
+
+A **plugin** is a self-contained directory that bundles one or more components — skills, agents, rules, hooks, MCP servers, and LSP servers — into a single unit that agent tools can discover, install, and run.
+
+Plugins solve the distribution problem: instead of manually configuring individual skills, hooks, and servers, authors package them together with a manifest and users install them in one step.
+
+Plugin Directory Structure [#plugin-directory-structure]
+
+A plugin is a directory. At minimum, it contains one or more components in their default locations. An optional manifest provides metadata and custom component paths.
+
+Standard Layout [#standard-layout]
+
+```
+my-plugin/
+├── .plugin/                  # Metadata directory (optional)
+│   └── plugin.json             # Plugin manifest
+├── commands/                 # Slash-command skills (markdown files)
+├── agents/                   # Agent definitions (markdown files)
+├── skills/                   # Agent Skills (subdirectories with SKILL.md)
+├── rules/                    # Persistent AI rules (.mdc files)
+├── hooks/                    # Hook configurations
+│   └── hooks.json              # Main hook config
+├── .mcp.json                 # MCP server definitions
+├── .lsp.json                 # LSP server configurations
+├── scripts/                  # Hook and utility scripts
+├── assets/                   # Logos and static assets
+├── LICENSE                   # License file
+└── CHANGELOG.md              # Version history
+```
+
+Installed Plugin Location [#installed-plugin-location]
+
+When plugins are installed, they are stored in `.agents/plugins/`. See [Installation](/plugin-builders/installation#recommended-storage-paths) for details.
+
+```
+~/.agents/plugins/            # User-scope installed plugins
+<project>/.agents/plugins/    # Project-scope installed plugins
+```
+
+Directory Rules [#directory-rules]
+
+1. The metadata directory MUST contain only `plugin.json`. All component directories (commands, agents, skills, rules, hooks) MUST be at the plugin root, not inside the metadata directory.
+2. All paths within a plugin MUST be relative to the plugin root.
+3. All relative paths MUST start with `./`.
+4. A plugin MUST NOT reference files outside its own directory tree via `../` traversal.
+
+Plugin Manifest [#plugin-manifest]
+
+The manifest file is a `plugin.json` inside a metadata directory at the plugin root. It defines the plugin's metadata and configuration.
+
+Manifest Location [#manifest-location]
+
+Tools MUST check for the manifest in a metadata directory named with the pattern `.<tool-name>-plugin/plugin.json` or `.plugin/plugin.json`. The vendor-neutral path `.plugin/plugin.json` is RECOMMENDED for new plugins targeting multiple tools.
+
+For cross-tool compatibility, plugin authors MAY provide the manifest in multiple locations:
+
+| Path                         | Tool                         |
+| ---------------------------- | ---------------------------- |
+| `.plugin/plugin.json`        | Vendor-neutral (recommended) |
+| `.claude-plugin/plugin.json` | Claude Code                  |
+| `.cursor-plugin/plugin.json` | Cursor                       |
+
+When multiple manifest locations exist, the tool SHOULD prefer its own vendor-prefixed directory, then fall back to `.plugin/plugin.json`.
+
+Manifest Presence [#manifest-presence]
+
+The manifest is OPTIONAL. If omitted:
+
+* The plugin name is derived from the directory name
+* Components are discovered in their default locations only
+* No version, author, or other metadata is available
+
+If present, `name` is the only REQUIRED field.
+
+Schema [#schema]
+
+```json
+{
+  "name": "plugin-name",
+  "version": "1.2.0",
+  "description": "Brief plugin description",
+  "author": {
+    "name": "Author Name",
+    "email": "author@example.com",
+    "url": "https://github.com/author"
+  },
+  "homepage": "https://docs.example.com/plugin",
+  "repository": "https://github.com/author/plugin",
+  "license": "MIT",
+  "logo": "assets/logo.svg",
+  "keywords": ["keyword1", "keyword2"],
+  "commands": ["./custom/commands/special.md"],
+  "agents": "./custom/agents/",
+  "skills": "./custom/skills/",
+  "rules": "./custom/rules/",
+  "hooks": "./config/hooks.json",
+  "mcpServers": "./mcp-config.json",
+  "lspServers": "./.lsp.json",
+  "outputStyles": "./styles/"
+}
+```
+
+Required Fields [#required-fields]
+
+| Field  | Type   | Constraints                                                                                                                                                          | Description                                         |
+| ------ | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| `name` | string | 1-64 chars. Lowercase alphanumeric, hyphens, and periods (`a-z`, `0-9`, `-`, `.`). Must start and end with an alphanumeric character. Must not contain `--` or `..`. | Unique identifier. Used for namespacing components. |
+
+Metadata Fields [#metadata-fields]
+
+All metadata fields are OPTIONAL.
+
+| Field         | Type      | Description                                                                                     |
+| ------------- | --------- | ----------------------------------------------------------------------------------------------- |
+| `version`     | string    | Semantic version (e.g., `"2.1.0"`). Used by tools to determine update availability.             |
+| `description` | string    | Brief explanation of plugin purpose.                                                            |
+| `author`      | object    | Author information: `name` (string), `email` (string), `url` (string). All sub-fields optional. |
+| `homepage`    | string    | URL to documentation or landing page.                                                           |
+| `repository`  | string    | URL to source code repository.                                                                  |
+| `license`     | string    | SPDX license identifier (e.g., `"MIT"`, `"Apache-2.0"`).                                        |
+| `logo`        | string    | Relative path to a logo file in the plugin (e.g., `"assets/logo.svg"`), or an absolute URL.     |
+| `keywords`    | string\[] | Tags for discovery and search.                                                                  |
+
+Component Path Fields [#component-path-fields]
+
+Component path fields specify additional locations for components. By default, custom paths **supplement** default directories — they do not replace them. If a `commands/` directory exists at the plugin root, it is always loaded regardless of whether `commands` appears in the manifest.
+
+Tools MAY support an `exclusive` option that replaces default discovery instead of supplementing it:
+
+```json
+{
+  "skills": { "paths": ["./custom-skills/"], "exclusive": true }
+}
+```
+
+| Field          | Type                          | Description                                     |
+| -------------- | ----------------------------- | ----------------------------------------------- |
+| `commands`     | string \| string\[] \| object | Additional command files or directories.        |
+| `agents`       | string \| string\[] \| object | Additional agent files or directories.          |
+| `skills`       | string \| string\[] \| object | Additional skill directories.                   |
+| `rules`        | string \| string\[] \| object | Additional rule files or directories.           |
+| `hooks`        | string \| string\[] \| object | Hook config paths or inline hook configuration. |
+| `mcpServers`   | string \| string\[] \| object | MCP config paths or inline MCP configuration.   |
+| `lspServers`   | string \| string\[] \| object | LSP config paths or inline LSP configuration.   |
+| `outputStyles` | string \| string\[]           | Additional output style files or directories.   |
+
+Name Constraints [#name-constraints]
+
+The `name` field:
+
+* MUST be 1-64 characters
+* MUST contain only lowercase alphanumeric characters, hyphens, and periods (`a-z`, `0-9`, `-`, `.`)
+* MUST start and end with an alphanumeric character
+* MUST NOT contain consecutive hyphens (`--`) or consecutive periods (`..`)
+
+Valid: `deployment-tools`, `code-reviewer`, `my-plugin`, `prompts.chat`
+Invalid: `My-Plugin`, `-tools`, `tools-`, `my--plugin`, `my..plugin`, `.plugin`
+
+Component Discovery [#component-discovery]
+
+Tools implementing this spec MUST discover components in the following default locations, in addition to any custom paths declared in the manifest (unless `exclusive` mode is used):
+
+| Component   | Default Location   | File Pattern                         |
+| ----------- | ------------------ | ------------------------------------ |
+| Commands    | `commands/`        | `.md` files                          |
+| Agents      | `agents/`          | `.md` files with frontmatter         |
+| Skills      | `skills/`          | Subdirectories containing `SKILL.md` |
+| Rules       | `rules/`           | `.mdc` files                         |
+| Hooks       | `hooks/hooks.json` | JSON configuration                   |
+| MCP Servers | `.mcp.json`        | JSON configuration                   |
+| LSP Servers | `.lsp.json`        | JSON configuration                   |
+
+If a default location does not exist, the tool MUST NOT treat this as an error.
+
+Root SKILL.md [#root-skillmd]
+
+If a plugin has no `skills/` directory and no `skills` field in the manifest, tools MAY treat a `SKILL.md` file at the plugin root as a single-skill plugin.
+
+Component Namespacing [#component-namespacing]
+
+All components provided by a plugin MUST be namespaced: `{plugin-name}:{component-name}`
+
+For example, a plugin named `deploy-tools` with a command `status` produces `/deploy-tools:status`.
+
+Environment Variables [#environment-variables]
+
+Tools MUST provide `PLUGIN_ROOT` (or a vendor-prefixed equivalent) as an environment variable and expand `${PLUGIN_ROOT}` in configuration files at load time.
+
+| Variable / Placeholder                         | Tool           |
+| ---------------------------------------------- | -------------- |
+| `PLUGIN_ROOT` / `${PLUGIN_ROOT}`               | Vendor-neutral |
+| `CLAUDE_PLUGIN_ROOT` / `${CLAUDE_PLUGIN_ROOT}` | Claude Code    |
+
+Version Management [#version-management]
+
+Plugins SHOULD use [Semantic Versioning](https://semver.org/). Tools use the version to determine whether a plugin update is available.
+
+Conformance [#conformance]
+
+A tool is a **conformant plugin host** if it:
+
+1. Can discover and load plugins from a directory
+2. Parses `.plugin/plugin.json` when present
+3. Discovers components in default locations
+4. Expands `${PLUGIN_ROOT}` in configuration values
+5. Namespaces plugin components to prevent conflicts
+6. Supports at least one component type
+
+Tools MUST ignore component types they do not support.
+
+Component Specifications [#component-specifications]
+
+Each component type has its own specification:
+
+* [Skills](/agent-builders/components/skills)
+* [Agents](/agent-builders/components/agents)
+* [Rules](/agent-builders/components/rules)
+* [Hooks](/agent-builders/components/hooks)
+* [MCP Servers](/agent-builders/components/mcp-servers)
+* [LSP Servers](/agent-builders/components/lsp-servers)
+
+See Also [#see-also]
+
+* [Marketplace](/plugin-builders/marketplace) — Grouping multiple plugins into a collection
+* [Installation](/plugin-builders/installation) — Scopes, caching, and resolution
+
+
+# Agents
+
+
+
+Agents are specialized sub-agents that a plugin provides for specific tasks. The host tool can invoke them automatically based on task context, or users can invoke them manually.
+
+File Format [#file-format]
+
+Agent definitions are markdown files with YAML frontmatter.
+
+```markdown
+---
+name: security-reviewer
+description: Reviews code for security vulnerabilities, OWASP issues, and unsafe patterns.
+---
+
+You are a security review specialist. When reviewing code:
+
+1. Check for injection vulnerabilities (SQL, XSS, command injection)
+2. Review authentication and authorization logic
+3. Identify insecure data handling (hardcoded secrets, unencrypted storage)
+4. Check dependency versions against known CVE databases
+5. Flag unsafe deserialization or file operations
+
+Always provide specific line references and severity ratings (critical, high, medium, low).
+```
+
+Frontmatter Schema [#frontmatter-schema]
+
+| Field         | Required | Type   | Constraints             | Description                                          |
+| ------------- | -------- | ------ | ----------------------- | ---------------------------------------------------- |
+| `name`        | Yes      | string | 1-64 chars, kebab-case. | Agent identifier. Must be unique within the plugin.  |
+| `description` | Yes      | string | Max 1024 chars.         | What the agent specializes in and when to invoke it. |
+
+The `description` field serves two purposes: **discovery** (displayed when browsing agents) and **auto-invocation** (used to match tasks to agents). Include specific task keywords.
+
+Body Content [#body-content]
+
+The markdown body is the agent's **system prompt**, injected into context when invoked. Include role description, methodology, output format, and edge cases.
+
+Location and Discovery [#location-and-discovery]
+
+Agent files go in `agents/` at the plugin root. Each `.md` file with valid frontmatter is registered.
+
+Namespacing [#namespacing]
+
+| Plugin Name    | Agent File                    | Namespaced Name                  |
+| -------------- | ----------------------------- | -------------------------------- |
+| `code-quality` | `agents/security-reviewer.md` | `code-quality:security-reviewer` |
+
+Integration Behavior [#integration-behavior]
+
+* Tools SHOULD present available agents to users.
+* Tools SHOULD allow automatic invocation when task context matches.
+* Tools SHOULD allow manual invocation.
+* When invoked, the tool SHOULD create a sub-agent context using the body as the system prompt.
+
+
+# Hooks
+
+
+
+Hooks are event handlers that respond to lifecycle events in the agent tool. They enable plugins to automate actions like formatting code after edits, running linters, validating outputs, or enforcing policies.
+
+Configuration Format [#configuration-format]
+
+Hooks are configured in `hooks/hooks.json` at the plugin root.
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${PLUGIN_ROOT}/scripts/format-code.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Hook Rules [#hook-rules]
+
+A hook rule matches events and dispatches to one or more hook actions.
+
+| Field     | Required | Type          | Description                                             |
+| --------- | -------- | ------------- | ------------------------------------------------------- |
+| `matcher` | No       | string        | Regex pattern to filter events. Matches all if omitted. |
+| `hooks`   | Yes      | HookAction\[] | Actions to execute when the rule matches.               |
+
+The `matcher` tests against event-specific context: tool name for tool events, file path for file events, command string for shell events.
+
+Core Events [#core-events]
+
+| Event                | When It Fires                     | Matcher Context |
+| -------------------- | --------------------------------- | --------------- |
+| `PreToolUse`         | Before the agent uses a tool      | Tool name       |
+| `PostToolUse`        | After a tool is used successfully | Tool name       |
+| `PostToolUseFailure` | After a tool use fails            | Tool name       |
+| `SessionStart`       | At the beginning of a session     | —               |
+| `SessionEnd`         | At the end of a session           | —               |
+
+Extended Events [#extended-events]
+
+| Event                            | When It Fires                     | Matcher Context |
+| -------------------------------- | --------------------------------- | --------------- |
+| `BeforeReadFile`                 | Before reading a file             | File path       |
+| `AfterFileEdit`                  | After a file is written or edited | File path       |
+| `BeforeShellExecution`           | Before executing a shell command  | Command string  |
+| `AfterShellExecution`            | After a shell command completes   | Command string  |
+| `UserPromptSubmit`               | When the user submits a prompt    | —               |
+| `Stop`                           | When the agent attempts to stop   | —               |
+| `SubagentStart` / `SubagentStop` | Sub-agent lifecycle               | —               |
+
+Tools MUST ignore event names they do not recognize.
+
+Hook Action Types [#hook-action-types]
+
+command [#command]
+
+```json
+{ "type": "command", "command": "${PLUGIN_ROOT}/scripts/lint.sh" }
+```
+
+Receives event context as JSON on **stdin**. Exit code 0 = success.
+
+prompt [#prompt]
+
+```json
+{ "type": "prompt", "prompt": "Review the following change for security issues: $ARGUMENTS" }
+```
+
+Sends the prompt to the LLM. `$ARGUMENTS` is replaced with event context.
+
+agent [#agent]
+
+```json
+{ "type": "agent", "prompt": "Verify the code changes follow the style guide." }
+```
+
+Like `prompt`, but with tool access for multi-step verification.
+
+Script Requirements [#script-requirements]
+
+Hook scripts MUST be executable, include a shebang line, and use `${PLUGIN_ROOT}` for internal paths. Exit 0 on success, write errors to stderr.
+
+Execution Model [#execution-model]
+
+* Multiple rules MAY match the same event. All are executed.
+* Within a rule, hooks execute in array order.
+* Tools SHOULD enforce timeouts. Failures MUST NOT crash the host tool.
+
+
+# LSP Servers
+
+
+
+Plugins can provide [Language Server Protocol](https://microsoft.github.io/language-server-protocol/) (LSP) server configurations to give agents real-time code intelligence — diagnostics, go-to-definition, find references, and hover information.
+
+Important: Binary Not Bundled [#important-binary-not-bundled]
+
+LSP plugins configure how the host tool connects to a language server. They do **not** bundle the language server binary itself. Users MUST install the required language server separately.
+
+Configuration Format [#configuration-format]
+
+LSP servers are configured in `.lsp.json` at the plugin root.
+
+```json
+{
+  "go": {
+    "command": "gopls",
+    "args": ["serve"],
+    "extensionToLanguage": {
+      ".go": "go"
+    }
+  },
+  "python": {
+    "command": "pyright-langserver",
+    "args": ["--stdio"],
+    "extensionToLanguage": {
+      ".py": "python",
+      ".pyi": "python"
+    }
+  }
+}
+```
+
+Note: unlike MCP servers, the top-level object does not have a wrapping key. The keys are the server names directly.
+
+Server Configuration Schema [#server-configuration-schema]
+
+Required Fields [#required-fields]
+
+| Field                 | Required | Type   | Description                                              |
+| --------------------- | -------- | ------ | -------------------------------------------------------- |
+| `command`             | Yes      | string | The LSP binary to execute. Must be on `$PATH`.           |
+| `extensionToLanguage` | Yes      | object | Maps file extensions (with dot) to language identifiers. |
+
+Optional Fields [#optional-fields]
+
+| Field                   | Type                    | Default   | Description                                      |
+| ----------------------- | ----------------------- | --------- | ------------------------------------------------ |
+| `args`                  | string\[]               | `[]`      | Command-line arguments.                          |
+| `transport`             | `"stdio"` \| `"socket"` | `"stdio"` | Communication transport.                         |
+| `env`                   | object                  | `{}`      | Environment variables.                           |
+| `initializationOptions` | object                  | `{}`      | LSP initialization options.                      |
+| `settings`              | object                  | `{}`      | Settings via `workspace/didChangeConfiguration`. |
+| `restartOnCrash`        | boolean                 | `false`   | Auto-restart on crash.                           |
+| `maxRestarts`           | number                  | —         | Max restart attempts.                            |
+
+Capabilities [#capabilities]
+
+| Capability       | LSP Method                        | Description                        |
+| ---------------- | --------------------------------- | ---------------------------------- |
+| Diagnostics      | `textDocument/publishDiagnostics` | Errors and warnings after edits    |
+| Go to definition | `textDocument/definition`         | Navigate to symbol definitions     |
+| Find references  | `textDocument/references`         | Find all usages of a symbol        |
+| Hover            | `textDocument/hover`              | Type information and documentation |
+
+Lifecycle [#lifecycle]
+
+* LSP servers MUST start when the plugin is enabled and matching files are present.
+* LSP servers MUST stop when the plugin is disabled or the session ends.
+* If the binary is not found, the tool MUST log a clear error and continue.
+
+Compatibility [#compatibility]
+
+This spec does not redefine the Language Server Protocol. Plugin LSP servers MUST communicate using the [LSP specification](https://microsoft.github.io/language-server-protocol/specifications/specification-current/).
+
+
+# MCP Servers
+
+
+
+Plugins can bundle [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) servers to provide the agent with additional tools and data sources.
+
+Configuration Format [#configuration-format]
+
+MCP servers are configured in `.mcp.json` at the plugin root.
+
+```json
+{
+  "mcpServers": {
+    "plugin-database": {
+      "command": "${PLUGIN_ROOT}/servers/db-server",
+      "args": ["--config", "${PLUGIN_ROOT}/config.json"],
+      "env": {
+        "DB_PATH": "${PLUGIN_ROOT}/data"
+      }
+    },
+    "plugin-api": {
+      "command": "npx",
+      "args": ["@company/mcp-server", "--plugin-mode"],
+      "cwd": "${PLUGIN_ROOT}"
+    }
+  }
+}
+```
+
+Server Configuration Schema [#server-configuration-schema]
+
+| Field     | Required | Type      | Description                                             |
+| --------- | -------- | --------- | ------------------------------------------------------- |
+| `command` | Yes      | string    | The executable to run. Supports `${PLUGIN_ROOT}`.       |
+| `args`    | No       | string\[] | Command-line arguments. `${PLUGIN_ROOT}` is expanded.   |
+| `env`     | No       | object    | Environment variables. Values support `${PLUGIN_ROOT}`. |
+| `cwd`     | No       | string    | Working directory. Supports `${PLUGIN_ROOT}`.           |
+
+Lifecycle [#lifecycle]
+
+* MCP servers MUST start automatically when the plugin is enabled.
+* MCP servers MUST stop when the plugin is disabled or the session ends.
+* If a server fails to start, the tool SHOULD log the error and continue.
+
+Discovery [#discovery]
+
+Tools MUST discover MCP server configurations in:
+
+1. `.mcp.json` at the plugin root
+2. Inline in the manifest's `mcpServers` field
+3. Any additional paths declared in the manifest
+
+Compatibility [#compatibility]
+
+This spec does not redefine the MCP protocol. Plugin MCP servers MUST implement the [Model Context Protocol](https://modelcontextprotocol.io/) as specified by that project.
+
+
+# Rules
+
+
+
+Rules provide persistent AI guidance — coding standards, best practices, and constraints that the agent follows throughout a session. Unlike skills (which activate on demand), rules are always present in the agent's context.
+
+File Format [#file-format]
+
+Rule files are markdown with YAML frontmatter, using the `.mdc` extension.
+
+```markdown
+---
+description: Prefer const over let. Never use var.
+alwaysApply: true
+globs: "**/*.{js,ts,jsx,tsx}"
+---
+
+Always use `const` for variables that are never reassigned.
+Use `let` only when reassignment is necessary. Never use `var`.
+```
+
+Frontmatter Schema [#frontmatter-schema]
+
+| Field         | Required | Type                | Description                                    |
+| ------------- | -------- | ------------------- | ---------------------------------------------- |
+| `description` | Yes      | string              | What the rule enforces.                        |
+| `alwaysApply` | No       | boolean             | If `true`, always active. Defaults to `false`. |
+| `globs`       | No       | string \| string\[] | File patterns the rule applies to.             |
+
+Activation Modes [#activation-modes]
+
+| `alwaysApply`     | `globs` | Behavior                                            |
+| ----------------- | ------- | --------------------------------------------------- |
+| `true`            | not set | Always active for everything                        |
+| `true`            | set     | Always active for matching files                    |
+| `false` / omitted | not set | Available; agent or user decides                    |
+| `false` / omitted | set     | Available for matching files; agent or user decides |
+
+Body Content [#body-content]
+
+The body is injected into context when the rule is active. Keep rule bodies under 500 tokens — they may be present for the entire session.
+
+Location and Discovery [#location-and-discovery]
+
+Rule files go in `rules/` at the plugin root (`.mdc` files).
+
+Namespacing [#namespacing]
+
+| Plugin Name      | Rule File                | Namespaced Name               |
+| ---------------- | ------------------------ | ----------------------------- |
+| `code-standards` | `rules/prefer-const.mdc` | `code-standards:prefer-const` |
+
+Integration Behavior [#integration-behavior]
+
+* Rules with `alwaysApply: true` SHOULD be loaded automatically.
+* When `globs` is specified, rules SHOULD only be active for matching files.
+* Tools that do not support rules MUST ignore the `rules/` directory.
+
+
+# Skills
+
+
+
+Skills provide slash-command shortcuts and agent-invocable capabilities within a plugin.
+
+Both skill formats described below are fundamentally the same mechanism: markdown instructions loaded into the agent's context when invoked. The two formats differ only in packaging complexity — command skills are flat markdown files, while agent skills are directories that can bundle supporting scripts, references, and assets alongside their instructions.
+
+Relationship to Agent Skills [#relationship-to-agent-skills]
+
+The skill file format follows the [Agent Skills](https://agentskills.io) specification. This document describes how skills are discovered, namespaced, and loaded within the plugin context. For the `SKILL.md` file format itself — frontmatter fields, body content, optional directories — refer to the [Agent Skills Specification](https://agentskills.io/specification).
+
+Skill Types [#skill-types]
+
+Agent Skills (skills/ directory) [#agent-skills-skills-directory]
+
+Agent Skills are directories containing a `SKILL.md` file following the [Agent Skills](https://agentskills.io) format. These are the RECOMMENDED format for new skills.
+
+```
+my-plugin/
+└── skills/
+    ├── code-review/
+    │   ├── SKILL.md
+    │   ├── scripts/        # Optional
+    │   └── references/     # Optional
+    └── pdf-processor/
+        ├── SKILL.md
+        └── scripts/
+```
+
+Each subdirectory of `skills/` that contains a `SKILL.md` file is treated as a skill. The directory name MUST match the `name` field in the `SKILL.md` frontmatter.
+
+Command Skills (commands/ directory) [#command-skills-commands-directory]
+
+Command skills are simple markdown files that define slash commands — a flatter format for commands that don't need supporting files.
+
+```
+my-plugin/
+└── commands/
+    ├── deploy.md
+    └── status.md
+```
+
+Command File Format [#command-file-format]
+
+```markdown
+---
+description: Deploy the current project to staging
+---
+
+Deploy the project to the staging environment. Use "$ARGUMENTS" as the deployment target if provided.
+```
+
+| Frontmatter Field          | Required    | Description                                                            |
+| -------------------------- | ----------- | ---------------------------------------------------------------------- |
+| `description`              | RECOMMENDED | Short description for help text and auto-invocation matching.          |
+| `disable-model-invocation` | No          | If `true`, only the user can invoke this command. Defaults to `false`. |
+
+The placeholder `$ARGUMENTS` is replaced with any text after the command name (e.g., `/my-plugin:deploy production`).
+
+Discovery [#discovery]
+
+Tools MUST discover skills in:
+
+1. `skills/` at the plugin root — each subdirectory containing `SKILL.md`
+2. `commands/` at the plugin root — each `.md` file
+3. Any additional paths declared in the manifest
+
+Namespacing [#namespacing]
+
+| Plugin Name    | Skill Directory/File | User-Facing Name       |
+| -------------- | -------------------- | ---------------------- |
+| `deploy-tools` | `skills/deploy/`     | `/deploy-tools:deploy` |
+| `deploy-tools` | `commands/status.md` | `/deploy-tools:status` |
+
+Progressive Disclosure [#progressive-disclosure]
+
+1. **Metadata** (\~100 tokens): `name` and `description` loaded at startup for matching.
+2. **Instructions** (recommended \< 5000 tokens): Full body loaded when activated.
+3. **Resources** (as needed): Supporting files loaded during execution.
+
+Root SKILL.md [#root-skillmd]
+
+If a plugin has no `skills/` directory and no `skills` field in the manifest, tools MAY treat a `SKILL.md` at the plugin root as a single-skill plugin.
+
+Integration Behavior [#integration-behavior]
+
+* Skills MUST be automatically discovered when the plugin is installed.
+* Tools SHOULD present skills to the agent for automatic invocation based on task context.
+* Skills MAY include supporting files alongside `SKILL.md`.

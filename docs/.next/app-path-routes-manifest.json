@@ -1,0 +1,10 @@
+{
+  "/(docs)/[[...slug]]/page": "/[[...slug]]",
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/api/search/route": "/api/search",
+  "/llms-full.txt/route": "/llms-full.txt",
+  "/llms.mdx/[[...slug]]/route": "/llms.mdx/[[...slug]]",
+  "/llms.txt/route": "/llms.txt",
+  "/og/[...slug]/route": "/og/[...slug]"
+}

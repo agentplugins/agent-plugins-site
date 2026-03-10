@@ -1,0 +1,75 @@
+# LSP Servers
+
+
+
+Plugins can provide [Language Server Protocol](https://microsoft.github.io/language-server-protocol/) (LSP) server configurations to give agents real-time code intelligence — diagnostics, go-to-definition, find references, and hover information.
+
+Important: Binary Not Bundled [#important-binary-not-bundled]
+
+LSP plugins configure how the host tool connects to a language server. They do **not** bundle the language server binary itself. Users MUST install the required language server separately.
+
+Configuration Format [#configuration-format]
+
+LSP servers are configured in `.lsp.json` at the plugin root.
+
+```json
+{
+  "go": {
+    "command": "gopls",
+    "args": ["serve"],
+    "extensionToLanguage": {
+      ".go": "go"
+    }
+  },
+  "python": {
+    "command": "pyright-langserver",
+    "args": ["--stdio"],
+    "extensionToLanguage": {
+      ".py": "python",
+      ".pyi": "python"
+    }
+  }
+}
+```
+
+Note: unlike MCP servers, the top-level object does not have a wrapping key. The keys are the server names directly.
+
+Server Configuration Schema [#server-configuration-schema]
+
+Required Fields [#required-fields]
+
+| Field                 | Required | Type   | Description                                              |
+| --------------------- | -------- | ------ | -------------------------------------------------------- |
+| `command`             | Yes      | string | The LSP binary to execute. Must be on `$PATH`.           |
+| `extensionToLanguage` | Yes      | object | Maps file extensions (with dot) to language identifiers. |
+
+Optional Fields [#optional-fields]
+
+| Field                   | Type                    | Default   | Description                                      |
+| ----------------------- | ----------------------- | --------- | ------------------------------------------------ |
+| `args`                  | string\[]               | `[]`      | Command-line arguments.                          |
+| `transport`             | `"stdio"` \| `"socket"` | `"stdio"` | Communication transport.                         |
+| `env`                   | object                  | `{}`      | Environment variables.                           |
+| `initializationOptions` | object                  | `{}`      | LSP initialization options.                      |
+| `settings`              | object                  | `{}`      | Settings via `workspace/didChangeConfiguration`. |
+| `restartOnCrash`        | boolean                 | `false`   | Auto-restart on crash.                           |
+| `maxRestarts`           | number                  | —         | Max restart attempts.                            |
+
+Capabilities [#capabilities]
+
+| Capability       | LSP Method                        | Description                        |
+| ---------------- | --------------------------------- | ---------------------------------- |
+| Diagnostics      | `textDocument/publishDiagnostics` | Errors and warnings after edits    |
+| Go to definition | `textDocument/definition`         | Navigate to symbol definitions     |
+| Find references  | `textDocument/references`         | Find all usages of a symbol        |
+| Hover            | `textDocument/hover`              | Type information and documentation |
+
+Lifecycle [#lifecycle]
+
+* LSP servers MUST start when the plugin is enabled and matching files are present.
+* LSP servers MUST stop when the plugin is disabled or the session ends.
+* If the binary is not found, the tool MUST log a clear error and continue.
+
+Compatibility [#compatibility]
+
+This spec does not redefine the Language Server Protocol. Plugin LSP servers MUST communicate using the [LSP specification](https://microsoft.github.io/language-server-protocol/specifications/specification-current/).
