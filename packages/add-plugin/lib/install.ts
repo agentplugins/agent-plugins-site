@@ -18,7 +18,29 @@ import type { DiscoveredPlugin } from "./discover.js";
 import type { Target } from "./targets.js";
 
 /**
+ * Map from target id to the underlying installer key.
+ * Targets that share the same installer (e.g. claude-code and cursor both use
+ * the Claude Code CLI) map to the same key so we can deduplicate.
+ */
+function installerKey(targetId: string): string {
+  switch (targetId) {
+    case "claude-code":
+    case "cursor":
+      return "claude-code";
+    default:
+      return targetId;
+  }
+}
+
+/** Track which installers have already run to avoid duplicate work. */
+const completedInstallers = new Set<string>();
+
+/**
  * Install discovered plugins into a target tool.
+ *
+ * When multiple targets share the same underlying installer (e.g. claude-code
+ * and cursor both install via the Claude Code CLI), the installation is only
+ * performed once.
  */
 export async function installPlugins(
   plugins: DiscoveredPlugin[],
@@ -27,9 +49,14 @@ export async function installPlugins(
   repoPath: string,
   source: string,
 ): Promise<void> {
-  switch (target.id) {
+  const key = installerKey(target.id);
+
+  if (completedInstallers.has(key)) {
+    return;
+  }
+
+  switch (key) {
     case "claude-code":
-    case "cursor":
       // Both Claude Code and Cursor use the Claude Code plugin system.
       // Cursor discovers "Imported" plugins by reading from the Claude Code
       // plugin cache (~/.claude/plugins/cache/), so both targets install
@@ -39,6 +66,8 @@ export async function installPlugins(
     default:
       throw new Error(`Unsupported target: ${target.id}`);
   }
+
+  completedInstallers.add(key);
 }
 
 // ---------------------------------------------------------------------------
@@ -68,20 +97,34 @@ async function installToClaudeCode(
   await prepareForClaudeCode(plugins, repoPath, marketplaceName);
 
   // 2. Add the marketplace from the local path
+  const claudePath = findClaude();
   console.log(`Adding marketplace from local path: ${repoPath}`);
+  console.log(`  Using claude binary: ${claudePath}`);
   try {
-    execSync(`claude plugin marketplace add ${repoPath}`, {
+    const version = execSync(`${claudePath} --version`, { encoding: "utf-8", stdio: "pipe" }).trim();
+    console.log(`  Claude Code version: ${version}`);
+  } catch {
+    console.log(`  Warning: could not get claude version`);
+  }
+
+  try {
+    const result = execSync(`${claudePath} plugin marketplace add ${repoPath}`, {
       encoding: "utf-8",
       stdio: "pipe",
     });
     console.log("  Marketplace added.");
+    if (result.trim()) console.log(`  Output: ${result.trim()}`);
   } catch (err: any) {
     const stderr = err.stderr?.toString().trim() ?? "";
     const stdout = err.stdout?.toString().trim() ?? "";
     if (stderr.includes("already") || stdout.includes("already")) {
       console.log("  Marketplace already registered.");
     } else {
-      console.error(`Failed to add marketplace: ${stderr || stdout}`);
+      console.error(`Failed to add marketplace.`);
+      console.error(`  Command: ${claudePath} plugin marketplace add ${repoPath}`);
+      console.error(`  stdout: ${stdout}`);
+      console.error(`  stderr: ${stderr}`);
+      console.error(`  exit code: ${err.status}`);
       process.exit(1);
     }
   }
@@ -92,7 +135,7 @@ async function installToClaudeCode(
     console.log(`\nInstalling ${pluginRef}...`);
 
     try {
-      execSync(`claude plugin install ${pluginRef} --scope ${scope}`, {
+      execSync(`${claudePath} plugin install ${pluginRef} --scope ${scope}`, {
         encoding: "utf-8",
         stdio: "pipe",
       });
@@ -103,7 +146,11 @@ async function installToClaudeCode(
       if (stderr.includes("already") || stdout.includes("already")) {
         console.log(`  Already installed.`);
       } else {
-        console.error(`  Failed: ${stderr || stdout}`);
+        console.error(`  Failed to install ${pluginRef}.`);
+        console.error(`  Command: ${claudePath} plugin install ${pluginRef} --scope ${scope}`);
+        console.error(`  stdout: ${stdout}`);
+        console.error(`  stderr: ${stderr}`);
+        console.error(`  exit code: ${err.status}`);
       }
     }
   }
@@ -147,6 +194,39 @@ async function prepareForClaudeCode(
   for (const plugin of plugins) {
     await preparePluginDirForVendor(plugin, ".claude-plugin", "CLAUDE_PLUGIN_ROOT");
   }
+}
+
+// ---------------------------------------------------------------------------
+// Claude CLI resolution
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the claude binary, preferring the newest version if multiple exist.
+ * Returns the full path to avoid PATH-order issues across shell environments.
+ */
+function findClaude(): string {
+  // Try `which` first to find the default
+  try {
+    const path = execSync("which claude", { encoding: "utf-8", stdio: "pipe" }).trim();
+    if (path) return path;
+  } catch {
+    // not found via which
+  }
+
+  // Common install locations as fallback
+  const home = homedir();
+  const candidates = [
+    join(home, ".local", "bin", "claude"),
+    join(home, ".bun", "bin", "claude"),
+    "/usr/local/bin/claude",
+  ];
+
+  for (const candidate of candidates) {
+    if (existsSync(candidate)) return candidate;
+  }
+
+  // Last resort — just use bare "claude" and let the shell resolve it
+  return "claude";
 }
 
 // ---------------------------------------------------------------------------
