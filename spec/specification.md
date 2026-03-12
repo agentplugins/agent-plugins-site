@@ -65,6 +65,7 @@ For cross-tool compatibility, plugin authors MAY provide the manifest in multipl
 | `.plugin/plugin.json` | Vendor-neutral (recommended) |
 | `.claude-plugin/plugin.json` | Claude Code |
 | `.cursor-plugin/plugin.json` | Cursor |
+| `.github/plugin/plugin.json` | GitHub Copilot |
 
 When multiple manifest locations exist, the tool SHOULD prefer its own vendor-prefixed directory, then fall back to `.plugin/plugin.json`.
 

@@ -22,7 +22,7 @@ Tools MUST check for the marketplace index in the following locations, in order:
 |---|---|
 | `marketplace.json` | First (root of repository or directory) |
 | `.plugin/marketplace.json` | Second |
-| `.<tool-name>-plugin/marketplace.json` | Third (vendor-specific) |
+| `.<tool-name>-plugin/marketplace.json`/`.github/plugin/marketplace.json` | Third (vendor-specific) |
 
 The first match wins. If no marketplace index is found, the tool falls back to plugin-level discovery (scanning for `plugin.json` manifests and default component directories).
 
