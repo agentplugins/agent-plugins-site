@@ -10,6 +10,7 @@
 import { join } from "path";
 import { readFile, readdir, stat } from "fs/promises";
 import { existsSync } from "fs";
+import { c, barLine, S } from "./ui.js";
 
 export interface DiscoveredPlugin {
   /** Plugin name from manifest or marketplace entry */
@@ -126,7 +127,7 @@ async function discoverFromMarketplace(
     const sourcePath = join(repoPath, root, entry.source.replace(/^\.\//, ""));
 
     if (!(await dirExists(sourcePath))) {
-      console.warn(`  Warning: plugin source not found: ${entry.source}`);
+      barLine(`${c.yellow(S.warning)}  ${c.yellow(`Plugin source not found: ${entry.source}`)}`);
       continue;
     }
 

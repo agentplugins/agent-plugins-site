@@ -16,6 +16,7 @@ import { execSync } from "child_process";
 import { homedir } from "os";
 import type { DiscoveredPlugin } from "./discover.js";
 import type { Target } from "./targets.js";
+import { c, step, stepDone, stepError, barLine, barEmpty } from "./ui.js";
 
 /**
  * Map from target id to the underlying installer key.
@@ -93,18 +94,19 @@ async function installToClaudeCode(
   const marketplaceName = plugins[0]?.marketplace ?? deriveMarketplaceName(source);
 
   // 1. Prepare the repo directory for Claude Code
-  console.log("\nPreparing plugins for Claude Code...");
+  step("Preparing plugins for Claude Code...");
+  barEmpty();
   await prepareForClaudeCode(plugins, repoPath, marketplaceName);
 
   // 2. Add the marketplace from the local path
   const claudePath = findClaude();
-  console.log(`Adding marketplace from local path: ${repoPath}`);
-  console.log(`  Using claude binary: ${claudePath}`);
+  step("Adding marketplace");
+  barLine(c.dim(`Binary: ${claudePath}`));
   try {
     const version = execSync(`${claudePath} --version`, { encoding: "utf-8", stdio: "pipe" }).trim();
-    console.log(`  Claude Code version: ${version}`);
+    barLine(c.dim(`Version: ${version}`));
   } catch {
-    console.log(`  Warning: could not get claude version`);
+    barLine(c.dim(`Warning: could not get claude version`));
   }
 
   try {
@@ -112,45 +114,47 @@ async function installToClaudeCode(
       encoding: "utf-8",
       stdio: "pipe",
     });
-    console.log("  Marketplace added.");
-    if (result.trim()) console.log(`  Output: ${result.trim()}`);
+    if (result.trim()) barLine(c.dim(result.trim()));
+    stepDone("Marketplace added");
   } catch (err: any) {
     const stderr = err.stderr?.toString().trim() ?? "";
     const stdout = err.stdout?.toString().trim() ?? "";
     if (stderr.includes("already") || stdout.includes("already")) {
-      console.log("  Marketplace already registered.");
+      stepDone(`Marketplace ${c.dim("'"+marketplaceName+"'")} already on disk`);
     } else {
-      console.error(`Failed to add marketplace.`);
-      console.error(`  Command: ${claudePath} plugin marketplace add ${repoPath}`);
-      console.error(`  stdout: ${stdout}`);
-      console.error(`  stderr: ${stderr}`);
-      console.error(`  exit code: ${err.status}`);
+      stepError("Failed to add marketplace.");
+      barLine(c.dim(`Command: ${claudePath} plugin marketplace add ${repoPath}`));
+      if (stdout) barLine(c.dim(`stdout: ${stdout}`));
+      if (stderr) barLine(c.dim(`stderr: ${stderr}`));
+      barLine(c.dim(`exit code: ${err.status}`));
       process.exit(1);
     }
   }
 
+  barEmpty();
+
   // 3. Install each plugin
   for (const plugin of plugins) {
     const pluginRef = `${plugin.name}@${marketplaceName}`;
-    console.log(`\nInstalling ${pluginRef}...`);
+    step(`Installing ${c.bold(pluginRef)}...`);
 
     try {
       execSync(`${claudePath} plugin install ${pluginRef} --scope ${scope}`, {
         encoding: "utf-8",
         stdio: "pipe",
       });
-      console.log(`  Installed.`);
+      stepDone(`Installed ${c.cyan(pluginRef)}`);
     } catch (err: any) {
       const stderr = err.stderr?.toString().trim() ?? "";
       const stdout = err.stdout?.toString().trim() ?? "";
       if (stderr.includes("already") || stdout.includes("already")) {
-        console.log(`  Already installed.`);
+        stepDone(`${c.cyan(pluginRef)} ${c.dim("already installed")}`);
       } else {
-        console.error(`  Failed to install ${pluginRef}.`);
-        console.error(`  Command: ${claudePath} plugin install ${pluginRef} --scope ${scope}`);
-        console.error(`  stdout: ${stdout}`);
-        console.error(`  stderr: ${stderr}`);
-        console.error(`  exit code: ${err.status}`);
+        stepError(`Failed to install ${pluginRef}`);
+        barLine(c.dim(`Command: ${claudePath} plugin install ${pluginRef} --scope ${scope}`));
+        if (stdout) barLine(c.dim(`stdout: ${stdout}`));
+        if (stderr) barLine(c.dim(`stderr: ${stderr}`));
+        barLine(c.dim(`exit code: ${err.status}`));
       }
     }
   }
@@ -189,7 +193,7 @@ async function prepareForClaudeCode(
     join(claudePluginDir, "marketplace.json"),
     JSON.stringify(marketplaceJson, null, 2),
   );
-  console.log("  Generated .claude-plugin/marketplace.json");
+  barLine(c.dim("Generated .claude-plugin/marketplace.json"));
 
   for (const plugin of plugins) {
     await preparePluginDirForVendor(plugin, ".claude-plugin", "CLAUDE_PLUGIN_ROOT");
@@ -254,7 +258,7 @@ async function preparePluginDirForVendor(
 
   if (hasOpenPlugin && !hasVendorPlugin) {
     await cp(openPluginDir, vendorPluginDir, { recursive: true });
-    console.log(`  ${plugin.name}: translated .plugin/ -> ${vendorDir}/`);
+    barLine(c.dim(`${plugin.name}: translated .plugin/ → ${vendorDir}/`));
   }
 
   // Ensure vendor plugin.json exists (some plugins might only have skills/)
@@ -272,7 +276,7 @@ async function preparePluginDirForVendor(
         2,
       ),
     );
-    console.log(`  ${plugin.name}: generated ${vendorDir}/plugin.json`);
+    barLine(c.dim(`${plugin.name}: generated ${vendorDir}/plugin.json`));
   }
 
   // Translate ${PLUGIN_ROOT} -> ${<VENDOR_ENV_VAR>} in config files
@@ -326,8 +330,8 @@ async function translateEnvVars(
     }
     if (changed) {
       await writeFile(filePath, content);
-      console.log(
-        `  ${pluginName}: translated plugin root -> \${${envVar}} in ${filePath.split("/").pop()}`,
+      barLine(
+        c.dim(`${pluginName}: translated plugin root → \${${envVar}} in ${filePath.split("/").pop()}`),
       );
     }
   }
