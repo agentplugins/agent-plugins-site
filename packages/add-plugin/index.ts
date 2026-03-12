@@ -27,14 +27,14 @@ if (values.help || !command) {
 }
 
 switch (command) {
+  case "add":
+    await cmdInstall(rest[0], values);
+    break;
   case "discover":
     await cmdDiscover(rest[0]);
     break;
   case "targets":
     await cmdTargets();
-    break;
-  case "install":
-    await cmdInstall(rest[0], values);
     break;
   default:
     // If no subcommand, treat the first positional as a repo path/url
@@ -43,13 +43,13 @@ switch (command) {
 
 function printUsage() {
   console.log(`
-add-plugin - Install open-plugin format plugins into agent tools
+plugins - Install open-plugin format plugins into agent tools
 
 Usage:
-  add-plugin discover <repo-path-or-url>    Discover plugins in a repo
-  add-plugin targets                        List available install targets
-  add-plugin install <repo-path-or-url>     Install plugins from a repo
-  add-plugin <repo-path-or-url>             Shorthand for install
+  plugins add <repo-path-or-url>          Install plugins from a repo
+  plugins discover <repo-path-or-url>     Discover plugins in a repo
+  plugins targets                         List available install targets
+  plugins <repo-path-or-url>              Shorthand for add
 
 Options:
   -t, --target <target>   Target tool (e.g. claude-code). Default: auto-detect
@@ -168,16 +168,28 @@ function printPlugin(p: DiscoveredPlugin) {
   console.log();
 }
 
+/**
+ * Convert an SSH git URL to its HTTPS equivalent.
+ * e.g. "git@github.com:vercel-labs/open-plugin.git" -> "https://github.com/vercel-labs/open-plugin.git"
+ */
+function sshToHttps(sshUrl: string): string | null {
+  const m = sshUrl.match(/^git@([^:]+):(.+)$/);
+  if (!m) return null;
+  return `https://${m[1]}/${m[2]}`;
+}
+
 function resolveSource(source: string): string {
   // GitHub URL - clone to temp dir
   if (source.startsWith("https://") || source.startsWith("git@") || source.match(/^[\w-]+\/[\w.-]+$/)) {
     const url = source.match(/^[\w-]+\/[\w.-]+$/) ? `https://github.com/${source}` : source;
-    const cacheDir = join(process.env.HOME ?? "~", ".cache", "add-plugin");
+    const cacheDir = join(process.env.HOME ?? "~", ".cache", "plugins");
     mkdirSync(cacheDir, { recursive: true });
     // Derive a filesystem-safe directory name from the URL
     // e.g. "https://github.com/vercel-labs/open-plugin" -> "vercel-labs-open-plugin"
+    //       "git@github.com:vercel-labs/open-plugin.git" -> "github.com-vercel-labs-open-plugin"
     const slug = url
       .replace(/^https?:\/\//, "")
+      .replace(/^git@/, "")
       .replace(/\.git$/, "")
       .replace(/[^a-zA-Z0-9._-]+/g, "-")
       .replace(/^-+|-+$/g, "");
@@ -188,8 +200,50 @@ function resolveSource(source: string): string {
     if (existsSync(join(tmpDir, ".git", "HEAD"))) {
       rmSync(tmpDir, { recursive: true, force: true });
     }
+
     console.log(`Cloning ${url}...`);
-    execSync(`git clone --depth 1 -q ${url} ${tmpDir}`, { stdio: "inherit" });
+    try {
+      execSync(`git clone --depth 1 -q ${url} ${tmpDir}`, { stdio: "pipe" });
+    } catch (err: any) {
+      const stderr = err.stderr?.toString() ?? "";
+
+      // SSH auth failure — retry over HTTPS so git credential helpers / browser
+      // auth can kick in (works for private repos without SSH keys configured).
+      if (url.startsWith("git@") && stderr.includes("Permission denied")) {
+        const httpsUrl = sshToHttps(url);
+        if (httpsUrl) {
+          console.log(`SSH authentication failed. Retrying over HTTPS...`);
+          console.log(`Cloning ${httpsUrl}...`);
+          try {
+            execSync(`git clone --depth 1 -q ${httpsUrl} ${tmpDir}`, { stdio: "inherit" });
+            return tmpDir;
+          } catch {
+            // fall through to the error message below
+          }
+        }
+      }
+
+      // Clean up the failed clone directory
+      if (existsSync(tmpDir)) {
+        rmSync(tmpDir, { recursive: true, force: true });
+      }
+
+      if (stderr.includes("Permission denied") || stderr.includes("Could not read from remote repository")) {
+        console.error(`\nError: Could not access ${url}`);
+        console.error(`\nMake sure you have access to this repository. For private repos, try:`);
+        console.error(`  - HTTPS: plugins add https://github.com/owner/repo`);
+        console.error(`    (uses git credential helper / browser auth)`);
+        console.error(`  - SSH:   plugins add git@github.com:owner/repo.git`);
+        console.error(`    (requires SSH keys: https://docs.github.com/en/authentication/connecting-to-github-with-ssh)`);
+      } else if (stderr.includes("not found") || stderr.includes("does not exist") || err.status === 128) {
+        console.error(`\nError: Repository not found: ${url}`);
+        console.error(`Check that the URL is correct and the repository exists.`);
+      } else {
+        console.error(`\nError: git clone failed.`);
+        if (stderr.trim()) console.error(stderr.trim());
+      }
+      process.exit(1);
+    }
     return tmpDir;
   }
 

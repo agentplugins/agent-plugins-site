@@ -1,5 +1,5 @@
 ---
-description: Node.js CLI tool built with tsup. Published to npm as `add-plugin`.
+description: Node.js CLI tool built with tsup. Published to npm as `plugins`.
 globs: "*.ts, *.tsx, *.js, *.jsx, package.json"
 alwaysApply: false
 ---
@@ -15,7 +15,7 @@ This is a Node.js CLI tool that discovers and installs open-plugin format plugin
 ## Publishing
 
 - `npm publish` — publishes the `dist/` folder to npm
-- Users run: `npx add-plugin <repo-or-url>`
+- Users run: `npx plugins add <repo-or-url>`
 
 ## Code style
 

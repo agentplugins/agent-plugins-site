@@ -1,7 +1,7 @@
 {
   "name": "minimal-plugin",
   "owner": {
-    "name": "add-plugin"
+    "name": "plugins"
   },
   "plugins": [
     {
