@@ -1,6 +1,6 @@
 # Open Plugin
 
-An open format for packaging agent extensions. Supported by [Claude Code](https://code.claude.com), [Cursor](https://cursor.com), and [OpenCode](https://opencode.ai).
+An open format for packaging agent extensions. Supported by [Claude Code](https://code.claude.com), [Cursor](https://cursor.com), [OpenCode](https://opencode.ai), and [VS Code](https://code.visualstudio.com/).
 
 A plugin is a folder with skills, agents, hooks, rules, MCP servers, or LSP servers inside it.
 
