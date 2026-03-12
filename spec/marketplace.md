@@ -49,6 +49,15 @@ The first match wins. If no marketplace index is found, the tool falls back to p
       "source": "./plugin-two/",
       "description": "Second plugin in the collection.",
       "version": "2.1.0"
+    },
+    {
+      "name": "plugin-remote",
+      "source": {
+        "source": "github",
+        "repo": "org/plugin-repo"
+      },
+      "description": "Plugin from a remote repository.",
+      "version": "0.5.0"
     }
   ]
 }
@@ -76,7 +85,7 @@ Each object in the `plugins` array describes one plugin in the collection.
 | Field | Required | Type | Description |
 |---|---|---|---|
 | `name` | Yes | string | Plugin name. Must follow the same [name constraints](specification.md#name-constraints) as the plugin manifest `name` field. |
-| `source` | Yes | string | Relative path from `metadata.pluginRoot` (or the marketplace root) to the plugin directory. Must start with `./`. |
+| `source` | Yes | string \| object | Relative path from `metadata.pluginRoot` (or the marketplace root) to the plugin directory. Must start with `./`. Can also be an object for remote sources. |
 | `description` | No | string | Brief description of the plugin. Overrides the plugin manifest's description for marketplace display. |
 | `version` | No | string | Semantic version. Overrides the plugin manifest's version for update checks. |
 | `author` | No | object | Author information (same format as the plugin manifest `author` field). |
@@ -85,6 +94,21 @@ Each object in the `plugins` array describes one plugin in the collection.
 | `skills` | No | string[] | Explicit skill paths relative to the marketplace root. When present, only these paths are used for skill discovery instead of scanning the plugin's `skills/` directory. |
 
 When a plugin entry includes metadata fields (`description`, `version`, `author`, `license`, `keywords`), these values take precedence over the corresponding fields in the plugin's own `plugin.json` manifest for marketplace-level operations (display, search, update checks). The plugin manifest remains the source of truth at runtime.
+
+#### Remote Sources
+
+Plugin entries can specify a remote source instead of a local path. The `source` field becomes an object with a `source` type and additional parameters:
+
+| Field | Required | Type | Description |
+|---|---|---|---|
+| `source.source` | Yes | string | Type of remote source. Supported values: `github` (GitHub repository), `git` (generic Git URL). |
+| `source.repo` | Required for `github` | string | GitHub repository in the format `owner/repo`. |
+| `source.url` | Required for `git` | string | Git URL to the repository containing the plugin. |
+| `source.ref` | No | string | Git reference (branch, tag, or commit) to use. Defaults to the default branch. |
+| `source.path` | No | string | Subdirectory within the repository where the plugin is located. Defaults to the repository root. |
+| `source.sha` | No | string | Specific commit SHA to use. Overrides `ref` if both are provided. |
+
+> Note: The files contributed by a remote plugin source are not included in the marketplace repository. Tools must fetch the plugin from the remote source at install time, and it is up to the marketplace publisher to ensure the remote plugin is vetted and trustworthy.
 
 ## Multi-Plugin Repositories
 
@@ -146,7 +170,7 @@ my-repo/
 }
 ```
 
-The `source` paths are resolved relative to `pluginRoot`, so `plugin-a` resolves to `./plugins/plugin-a/`.
+If the `source` is a string, the path is resolved relative to `pluginRoot`, so `plugin-a` resolves to `./plugins/plugin-a/`.
 
 ## Discovery Without a Marketplace Index
 
