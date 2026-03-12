@@ -1,10 +1,10 @@
 {
-  "name": "add-plugin",
-  "version": "0.0.2",
+  "name": "plugins",
+  "version": "1.0.0",
   "description": "Install open-plugin format plugins into agent tools",
   "type": "module",
   "bin": {
-    "add-plugin": "dist/index.js"
+    "plugins": "dist/index.js"
   },
   "files": [
     "dist"

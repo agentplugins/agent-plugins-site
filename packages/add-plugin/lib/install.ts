@@ -166,7 +166,7 @@ async function prepareForClaudeCode(
 
   const marketplaceJson = {
     name: marketplaceName,
-    owner: { name: "add-plugin" },
+    owner: { name: "plugins" },
     plugins: plugins.map((p) => {
       const rel = relative(repoPath, p.path);
       const sourcePath = rel === "" ? "./" : `./${rel}`;
@@ -344,7 +344,16 @@ function deriveMarketplaceName(source: string): string {
     return source.replace("/", "-");
   }
 
-  // Git URL: extract owner/repo
+  // SSH URL: git@github.com:owner/repo.git -> owner-repo
+  const sshMatch = source.match(/^git@[^:]+:(.+?)(?:\.git)?$/);
+  if (sshMatch) {
+    const parts = sshMatch[1]!.split("/").filter(Boolean);
+    if (parts.length >= 2) {
+      return `${parts[parts.length - 2]}-${parts[parts.length - 1]}`;
+    }
+  }
+
+  // HTTPS URL: extract owner/repo
   try {
     const url = new URL(source);
     const parts = url.pathname.replace(/\.git$/, "").split("/").filter(Boolean);
@@ -357,5 +366,5 @@ function deriveMarketplaceName(source: string): string {
 
   // Local path: use basename
   const parts = source.replace(/\/$/, "").split("/");
-  return parts[parts.length - 1] ?? "add-plugin";
+  return parts[parts.length - 1] ?? "plugins";
 }

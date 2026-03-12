@@ -1,15 +1,17 @@
-# add-plugin
+# plugins
 
-To install dependencies:
+Install open-plugin format plugins into agent tools.
 
-```bash
-bun install
-```
-
-To run:
+## Usage
 
 ```bash
-bun run index.ts
+npx plugins add <repo-path-or-url>
 ```
 
-This project was created using `bun init` in bun v1.3.8. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+## Development
+
+```bash
+npm install
+npm run build
+node dist/index.js --help
+```
