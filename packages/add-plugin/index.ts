@@ -6,6 +6,7 @@ import { createInterface } from "readline";
 import { discover, type DiscoveredPlugin } from "./lib/discover.js";
 import { getTargets, type Target } from "./lib/targets.js";
 import { installPlugins } from "./lib/install.js";
+import { c, S, banner, header, footer, step, stepDone, stepActive, stepError, barLine, barEmpty, error } from "./lib/ui.js";
 
 const { values, positionals } = parseArgs({
   args: process.argv.slice(2),
@@ -43,73 +44,97 @@ switch (command) {
 
 function printUsage() {
   console.log(`
-plugins - Install open-plugin format plugins into agent tools
+${c.bold("plugins")} — Install open-plugin format plugins into agent tools
 
-Usage:
-  plugins add <repo-path-or-url>          Install plugins from a repo
-  plugins discover <repo-path-or-url>     Discover plugins in a repo
-  plugins targets                         List available install targets
-  plugins <repo-path-or-url>              Shorthand for add
+${c.dim("Usage:")}
+  ${c.cyan("plugins add")} <repo-path-or-url>          Install plugins from a repo
+  ${c.cyan("plugins discover")} <repo-path-or-url>     Discover plugins in a repo
+  ${c.cyan("plugins targets")}                         List available install targets
+  ${c.cyan("plugins")} <repo-path-or-url>              Shorthand for add
 
-Options:
-  -t, --target <target>   Target tool (e.g. claude-code). Default: auto-detect
-  -s, --scope <scope>     Install scope: user, project, local. Default: user
-  -y, --yes               Skip confirmation prompts
-  -h, --help              Show this help
+${c.dim("Options:")}
+  ${c.yellow("-t, --target")} <target>   Target tool (e.g. claude-code). Default: auto-detect
+  ${c.yellow("-s, --scope")} <scope>     Install scope: user, project, local. Default: user
+  ${c.yellow("-y, --yes")}               Skip confirmation prompts
+  ${c.yellow("-h, --help")}              Show this help
 `);
 }
 
 async function cmdDiscover(source?: string) {
   if (!source) {
-    console.error("Error: provide a repo path or URL");
+    error("Provide a repo path or URL");
     process.exit(1);
   }
+
+  banner();
+  header("plugins");
 
   const repoPath = resolveSource(source);
   const plugins = await discover(repoPath);
 
   if (plugins.length === 0) {
-    console.log("No plugins found.");
+    barEmpty();
+    step("No plugins found.");
+    footer();
     return;
   }
 
-  console.log(`Found ${plugins.length} plugin(s) in ${source}:\n`);
+  barEmpty();
+  step(`Found ${c.bold(String(plugins.length))} plugin(s) in ${c.dim(source)}`);
+  barEmpty();
   for (const p of plugins) {
     printPlugin(p);
   }
+  footer();
 }
 
 async function cmdTargets() {
   const targets = await getTargets();
+
+  banner();
+  header("plugins");
+
   if (targets.length === 0) {
-    console.log("No supported targets detected.");
+    barEmpty();
+    step("No supported targets detected.");
+    footer();
     return;
   }
-  console.log("Available install targets:\n");
+
+  barEmpty();
+  step("Available install targets");
+  barEmpty();
+
   for (const t of targets) {
-    console.log(`  ${t.name}`);
-    console.log(`    ${t.description}`);
-    console.log(`    Config: ${t.configPath}`);
-    console.log(`    Status: ${t.detected ? "detected" : "not found"}`);
-    console.log();
+    barLine(`  ${c.bold(t.name)}`);
+    barLine(`  ${c.dim(t.description)}`);
+    barLine(`  Config: ${c.dim(t.configPath)}`);
+    barLine(`  Status: ${t.detected ? c.green("detected") : c.dim("not found")}`);
+    barEmpty();
   }
+  footer();
 }
 
 async function cmdInstall(source: string | undefined, opts: typeof values) {
   if (!source) {
-    console.error("Error: provide a repo path or URL");
+    error("Provide a repo path or URL");
     process.exit(1);
   }
+
+  banner();
+  header("plugins");
 
   const repoPath = resolveSource(source);
   const plugins = await discover(repoPath);
 
   if (plugins.length === 0) {
-    console.log("No plugins found.");
+    barEmpty();
+    step("No plugins found.");
+    footer();
     return;
   }
 
-  // Resolve targets — install to all detected targets unless --target is specified
+  // Resolve targets
   const targets = await getTargets();
   const detectedTargets = targets.filter((t) => t.detected);
 
@@ -117,30 +142,40 @@ async function cmdInstall(source: string | undefined, opts: typeof values) {
   if (opts.target) {
     const found = targets.find((t) => t.id === opts.target);
     if (!found) {
-      console.error(`Unknown target: ${opts.target}`);
-      console.error(`Available: ${targets.map((t) => t.id).join(", ")}`);
+      barEmpty();
+      stepError(`Unknown target: ${c.bold(opts.target!)}`);
+      barLine(c.dim(`Available: ${targets.map((t) => t.id).join(", ")}`));
+      footer();
       process.exit(1);
     }
     installTargets = [found];
   } else if (detectedTargets.length === 0) {
-    console.error("No supported targets detected. Use --target to specify one.");
+    barEmpty();
+    stepError("No supported targets detected.");
+    barLine(c.dim("Use --target to specify one."));
+    footer();
     process.exit(1);
   } else {
     installTargets = detectedTargets;
   }
 
-  console.log(`Found ${plugins.length} plugin(s):\n`);
+  barEmpty();
+  step(`Found ${c.bold(String(plugins.length))} plugin(s)`);
+  barEmpty();
+
   for (const p of plugins) {
     printPlugin(p);
   }
 
-  console.log(`Targets: ${installTargets.map((t) => t.name).join(", ")}`);
-  console.log(`Scope: ${opts.scope ?? "user"}\n`);
+  barLine(`${c.dim("Targets:")}  ${installTargets.map((t) => c.cyan(t.name)).join(c.dim(", "))}`);
+  barLine(`${c.dim("Scope:")}    ${c.cyan(opts.scope ?? "user")}`);
+  barEmpty();
 
   if (!opts.yes) {
-    const response = await readLine("Install? [y/N] ");
-    if (response.trim().toLowerCase() !== "y") {
-      console.log("Aborted.");
+    const response = await readLine(`${c.cyan(S.stepActive)}  Install? ${c.dim("[Y/n]")} `);
+    if (response.trim().toLowerCase() === "n") {
+      step("Aborted.");
+      footer();
       return;
     }
   }
@@ -150,12 +185,14 @@ async function cmdInstall(source: string | undefined, opts: typeof values) {
     await installPlugins(plugins, target, scope, repoPath, source);
   }
 
-  console.log("\nDone. Restart your agent tools to load the plugins.");
+  barEmpty();
+  stepDone(c.green("Done.") + "  Restart your agent tools to load the plugins.");
+  footer();
 }
 
 function printPlugin(p: DiscoveredPlugin) {
-  console.log(`  ${p.name} (v${p.version ?? "0.0.0"})`);
-  if (p.description) console.log(`    ${p.description}`);
+  barLine(`${c.bold(p.name)} ${p.version ? c.dim(`(v${p.version})`) : ""}`);
+  if (p.description) barLine(`${c.dim(p.description)}`);
   const parts: string[] = [];
   if (p.skills.length) parts.push(`${p.skills.length} skill(s)`);
   if (p.commands.length) parts.push(`${p.commands.length} command(s)`);
@@ -164,8 +201,8 @@ function printPlugin(p: DiscoveredPlugin) {
   if (p.hasHooks) parts.push("hooks");
   if (p.hasMcp) parts.push("MCP servers");
   if (p.hasLsp) parts.push("LSP servers");
-  if (parts.length) console.log(`    Components: ${parts.join(", ")}`);
-  console.log();
+  if (parts.length) barLine(`${c.dim("Components:")} ${parts.join(c.dim(", "))}`);
+  barEmpty();
 }
 
 /**
@@ -184,9 +221,6 @@ function resolveSource(source: string): string {
     const url = source.match(/^[\w-]+\/[\w.-]+$/) ? `https://github.com/${source}` : source;
     const cacheDir = join(process.env.HOME ?? "~", ".cache", "plugins");
     mkdirSync(cacheDir, { recursive: true });
-    // Derive a filesystem-safe directory name from the URL
-    // e.g. "https://github.com/vercel-labs/open-plugin" -> "vercel-labs-open-plugin"
-    //       "git@github.com:vercel-labs/open-plugin.git" -> "github.com-vercel-labs-open-plugin"
     const slug = url
       .replace(/^https?:\/\//, "")
       .replace(/^git@/, "")
@@ -195,27 +229,28 @@ function resolveSource(source: string): string {
       .replace(/^-+|-+$/g, "");
     const tmpDir = join(cacheDir, slug);
 
-    // Always do a fresh shallow clone — previous runs may have modified the tree
-    // (e.g. generated .claude-plugin/), and shallow clones don't pull cleanly.
     if (existsSync(join(tmpDir, ".git", "HEAD"))) {
       rmSync(tmpDir, { recursive: true, force: true });
     }
 
-    console.log(`Cloning ${url}...`);
+    step(`Source: ${c.dim(url)}`);
+    barEmpty();
+
     try {
       execSync(`git clone --depth 1 -q ${url} ${tmpDir}`, { stdio: "pipe" });
     } catch (err: any) {
       const stderr = err.stderr?.toString() ?? "";
 
-      // SSH auth failure — retry over HTTPS so git credential helpers / browser
-      // auth can kick in (works for private repos without SSH keys configured).
       if (url.startsWith("git@") && stderr.includes("Permission denied")) {
         const httpsUrl = sshToHttps(url);
         if (httpsUrl) {
-          console.log(`SSH authentication failed. Retrying over HTTPS...`);
-          console.log(`Cloning ${httpsUrl}...`);
+          barLine(c.yellow("SSH authentication failed. Retrying over HTTPS..."));
+          step(`Source: ${c.dim(httpsUrl)}`);
+          barEmpty();
           try {
             execSync(`git clone --depth 1 -q ${httpsUrl} ${tmpDir}`, { stdio: "inherit" });
+            stepDone("Repository cloned");
+            barEmpty();
             return tmpDir;
           } catch {
             // fall through to the error message below
@@ -223,27 +258,34 @@ function resolveSource(source: string): string {
         }
       }
 
-      // Clean up the failed clone directory
       if (existsSync(tmpDir)) {
         rmSync(tmpDir, { recursive: true, force: true });
       }
 
       if (stderr.includes("Permission denied") || stderr.includes("Could not read from remote repository")) {
-        console.error(`\nError: Could not access ${url}`);
-        console.error(`\nMake sure you have access to this repository. For private repos, try:`);
-        console.error(`  - HTTPS: plugins add https://github.com/owner/repo`);
-        console.error(`    (uses git credential helper / browser auth)`);
-        console.error(`  - SSH:   plugins add git@github.com:owner/repo.git`);
-        console.error(`    (requires SSH keys: https://docs.github.com/en/authentication/connecting-to-github-with-ssh)`);
+        barEmpty();
+        stepError(`Could not access ${c.bold(url)}`);
+        barEmpty();
+        barLine(c.dim("Make sure you have access to this repository. For private repos, try:"));
+        barLine(`  ${c.dim("HTTPS:")} plugins add https://github.com/owner/repo`);
+        barLine(`  ${c.dim("       (uses git credential helper / browser auth)")}`);
+        barLine(`  ${c.dim("SSH:")}   plugins add git@github.com:owner/repo.git`);
+        barLine(`  ${c.dim("       (requires SSH keys)")}`);
       } else if (stderr.includes("not found") || stderr.includes("does not exist") || err.status === 128) {
-        console.error(`\nError: Repository not found: ${url}`);
-        console.error(`Check that the URL is correct and the repository exists.`);
+        barEmpty();
+        stepError(`Repository not found: ${c.bold(url)}`);
+        barLine(c.dim("Check that the URL is correct and the repository exists."));
       } else {
-        console.error(`\nError: git clone failed.`);
-        if (stderr.trim()) console.error(stderr.trim());
+        barEmpty();
+        stepError("git clone failed.");
+        if (stderr.trim()) barLine(c.dim(stderr.trim()));
       }
+      footer();
       process.exit(1);
     }
+
+    stepDone("Repository cloned");
+    barEmpty();
     return tmpDir;
   }
 
@@ -256,6 +298,8 @@ function readLine(prompt: string): Promise<string> {
   return new Promise((resolve) => {
     rl.question(prompt, (answer) => {
       rl.close();
+      // Ensure newline after answer (piped stdin may not echo one)
+      if (!process.stdin.isTTY) process.stdout.write("\n");
       resolve(answer);
     });
   });
