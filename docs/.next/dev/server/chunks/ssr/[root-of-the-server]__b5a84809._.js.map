@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 18, "column": 0}, "map": {"version":3,"sources":["file:///Users/qua/projects/open-plugin/docs/app/%28home%29/page.tsx"],"sourcesContent":["import { redirect } from 'next/navigation';\n\nexport default function HomePage() {\n  redirect('/docs');\n}\n"],"names":[],"mappings":";;;;AAAA;AAAA;;AAEe,SAAS;IACtB,IAAA,sWAAQ,EAAC;AACX"}}]
-}
