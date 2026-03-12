@@ -10,6 +10,14 @@ node_modules/
 dist/
 *.tgz
 
+# Build output
+.next/
+.source/
+
+# Lock files (managed per-package, not committed)
+package-lock.json
+pnpm-lock.yaml
+
 # Environment
 .env
 .env.local
