@@ -7,6 +7,9 @@ import { discover, type DiscoveredPlugin } from "./lib/discover.js";
 import { getTargets, type Target } from "./lib/targets.js";
 import { installPlugins } from "./lib/install.js";
 import { c, S, banner, header, footer, step, stepDone, stepActive, stepError, barLine, barEmpty, error } from "./lib/ui.js";
+import { setVersion, track } from "./lib/telemetry.js";
+
+setVersion("1.0.1");
 
 const { values, positionals } = parseArgs({
   args: process.argv.slice(2),
@@ -85,6 +88,7 @@ async function cmdDiscover(source?: string) {
   for (const p of plugins) {
     printPlugin(p);
   }
+
   footer();
 }
 
@@ -112,6 +116,7 @@ async function cmdTargets() {
     barLine(`  Status: ${t.detected ? c.green("detected") : c.dim("not found")}`);
     barEmpty();
   }
+
   footer();
 }
 
@@ -184,6 +189,15 @@ async function cmdInstall(source: string | undefined, opts: typeof values) {
   for (const target of installTargets) {
     await installPlugins(plugins, target, scope, repoPath, source);
   }
+
+  track({
+    event: "install",
+    source,
+    plugins: plugins.map((p) => p.name).join(","),
+    pluginCount: String(plugins.length),
+    targets: installTargets.map((t) => t.id).join(","),
+    scope,
+  });
 
   barEmpty();
   stepDone(c.green("Done.") + "  Restart your agent tools to load the plugins.");
