@@ -10,7 +10,7 @@
 import { join } from "path";
 import { readFile, readdir, stat } from "fs/promises";
 import { existsSync } from "fs";
-import { c, barLine, S } from "./ui.js";
+
 
 export interface DiscoveredPlugin {
   /** Plugin name from manifest or marketplace entry */
@@ -48,6 +48,20 @@ export interface DiscoveredPlugin {
   marketplaceEntry: Record<string, unknown> | undefined;
 }
 
+/** A plugin that references a remote source (another repo) and can't be resolved locally */
+export interface RemotePlugin {
+  name: string;
+  description: string | undefined;
+  source: Record<string, unknown>;
+}
+
+export interface DiscoverResult {
+  plugins: DiscoveredPlugin[];
+  remotePlugins: RemotePlugin[];
+  /** Local source paths referenced in marketplace.json but not found on disk */
+  missingPaths: string[];
+}
+
 interface MarketplaceIndex {
   name: string;
   plugins: MarketplaceEntry[];
@@ -58,7 +72,8 @@ interface MarketplaceEntry {
   name: string;
   description: string;
   version?: string;
-  source: string;
+  /** Local relative path (string) or remote reference (object with url, etc.) */
+  source: string | Record<string, unknown>;
   skills?: string[];
   [key: string]: unknown;
 }
@@ -66,7 +81,7 @@ interface MarketplaceEntry {
 /**
  * Discover all plugins in a repository/directory.
  */
-export async function discover(repoPath: string): Promise<DiscoveredPlugin[]> {
+export async function discover(repoPath: string): Promise<DiscoverResult> {
   // 1. Check for marketplace.json
   const marketplacePaths = [
     join(repoPath, "marketplace.json"),
@@ -87,14 +102,14 @@ export async function discover(repoPath: string): Promise<DiscoveredPlugin[]> {
   // 2. Check if repo root itself is a plugin
   if (await isPluginDir(repoPath)) {
     const plugin = await inspectPlugin(repoPath);
-    return plugin ? [plugin] : [];
+    return { plugins: plugin ? [plugin] : [], remotePlugins: [], missingPaths: [] };
   }
 
   // 3. Scan directories for plugins (up to 2 levels deep)
   const plugins: DiscoveredPlugin[] = [];
   await scanForPlugins(repoPath, plugins, 2);
 
-  return plugins;
+  return { plugins, remotePlugins: [], missingPaths: [] };
 }
 
 async function scanForPlugins(
@@ -119,15 +134,27 @@ async function scanForPlugins(
 async function discoverFromMarketplace(
   repoPath: string,
   marketplace: MarketplaceIndex,
-): Promise<DiscoveredPlugin[]> {
+): Promise<DiscoverResult> {
   const plugins: DiscoveredPlugin[] = [];
+  const remotePlugins: RemotePlugin[] = [];
+  const missingPaths: string[] = [];
   const root = marketplace.metadata?.pluginRoot ?? ".";
 
   for (const entry of marketplace.plugins) {
+    // Collect entries with non-string source (remote references to other repos)
+    if (typeof entry.source !== "string") {
+      remotePlugins.push({
+        name: entry.name,
+        description: entry.description || undefined,
+        source: entry.source as Record<string, unknown>,
+      });
+      continue;
+    }
+
     const sourcePath = join(repoPath, root, entry.source.replace(/^\.\//, ""));
 
     if (!(await dirExists(sourcePath))) {
-      barLine(`${c.yellow(S.warning)}  ${c.yellow(`Plugin source not found: ${entry.source}`)}`);
+      missingPaths.push(entry.source);
       continue;
     }
 
@@ -193,7 +220,7 @@ async function discoverFromMarketplace(
     });
   }
 
-  return plugins;
+  return { plugins, remotePlugins, missingPaths };
 }
 
 /**

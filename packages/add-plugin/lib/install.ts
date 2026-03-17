@@ -98,7 +98,12 @@ async function installToClaudeCode(
   barEmpty();
   await prepareForClaudeCode(plugins, repoPath, marketplaceName);
 
-  // 2. Add the marketplace from the local path
+  // 2. Add the marketplace
+  // For official Anthropic marketplaces, pass the GitHub URL directly so the
+  // claude CLI recognises the source as coming from the 'anthropics' org.
+  // Otherwise it rejects the reserved marketplace name.
+  const marketplaceSource = isAnthropicSource(source) ? normalizeGitUrl(source) : repoPath;
+
   const claudePath = findClaude();
   step("Adding marketplace");
   barLine(c.dim(`Binary: ${claudePath}`));
@@ -110,7 +115,7 @@ async function installToClaudeCode(
   }
 
   try {
-    const result = execSync(`${claudePath} plugin marketplace add ${repoPath}`, {
+    const result = execSync(`${claudePath} plugin marketplace add ${marketplaceSource}`, {
       encoding: "utf-8",
       stdio: "pipe",
     });
@@ -123,7 +128,7 @@ async function installToClaudeCode(
       stepDone(`Marketplace ${c.dim("'"+marketplaceName+"'")} already on disk`);
     } else {
       stepError("Failed to add marketplace.");
-      barLine(c.dim(`Command: ${claudePath} plugin marketplace add ${repoPath}`));
+      barLine(c.dim(`Command: ${claudePath} plugin marketplace add ${marketplaceSource}`));
       if (stdout) barLine(c.dim(`stdout: ${stdout}`));
       if (stderr) barLine(c.dim(`stderr: ${stderr}`));
       barLine(c.dim(`exit code: ${err.status}`));
@@ -371,4 +376,30 @@ function deriveMarketplaceName(source: string): string {
   // Local path: use basename
   const parts = source.replace(/\/$/, "").split("/");
   return parts[parts.length - 1] ?? "plugins";
+}
+
+/**
+ * Check if a source string points to the anthropics GitHub org.
+ */
+function isAnthropicSource(source: string): boolean {
+  if (source.match(/^anthropics\/[\w.-]+$/)) return true;
+  if (source.startsWith("https://github.com/anthropics/")) return true;
+  if (source.startsWith("git@github.com:anthropics/")) return true;
+  return false;
+}
+
+/**
+ * Normalize a source string to a GitHub HTTPS URL.
+ * Shorthand `owner/repo` becomes `https://github.com/owner/repo`.
+ * SSH URLs become HTTPS. Already-HTTPS URLs are returned as-is.
+ */
+function normalizeGitUrl(source: string): string {
+  if (source.match(/^[\w-]+\/[\w.-]+$/)) {
+    return `https://github.com/${source}`;
+  }
+  const sshMatch = source.match(/^git@([^:]+):(.+?)(?:\.git)?$/);
+  if (sshMatch) {
+    return `https://${sshMatch[1]}/${sshMatch[2]}`;
+  }
+  return source;
 }

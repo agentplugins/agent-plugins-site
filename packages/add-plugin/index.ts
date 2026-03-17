@@ -3,10 +3,10 @@ import { resolve, join } from "path";
 import { execSync } from "child_process";
 import { existsSync, rmSync, mkdirSync } from "fs";
 import { createInterface } from "readline";
-import { discover, type DiscoveredPlugin } from "./lib/discover.js";
+import { discover, type DiscoveredPlugin, type RemotePlugin } from "./lib/discover.js";
 import { getTargets, type Target } from "./lib/targets.js";
 import { installPlugins } from "./lib/install.js";
-import { c, S, banner, header, footer, step, stepDone, stepActive, stepError, barLine, barEmpty, error } from "./lib/ui.js";
+import { c, S, banner, header, footer, step, stepDone, stepActive, stepError, barLine, barEmpty, error, multiSelect, type MultiSelectOption } from "./lib/ui.js";
 import { setVersion, track } from "./lib/telemetry.js";
 
 setVersion("1.0.1");
@@ -18,6 +18,7 @@ const { values, positionals } = parseArgs({
     target: { type: "string", short: "t" },
     scope: { type: "string", short: "s", default: "user" },
     yes: { type: "boolean", short: "y" },
+    remote: { type: "boolean" },
   },
   allowPositionals: true,
   strict: true,
@@ -59,6 +60,7 @@ ${c.dim("Options:")}
   ${c.yellow("-t, --target")} <target>   Target tool (e.g. claude-code). Default: auto-detect
   ${c.yellow("-s, --scope")} <scope>     Install scope: user, project, local. Default: user
   ${c.yellow("-y, --yes")}               Skip confirmation prompts
+  ${c.yellow("--remote")}                Include remote-source plugins in output
   ${c.yellow("-h, --help")}              Show this help
 `);
 }
@@ -73,20 +75,36 @@ async function cmdDiscover(source?: string) {
   header("plugins");
 
   const repoPath = resolveSource(source);
-  const plugins = await discover(repoPath);
+  const { plugins, remotePlugins, missingPaths } = await discover(repoPath);
 
-  if (plugins.length === 0) {
+  if (plugins.length === 0 && remotePlugins.length === 0) {
     barEmpty();
     step("No plugins found.");
     footer();
     return;
   }
 
-  barEmpty();
-  step(`Found ${c.bold(String(plugins.length))} plugin(s) in ${c.dim(source)}`);
-  barEmpty();
-  for (const p of plugins) {
-    printPlugin(p);
+  if (plugins.length > 0) {
+    barEmpty();
+    step(`Found ${c.bold(String(plugins.length))} local plugin(s)`);
+    barEmpty();
+    printPluginTable(plugins);
+  }
+
+  if (remotePlugins.length > 0) {
+    if (values.remote) {
+      barEmpty();
+      step(`${c.bold(String(remotePlugins.length))} remote plugin(s) ${c.dim("(hosted in external repos)")}`);
+      barEmpty();
+      printRemotePluginTable(remotePlugins);
+    } else {
+      barEmpty();
+      barLine(
+        c.dim(`${remotePlugins.length} remote plugin(s) not shown. Run:`),
+      );
+      barLine(`  ${c.cyan(`npx plugins discover ${source} --remote`)}`);
+    }
+    printMissingPaths(missingPaths);
   }
 
   footer();
@@ -130,11 +148,18 @@ async function cmdInstall(source: string | undefined, opts: typeof values) {
   header("plugins");
 
   const repoPath = resolveSource(source);
-  const plugins = await discover(repoPath);
+  const { plugins, remotePlugins, missingPaths } = await discover(repoPath);
 
   if (plugins.length === 0) {
     barEmpty();
     step("No plugins found.");
+    if (remotePlugins.length > 0) {
+      barLine(
+        c.dim(`${remotePlugins.length} remote plugin(s) not shown. Run:`),
+      );
+      barLine(`  ${c.cyan(`npx plugins discover ${source} --remote`)}`);
+      printMissingPaths(missingPaths);
+    }
     footer();
     return;
   }
@@ -165,36 +190,84 @@ async function cmdInstall(source: string | undefined, opts: typeof values) {
   }
 
   barEmpty();
-  step(`Found ${c.bold(String(plugins.length))} plugin(s)`);
-  barEmpty();
 
-  for (const p of plugins) {
-    printPlugin(p);
-  }
+  // Single plugin or --yes: skip selection, install all
+  let selectedPlugins: DiscoveredPlugin[];
 
-  barLine(`${c.dim("Targets:")}  ${installTargets.map((t) => c.cyan(t.name)).join(c.dim(", "))}`);
-  barLine(`${c.dim("Scope:")}    ${c.cyan(opts.scope ?? "user")}`);
-  barEmpty();
+  if (plugins.length === 1 || opts.yes) {
+    step(`Found ${c.bold(String(plugins.length))} plugin(s)`);
+    barEmpty();
+    printPluginTable(plugins);
 
-  if (!opts.yes) {
-    const response = await readLine(`${c.cyan(S.stepActive)}  Install? ${c.dim("[Y/n]")} `);
-    if (response.trim().toLowerCase() === "n") {
+    if (remotePlugins.length > 0) {
+      barEmpty();
+      barLine(
+        c.dim(`+ ${remotePlugins.length} remote plugin(s) not included. Run:`),
+      );
+      barLine(`  ${c.cyan(`npx plugins discover ${source} --remote`)}`);
+      printMissingPaths(missingPaths);
+    }
+
+    barEmpty();
+    barLine(`${c.dim("Targets:")}  ${installTargets.map((t) => c.cyan(t.name)).join(c.dim(", "))}`);
+    barLine(`${c.dim("Scope:")}    ${c.cyan(opts.scope ?? "user")}`);
+    barEmpty();
+
+    if (!opts.yes) {
+      const response = await readLine(`${c.cyan(S.stepActive)}  Install? ${c.dim("[Y/n]")} `);
+      if (response.trim().toLowerCase() === "n") {
+        step("Aborted.");
+        footer();
+        return;
+      }
+    }
+
+    selectedPlugins = plugins;
+  } else {
+    // Multiple plugins: interactive multi-select
+    step(`Found ${c.bold(String(plugins.length))} plugin(s)`);
+    barEmpty();
+
+    const options: MultiSelectOption[] = plugins.map((p) => {
+      const parts = pluginComponents(p);
+      const hint = parts.length ? parts.join(", ") : undefined;
+      return { label: p.name, value: p.name, hint };
+    });
+
+    const selected = await multiSelect("Select plugins to install", options);
+
+    if (!selected || selected.length === 0) {
       step("Aborted.");
       footer();
       return;
     }
+
+    selectedPlugins = plugins.filter((p) => selected.includes(p.name));
+
+    if (remotePlugins.length > 0) {
+      barLine(
+        c.dim(`+ ${remotePlugins.length} remote plugin(s) not included. Run:`),
+      );
+      barLine(`  ${c.cyan(`npx plugins discover ${source} --remote`)}`);
+      printMissingPaths(missingPaths);
+    }
+
+    barEmpty();
+    barLine(`${c.dim("Targets:")}  ${installTargets.map((t) => c.cyan(t.name)).join(c.dim(", "))}`);
+    barLine(`${c.dim("Scope:")}    ${c.cyan(opts.scope ?? "user")}`);
+    barEmpty();
   }
 
   const scope = opts.scope ?? "user";
   for (const target of installTargets) {
-    await installPlugins(plugins, target, scope, repoPath, source);
+    await installPlugins(selectedPlugins, target, scope, repoPath, source);
   }
 
   track({
     event: "install",
     source,
-    plugins: plugins.map((p) => p.name).join(","),
-    pluginCount: String(plugins.length),
+    plugins: selectedPlugins.map((p) => p.name).join(","),
+    pluginCount: String(selectedPlugins.length),
     targets: installTargets.map((t) => t.id).join(","),
     scope,
   });
@@ -204,19 +277,59 @@ async function cmdInstall(source: string | undefined, opts: typeof values) {
   footer();
 }
 
-function printPlugin(p: DiscoveredPlugin) {
-  barLine(`${c.bold(p.name)} ${p.version ? c.dim(`(v${p.version})`) : ""}`);
-  if (p.description) barLine(`${c.dim(p.description)}`);
+function pluginComponents(p: DiscoveredPlugin): string[] {
   const parts: string[] = [];
-  if (p.skills.length) parts.push(`${p.skills.length} skill(s)`);
-  if (p.commands.length) parts.push(`${p.commands.length} command(s)`);
-  if (p.agents.length) parts.push(`${p.agents.length} agent(s)`);
-  if (p.rules.length) parts.push(`${p.rules.length} rule(s)`);
-  if (p.hasHooks) parts.push("hooks");
-  if (p.hasMcp) parts.push("MCP servers");
-  if (p.hasLsp) parts.push("LSP servers");
-  if (parts.length) barLine(`${c.dim("Components:")} ${parts.join(c.dim(", "))}`);
-  barEmpty();
+  if (p.skills.length) parts.push(`${p.skills.length} skill`);
+  if (p.commands.length) parts.push(`${p.commands.length} cmd`);
+  if (p.agents.length) parts.push(`${p.agents.length} agent`);
+  if (p.rules.length) parts.push(`${p.rules.length} rule`);
+  if (p.hasHooks) parts.push("hook");
+  if (p.hasMcp) parts.push("mcp");
+  if (p.hasLsp) parts.push("lsp");
+  return parts;
+}
+
+function printPluginTable(plugins: DiscoveredPlugin[]) {
+  const nameWidth = Math.max(...plugins.map((p) => p.name.length), 4);
+  // Pre-compute component strings to measure width (plain text, no ANSI)
+  const compStrs = plugins.map((p) => pluginComponents(p).join(", "));
+  const compWidth = Math.max(...compStrs.map((s) => s.length), 0);
+  const termWidth = process.stdout.columns || 80;
+  // bar(1) + spacing(2) + name + gap(2) + comp + gap(2) + desc
+  const descWidth = Math.max(termWidth - 3 - nameWidth - 2 - compWidth - 2, 20);
+
+  for (let i = 0; i < plugins.length; i++) {
+    const p = plugins[i]!;
+    const name = p.name.padEnd(nameWidth);
+    const comp = compStrs[i]!;
+    const desc = truncate(p.description ?? "", descWidth);
+
+    barLine(`${c.bold(name)}  ${comp ? c.cyan(comp.padEnd(compWidth)) : " ".repeat(compWidth)}  ${c.dim(desc)}`);
+  }
+}
+
+function printRemotePluginTable(plugins: RemotePlugin[]) {
+  const nameWidth = Math.max(...plugins.map((p) => p.name.length), 4);
+  const termWidth = process.stdout.columns || 80;
+  const descWidth = Math.max(termWidth - 3 - nameWidth - 2, 20);
+
+  for (const p of plugins) {
+    const name = p.name.padEnd(nameWidth);
+    const desc = truncate(p.description ?? "", descWidth);
+    barLine(`${c.bold(name)}  ${c.dim(desc)}`);
+  }
+}
+
+function printMissingPaths(paths: string[]) {
+  if (paths.length === 0) return;
+  for (const p of paths) {
+    barLine(c.dim(`  source not found: ${p}`));
+  }
+}
+
+function truncate(s: string, max: number): string {
+  if (s.length <= max) return s;
+  return s.slice(0, max - 1) + "\u2026";
 }
 
 /**
