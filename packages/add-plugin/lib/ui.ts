@@ -142,6 +142,242 @@ export function warn(message: string) {
   barLine(`${c.yellow(S.warning)}  ${c.yellow(message)}`);
 }
 
+// -- Multi-select prompt ----------------------------------------------------
+
+export interface MultiSelectOption {
+  label: string;
+  value: string;
+  hint?: string;
+}
+
+/**
+ * Interactive search multi-select prompt.
+ * Type to filter, arrow keys to navigate, space to toggle, enter to confirm.
+ * Shows a scrolling window of max 8 items with scroll indicators.
+ * All items start selected. Returns selected values, or null if cancelled.
+ *
+ * Matches the skills CLI's search-multiselect aesthetic.
+ */
+export async function multiSelect(
+  title: string,
+  options: MultiSelectOption[],
+  maxVisible = 8,
+): Promise<string[] | null> {
+  if (!process.stdin.isTTY) {
+    return options.map((o) => o.value);
+  }
+
+  const { createInterface, emitKeypressEvents } = await import("readline");
+  const { Writable } = await import("stream");
+
+  // Silent output to prevent readline echo
+  const silentOutput = new Writable({
+    write(_chunk: any, _encoding: any, callback: () => void) {
+      callback();
+    },
+  });
+
+  return new Promise<string[] | null>((resolve) => {
+    const rl = createInterface({
+      input: process.stdin,
+      output: silentOutput,
+      terminal: false,
+    });
+
+    if (process.stdin.isTTY) {
+      process.stdin.setRawMode(true);
+    }
+    emitKeypressEvents(process.stdin, rl);
+
+    let query = "";
+    let cursor = 0;
+    const selected = new Set(options.map((o) => o.value));
+    let lastRenderHeight = 0;
+
+    const filter = (item: MultiSelectOption, q: string): boolean => {
+      if (!q) return true;
+      const lq = q.toLowerCase();
+      return item.label.toLowerCase().includes(lq) || (item.hint?.toLowerCase().includes(lq) ?? false);
+    };
+
+    const getFiltered = () => options.filter((item) => filter(item, query));
+
+    const clearRender = () => {
+      if (lastRenderHeight > 0) {
+        process.stdout.write(`\x1b[${lastRenderHeight}A`);
+        for (let i = 0; i < lastRenderHeight; i++) {
+          process.stdout.write("\x1b[2K\x1b[1B");
+        }
+        process.stdout.write(`\x1b[${lastRenderHeight}A`);
+      }
+    };
+
+    const render = (state: "active" | "submit" | "cancel" = "active") => {
+      clearRender();
+      const lines: string[] = [];
+      const filtered = getFiltered();
+
+      const icon =
+        state === "active"
+          ? c.cyan(S.stepActive)
+          : state === "cancel"
+            ? c.red(S.stepError)
+            : c.green(S.stepComplete);
+      lines.push(`${icon}  ${state === "active" ? title : c.dim(title)}`);
+
+      if (state === "active") {
+        // Search input
+        const blockCursor = isColorSupported ? `\x1b[7m \x1b[0m` : "_";
+        lines.push(`${c.gray(S.bar)}  ${c.dim("Search:")} ${query}${blockCursor}`);
+        lines.push(`${c.gray(S.bar)}  ${c.dim("↑↓ move, space toggle, a all, n none, enter confirm")}`);
+        lines.push(`${c.gray(S.bar)}`);
+
+        // Scrolling window
+        const visibleStart = Math.max(
+          0,
+          Math.min(cursor - Math.floor(maxVisible / 2), filtered.length - maxVisible),
+        );
+        const visibleEnd = Math.min(filtered.length, visibleStart + maxVisible);
+        const visibleItems = filtered.slice(visibleStart, visibleEnd);
+
+        if (filtered.length === 0) {
+          lines.push(`${c.gray(S.bar)}  ${c.dim("No matches found")}`);
+        } else {
+          for (let i = 0; i < visibleItems.length; i++) {
+            const item = visibleItems[i]!;
+            const actualIndex = visibleStart + i;
+            const isSelected = selected.has(item.value);
+            const isCursor = actualIndex === cursor;
+
+            const radio = isSelected ? c.green(S.stepComplete) : c.dim(S.circle);
+            const label = isCursor ? c.underline(item.label) : item.label;
+            const hint = item.hint ? c.dim(` (${item.hint})`) : "";
+            const pointer = isCursor ? c.cyan("\u276F") : " ";
+            lines.push(`${c.gray(S.bar)} ${pointer} ${radio} ${label}${hint}`);
+          }
+
+          // Scroll indicators
+          const hiddenBefore = visibleStart;
+          const hiddenAfter = filtered.length - visibleEnd;
+          if (hiddenBefore > 0 || hiddenAfter > 0) {
+            const parts: string[] = [];
+            if (hiddenBefore > 0) parts.push(`\u2191 ${hiddenBefore} more`);
+            if (hiddenAfter > 0) parts.push(`\u2193 ${hiddenAfter} more`);
+            lines.push(`${c.gray(S.bar)}  ${c.dim(parts.join("  "))}`);
+          }
+        }
+
+        // Selected summary
+        lines.push(`${c.gray(S.bar)}`);
+        const selectedLabels = options.filter((o) => selected.has(o.value)).map((o) => o.label);
+        if (selectedLabels.length === 0) {
+          lines.push(`${c.gray(S.bar)}  ${c.dim("Selected: (none)")}`);
+        } else {
+          const summary =
+            selectedLabels.length <= 3
+              ? selectedLabels.join(", ")
+              : `${selectedLabels.slice(0, 3).join(", ")} +${selectedLabels.length - 3} more`;
+          lines.push(`${c.gray(S.bar)}  ${c.green("Selected:")} ${summary}`);
+        }
+        lines.push(c.gray(S.barEnd));
+      } else if (state === "submit") {
+        const selectedLabels = options.filter((o) => selected.has(o.value)).map((o) => o.label);
+        lines.push(`${c.gray(S.bar)}  ${c.dim(selectedLabels.join(", "))}`);
+      } else if (state === "cancel") {
+        lines.push(`${c.gray(S.bar)}  ${c.dim("Cancelled")}`);
+      }
+
+      process.stdout.write(lines.join("\n") + "\n");
+      lastRenderHeight = lines.length;
+    };
+
+    const cleanup = () => {
+      process.stdin.removeListener("keypress", onKeypress);
+      if (process.stdin.isTTY) {
+        process.stdin.setRawMode(false);
+      }
+      rl.close();
+    };
+
+    const onKeypress = (_str: string, key: import("readline").Key) => {
+      if (!key) return;
+      const filtered = getFiltered();
+
+      // Enter -> submit
+      if (key.name === "return") {
+        render("submit");
+        cleanup();
+        resolve([...selected]);
+        return;
+      }
+
+      // Escape / Ctrl-C -> cancel
+      if (key.name === "escape" || (key.ctrl && key.name === "c")) {
+        render("cancel");
+        cleanup();
+        resolve(null);
+        return;
+      }
+
+      // Arrow up
+      if (key.name === "up") {
+        cursor = Math.max(0, cursor - 1);
+        render();
+        return;
+      }
+
+      // Arrow down
+      if (key.name === "down") {
+        cursor = Math.min(filtered.length - 1, cursor + 1);
+        render();
+        return;
+      }
+
+      // Space -> toggle
+      if (key.name === "space") {
+        const item = filtered[cursor];
+        if (item) {
+          if (selected.has(item.value)) selected.delete(item.value);
+          else selected.add(item.value);
+        }
+        render();
+        return;
+      }
+
+      // Backspace
+      if (key.name === "backspace") {
+        query = query.slice(0, -1);
+        cursor = 0;
+        render();
+        return;
+      }
+
+      // Regular character input (including 'a' and 'n' shortcuts)
+      if (key.sequence && !key.ctrl && !key.meta && key.sequence.length === 1) {
+        // 'a' with empty query -> select all
+        if (key.sequence === "a" && query === "") {
+          for (const o of options) selected.add(o.value);
+          render();
+          return;
+        }
+        // 'n' with empty query -> select none
+        if (key.sequence === "n" && query === "") {
+          selected.clear();
+          render();
+          return;
+        }
+        query += key.sequence;
+        cursor = 0;
+        render();
+        return;
+      }
+    };
+
+    process.stdin.on("keypress", onKeypress);
+    render();
+  });
+}
+
 // -- Banner -----------------------------------------------------------------
 
 const BANNER_LINES = [
