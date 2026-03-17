@@ -82,7 +82,7 @@ Discovery follows a 3-step fallback:
 2. **Root plugin** — checks if the repo root itself is a plugin
 3. **Recursive scan** — scans subdirectories (up to 2 levels deep) for plugin directories
 
-A plugin is any directory containing skills, commands, agents, rules, hooks, MCP servers, or LSP servers in the [open-plugin format](https://github.com/anthropics/open-plugin).
+A plugin is any directory containing skills, commands, agents, rules, hooks, MCP servers, or LSP servers.
 
 ### Installation
 
