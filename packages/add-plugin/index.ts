@@ -6,7 +6,7 @@ import { createInterface } from "readline";
 import { discover, type DiscoveredPlugin, type RemotePlugin } from "./lib/discover.js";
 import { getTargets, type Target } from "./lib/targets.js";
 import { installPlugins } from "./lib/install.js";
-import { c, S, banner, header, footer, step, stepDone, stepActive, stepError, barLine, barEmpty, error, multiSelect, type MultiSelectOption } from "./lib/ui.js";
+import { c, S, banner, header, footer, step, stepDone, stepActive, stepError, barLine, barEmpty, barDebug, error, multiSelect, setDebug, type MultiSelectOption } from "./lib/ui.js";
 import { setVersion, track } from "./lib/telemetry.js";
 
 setVersion("1.0.1");
@@ -19,12 +19,15 @@ const { values, positionals } = parseArgs({
     scope: { type: "string", short: "s", default: "user" },
     yes: { type: "boolean", short: "y" },
     remote: { type: "boolean" },
+    debug: { type: "boolean" },
   },
   allowPositionals: true,
   strict: true,
 });
 
 const [command, ...rest] = positionals;
+
+if (values.debug) setDebug(true);
 
 if (values.help || !command) {
   printUsage();
@@ -61,6 +64,7 @@ ${c.dim("Options:")}
   ${c.yellow("-s, --scope")} <scope>     Install scope: user, project, local. Default: user
   ${c.yellow("-y, --yes")}               Skip confirmation prompts
   ${c.yellow("--remote")}                Include remote-source plugins in output
+  ${c.yellow("--debug")}                 Show verbose installation output
   ${c.yellow("-h, --help")}              Show this help
 `);
 }
@@ -178,11 +182,16 @@ async function cmdInstall(source: string | undefined, opts: typeof values) {
       footer();
       process.exit(1);
     }
+    if (!found.detected) {
+      barEmpty();
+      barLine(c.yellow(`Warning: ${found.name} was not detected on this system.`));
+    }
     installTargets = [found];
   } else if (detectedTargets.length === 0) {
     barEmpty();
     stepError("No supported targets detected.");
-    barLine(c.dim("Use --target to specify one."));
+    barLine(c.dim("Neither 'claude' nor 'cursor' binaries were found on PATH."));
+    barLine(c.dim("Use --target to specify one manually."));
     footer();
     process.exit(1);
   } else {
@@ -279,11 +288,11 @@ async function cmdInstall(source: string | undefined, opts: typeof values) {
 
 function pluginComponents(p: DiscoveredPlugin): string[] {
   const parts: string[] = [];
-  if (p.skills.length) parts.push(`${p.skills.length} skill`);
-  if (p.commands.length) parts.push(`${p.commands.length} cmd`);
-  if (p.agents.length) parts.push(`${p.agents.length} agent`);
-  if (p.rules.length) parts.push(`${p.rules.length} rule`);
-  if (p.hasHooks) parts.push("hook");
+  if (p.skills.length) parts.push(`${p.skills.length} ${p.skills.length === 1 ? "skill" : "skills"}`);
+  if (p.commands.length) parts.push(`${p.commands.length} ${p.commands.length === 1 ? "cmd" : "cmds"}`);
+  if (p.agents.length) parts.push(`${p.agents.length} ${p.agents.length === 1 ? "agent" : "agents"}`);
+  if (p.rules.length) parts.push(`${p.rules.length} ${p.rules.length === 1 ? "rule" : "rules"}`);
+  if (p.hasHooks) parts.push("hooks");
   if (p.hasMcp) parts.push("mcp");
   if (p.hasLsp) parts.push("lsp");
   return parts;
@@ -423,7 +432,16 @@ function resolveSource(source: string): string {
 function readLine(prompt: string): Promise<string> {
   const rl = createInterface({ input: process.stdin, output: process.stdout });
   return new Promise((resolve) => {
+    let answered = false;
+    rl.on("close", () => {
+      if (!answered) {
+        // Ctrl+C or EOF — exit cleanly without the unsettled await warning
+        process.stdout.write("\n");
+        process.exit(0);
+      }
+    });
     rl.question(prompt, (answer) => {
+      answered = true;
       rl.close();
       // Ensure newline after answer (piped stdin may not echo one)
       if (!process.stdin.isTTY) process.stdout.write("\n");

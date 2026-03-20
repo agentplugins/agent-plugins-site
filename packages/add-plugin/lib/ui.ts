@@ -92,6 +92,19 @@ export function barEmpty() {
   console.log(`${c.gray(S.bar)}`);
 }
 
+/** Whether verbose/debug output is enabled */
+let _debug = false;
+
+/** Enable debug output */
+export function setDebug(enabled: boolean) {
+  _debug = enabled;
+}
+
+/** Print a bar-connected line only when --debug is passed */
+export function barDebug(content: string = "") {
+  if (_debug) barLine(content);
+}
+
 /** Print a step line: `◇  <content>` */
 export function step(content: string) {
   console.log(`${c.gray(S.step)}  ${content}`);

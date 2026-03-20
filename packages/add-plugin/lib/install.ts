@@ -4,9 +4,9 @@
  * For Claude Code: prepares a local marketplace directory that Claude Code
  * understands, then shells out to `claude plugin marketplace add` + `claude plugin install`.
  *
- * For Cursor: also installs via the Claude Code CLI. Cursor discovers "Imported"
- * plugins by reading from the Claude Code plugin cache (~/.claude/plugins/cache/),
- * so both targets use the same underlying installation mechanism.
+ * For Cursor: installs via the Claude Code CLI when available. When the claude
+ * CLI is not installed, writes directly to the Claude plugin cache directory
+ * (~/.claude/plugins/) which Cursor reads for "Imported" plugins.
  */
 
 import { join, relative } from "path";
@@ -16,32 +16,18 @@ import { execSync } from "child_process";
 import { homedir } from "os";
 import type { DiscoveredPlugin } from "./discover.js";
 import type { Target } from "./targets.js";
-import { c, step, stepDone, stepError, barLine, barEmpty } from "./ui.js";
+import { c, step, stepDone, stepError, barLine, barEmpty, barDebug } from "./ui.js";
 
 /**
- * Map from target id to the underlying installer key.
- * Targets that share the same installer (e.g. claude-code and cursor both use
- * the Claude Code CLI) map to the same key so we can deduplicate.
+ * Track whether the plugin cache has already been populated (by the Claude Code
+ * CLI installer or the direct file installer). When both claude-code and cursor
+ * targets are present, the first successful installation populates the cache
+ * and the second can skip.
  */
-function installerKey(targetId: string): string {
-  switch (targetId) {
-    case "claude-code":
-    case "cursor":
-      return "claude-code";
-    default:
-      return targetId;
-  }
-}
-
-/** Track which installers have already run to avoid duplicate work. */
-const completedInstallers = new Set<string>();
+let cachePopulated = false;
 
 /**
  * Install discovered plugins into a target tool.
- *
- * When multiple targets share the same underlying installer (e.g. claude-code
- * and cursor both install via the Claude Code CLI), the installation is only
- * performed once.
  */
 export async function installPlugins(
   plugins: DiscoveredPlugin[],
@@ -50,29 +36,20 @@ export async function installPlugins(
   repoPath: string,
   source: string,
 ): Promise<void> {
-  const key = installerKey(target.id);
-
-  if (completedInstallers.has(key)) {
-    return;
-  }
-
-  switch (key) {
+  switch (target.id) {
     case "claude-code":
-      // Both Claude Code and Cursor use the Claude Code plugin system.
-      // Cursor discovers "Imported" plugins by reading from the Claude Code
-      // plugin cache (~/.claude/plugins/cache/), so both targets install
-      // through the Claude Code CLI.
       await installToClaudeCode(plugins, scope, repoPath, source);
+      break;
+    case "cursor":
+      await installToCursor(plugins, scope, repoPath, source);
       break;
     default:
       throw new Error(`Unsupported target: ${target.id}`);
   }
-
-  completedInstallers.add(key);
 }
 
 // ---------------------------------------------------------------------------
-// Claude Code installer
+// Claude Code installer (uses the `claude` CLI)
 // ---------------------------------------------------------------------------
 //
 // Claude Code requires:
@@ -106,12 +83,12 @@ async function installToClaudeCode(
 
   const claudePath = findClaude();
   step("Adding marketplace");
-  barLine(c.dim(`Binary: ${claudePath}`));
+  barDebug(c.dim(`Binary: ${claudePath}`));
   try {
     const version = execSync(`${claudePath} --version`, { encoding: "utf-8", stdio: "pipe" }).trim();
-    barLine(c.dim(`Version: ${version}`));
+    barDebug(c.dim(`Version: ${version}`));
   } catch {
-    barLine(c.dim(`Warning: could not get claude version`));
+    barDebug(c.dim(`Warning: could not get claude version`));
   }
 
   try {
@@ -119,7 +96,7 @@ async function installToClaudeCode(
       encoding: "utf-8",
       stdio: "pipe",
     });
-    if (result.trim()) barLine(c.dim(result.trim()));
+    if (result.trim()) barDebug(c.dim(result.trim()));
     stepDone("Marketplace added");
   } catch (err: any) {
     const stderr = err.stderr?.toString().trim() ?? "";
@@ -163,6 +140,146 @@ async function installToClaudeCode(
       }
     }
   }
+
+  cachePopulated = true;
+}
+
+// ---------------------------------------------------------------------------
+// Cursor installer
+// ---------------------------------------------------------------------------
+//
+// Cursor reads "Imported" plugins from the Claude Code plugin cache directory
+// (~/.claude/plugins/). When the `claude` CLI is available, we use it (same as
+// Claude Code). When it's not available, we write directly to the cache
+// directory, registering the marketplace and plugins in the JSON manifests
+// that Cursor reads.
+
+async function installToCursor(
+  plugins: DiscoveredPlugin[],
+  scope: string,
+  repoPath: string,
+  source: string,
+): Promise<void> {
+  // If the Claude Code installer already ran successfully, the cache is
+  // populated and Cursor will pick it up — nothing more to do.
+  if (cachePopulated) return;
+
+  const claudePath = findClaudeOrNull();
+
+  if (claudePath) {
+    // Claude CLI available — use it (same mechanism as Claude Code target).
+    await installToClaudeCode(plugins, scope, repoPath, source);
+    return;
+  }
+
+  // No claude CLI — install directly to the plugin cache.
+  await installToPluginCache(plugins, scope, repoPath, source);
+}
+
+// ---------------------------------------------------------------------------
+// Direct file-based installer (no claude CLI required)
+// ---------------------------------------------------------------------------
+//
+// Replicates what `claude plugin marketplace add` + `claude plugin install`
+// does under the hood: writes to ~/.claude/plugins/{cache, known_marketplaces,
+// installed_plugins}.
+
+async function installToPluginCache(
+  plugins: DiscoveredPlugin[],
+  scope: string,
+  repoPath: string,
+  source: string,
+): Promise<void> {
+  const marketplaceName = plugins[0]?.marketplace ?? deriveMarketplaceName(source);
+  const home = homedir();
+  const pluginsDir = join(home, ".claude", "plugins");
+  const cacheDir = join(pluginsDir, "cache");
+
+  // 1. Prepare the repo directory for Claude Code format
+  step("Preparing plugins for Cursor...");
+  barEmpty();
+  await prepareForClaudeCode(plugins, repoPath, marketplaceName);
+
+  // 2. Register the marketplace in known_marketplaces.json
+  step("Registering marketplace");
+  await mkdir(pluginsDir, { recursive: true });
+
+  const knownPath = join(pluginsDir, "known_marketplaces.json");
+  let knownMarketplaces: Record<string, unknown> = {};
+  if (existsSync(knownPath)) {
+    try {
+      knownMarketplaces = JSON.parse(await readFile(knownPath, "utf-8"));
+    } catch {
+      // corrupted — start fresh
+    }
+  }
+
+  if (knownMarketplaces[marketplaceName]) {
+    stepDone(`Marketplace ${c.dim("'" + marketplaceName + "'")} already registered`);
+  } else {
+    knownMarketplaces[marketplaceName] = {
+      source: { source: "directory", path: repoPath },
+      installLocation: repoPath,
+      lastUpdated: new Date().toISOString(),
+    };
+    await writeFile(knownPath, JSON.stringify(knownMarketplaces, null, 2));
+    stepDone("Marketplace registered");
+  }
+
+  barEmpty();
+
+  // 3. Copy each plugin into the cache and register in installed_plugins.json
+  const installedPath = join(pluginsDir, "installed_plugins.json");
+  let installedData: { version: number; plugins: Record<string, unknown[]> } = { version: 2, plugins: {} };
+  if (existsSync(installedPath)) {
+    try {
+      installedData = JSON.parse(await readFile(installedPath, "utf-8"));
+    } catch {
+      // corrupted — start fresh
+    }
+  }
+
+  // Read the git commit sha from the repo (if available)
+  let gitSha: string | undefined;
+  try {
+    gitSha = execSync("git rev-parse HEAD", { cwd: repoPath, encoding: "utf-8", stdio: "pipe" }).trim();
+  } catch {
+    // not a git repo or git not available
+  }
+
+  for (const plugin of plugins) {
+    const pluginRef = `${plugin.name}@${marketplaceName}`;
+    const version = plugin.version ?? "0.0.0";
+    step(`Installing ${c.bold(pluginRef)}...`);
+
+    // Copy plugin directory to cache
+    const cacheDest = join(cacheDir, marketplaceName, plugin.name, version);
+    await mkdir(cacheDest, { recursive: true });
+    await cp(plugin.path, cacheDest, { recursive: true });
+    barDebug(c.dim(`Cached to ${cacheDest}`));
+
+    // Register in installed_plugins.json
+    const pluginKey = `${plugin.name}@${marketplaceName}`;
+    const now = new Date().toISOString();
+    const entry: Record<string, unknown> = {
+      scope,
+      installPath: cacheDest,
+      version,
+      installedAt: now,
+      lastUpdated: now,
+    };
+    if (gitSha) entry.gitCommitSha = gitSha;
+
+    // Replace existing entries for this plugin key with the new one
+    installedData.plugins[pluginKey] = [entry];
+
+    stepDone(`Installed ${c.cyan(pluginRef)}`);
+  }
+
+  await writeFile(installedPath, JSON.stringify(installedData, null, 2));
+  barDebug(c.dim("Updated installed_plugins.json"));
+
+  cachePopulated = true;
 }
 
 async function prepareForClaudeCode(
@@ -198,7 +315,7 @@ async function prepareForClaudeCode(
     join(claudePluginDir, "marketplace.json"),
     JSON.stringify(marketplaceJson, null, 2),
   );
-  barLine(c.dim("Generated .claude-plugin/marketplace.json"));
+  barDebug(c.dim("Generated .claude-plugin/marketplace.json"));
 
   for (const plugin of plugins) {
     await preparePluginDirForVendor(plugin, ".claude-plugin", "CLAUDE_PLUGIN_ROOT");
@@ -210,10 +327,9 @@ async function prepareForClaudeCode(
 // ---------------------------------------------------------------------------
 
 /**
- * Find the claude binary, preferring the newest version if multiple exist.
- * Returns the full path to avoid PATH-order issues across shell environments.
+ * Find the claude binary. Returns null if not found anywhere.
  */
-function findClaude(): string {
+function findClaudeOrNull(): string | null {
   // Try `which` first to find the default
   try {
     const path = execSync("which claude", { encoding: "utf-8", stdio: "pipe" }).trim();
@@ -234,8 +350,16 @@ function findClaude(): string {
     if (existsSync(candidate)) return candidate;
   }
 
-  // Last resort — just use bare "claude" and let the shell resolve it
-  return "claude";
+  return null;
+}
+
+/**
+ * Find the claude binary, preferring the newest version if multiple exist.
+ * Returns the full path to avoid PATH-order issues across shell environments.
+ * Falls back to bare "claude" as a last resort.
+ */
+function findClaude(): string {
+  return findClaudeOrNull() ?? "claude";
 }
 
 // ---------------------------------------------------------------------------
@@ -263,7 +387,7 @@ async function preparePluginDirForVendor(
 
   if (hasOpenPlugin && !hasVendorPlugin) {
     await cp(openPluginDir, vendorPluginDir, { recursive: true });
-    barLine(c.dim(`${plugin.name}: translated .plugin/ → ${vendorDir}/`));
+    barDebug(c.dim(`${plugin.name}: translated .plugin/ → ${vendorDir}/`));
   }
 
   // Ensure vendor plugin.json exists (some plugins might only have skills/)
@@ -281,7 +405,7 @@ async function preparePluginDirForVendor(
         2,
       ),
     );
-    barLine(c.dim(`${plugin.name}: generated ${vendorDir}/plugin.json`));
+    barDebug(c.dim(`${plugin.name}: generated ${vendorDir}/plugin.json`));
   }
 
   // Translate ${PLUGIN_ROOT} -> ${<VENDOR_ENV_VAR>} in config files
@@ -335,7 +459,7 @@ async function translateEnvVars(
     }
     if (changed) {
       await writeFile(filePath, content);
-      barLine(
+      barDebug(
         c.dim(`${pluginName}: translated plugin root → \${${envVar}} in ${filePath.split("/").pop()}`),
       );
     }
