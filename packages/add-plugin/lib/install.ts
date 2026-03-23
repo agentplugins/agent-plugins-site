@@ -352,10 +352,14 @@ async function installToCursorExtensions(
       (e: any) => e?.identifier?.id !== identifier,
     );
 
+    // VS Code/Cursor URI format requires forward slashes with a leading "/"
+    // prefix on Windows (e.g. /C:/Users/...) rather than native backslash paths.
+    const uriPath = "/" + destDir.replace(/\\/g, "/");
+
     extensions.push({
       identifier: { id: identifier },
       version,
-      location: { $mid: 1, path: destDir, scheme: "file" },
+      location: { $mid: 1, path: uriPath, scheme: "file" },
       relativeLocation: folderName,
       metadata: {
         installedTimestamp: Date.now(),
