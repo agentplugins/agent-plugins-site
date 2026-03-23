@@ -172,8 +172,8 @@ async function installToCursor(
     return;
   }
 
-  // No claude CLI — install directly to the plugin cache.
-  await installToPluginCache(plugins, scope, repoPath, source);
+  // No claude CLI — install directly to Cursor's extensions directory.
+  await installToCursorExtensions(plugins, scope, repoPath, source);
 }
 
 // ---------------------------------------------------------------------------
@@ -278,6 +278,96 @@ async function installToPluginCache(
 
   await writeFile(installedPath, JSON.stringify(installedData, null, 2));
   barDebug(c.dim("Updated installed_plugins.json"));
+
+  cachePopulated = true;
+}
+
+// ---------------------------------------------------------------------------
+// Cursor extensions installer (no claude CLI required)
+// ---------------------------------------------------------------------------
+//
+// On Windows, Cursor reads extensions from %USERPROFILE%\.cursor\extensions\
+// rather than the ~/.claude/plugins/ cache that macOS/Linux Cursor uses.
+// On macOS/Linux, falls back to the Claude plugin cache (existing behavior).
+
+async function installToCursorExtensions(
+  plugins: DiscoveredPlugin[],
+  scope: string,
+  repoPath: string,
+  source: string,
+): Promise<void> {
+  if (process.platform !== "win32") {
+    // macOS/Linux: use the Claude plugin cache (Cursor reads from there)
+    await installToPluginCache(plugins, scope, repoPath, source);
+    return;
+  }
+
+  // Windows: install to ~/.cursor/extensions/
+  const marketplaceName = plugins[0]?.marketplace ?? deriveMarketplaceName(source);
+  const home = homedir();
+  const extensionsDir = join(home, ".cursor", "extensions");
+
+  step("Preparing plugins for Cursor...");
+  barEmpty();
+  await prepareForClaudeCode(plugins, repoPath, marketplaceName);
+
+  await mkdir(extensionsDir, { recursive: true });
+
+  // Read existing extensions.json
+  const extensionsJsonPath = join(extensionsDir, "extensions.json");
+  let extensions: unknown[] = [];
+  if (existsSync(extensionsJsonPath)) {
+    try {
+      const parsed = JSON.parse(await readFile(extensionsJsonPath, "utf-8"));
+      if (Array.isArray(parsed)) extensions = parsed;
+    } catch {
+      // corrupted — start fresh
+    }
+  }
+
+  // Read git commit sha (if available)
+  let gitSha: string | undefined;
+  try {
+    gitSha = execSync("git rev-parse HEAD", { cwd: repoPath, encoding: "utf-8", stdio: "pipe" }).trim();
+  } catch {
+    // not a git repo or git not available
+  }
+
+  for (const plugin of plugins) {
+    const pluginRef = `${plugin.name}@${marketplaceName}`;
+    const version = plugin.version ?? "0.0.0";
+    const folderName = `${marketplaceName}.${plugin.name}-${version}`;
+    const destDir = join(extensionsDir, folderName);
+
+    step(`Installing ${c.bold(pluginRef)}...`);
+
+    // Copy plugin directory into the extensions folder
+    await mkdir(destDir, { recursive: true });
+    await cp(plugin.path, destDir, { recursive: true });
+    barDebug(c.dim(`Copied to ${destDir}`));
+
+    // Remove any existing entry for this plugin, then add the new one
+    const identifier = `${marketplaceName}.${plugin.name}`;
+    extensions = extensions.filter(
+      (e: any) => e?.identifier?.id !== identifier,
+    );
+
+    extensions.push({
+      identifier: { id: identifier },
+      version,
+      location: { $mid: 1, path: destDir, scheme: "file" },
+      relativeLocation: folderName,
+      metadata: {
+        installedTimestamp: Date.now(),
+        ...(gitSha ? { gitCommitSha: gitSha } : {}),
+      },
+    });
+
+    stepDone(`Installed ${c.cyan(pluginRef)}`);
+  }
+
+  await writeFile(extensionsJsonPath, JSON.stringify(extensions, null, 2));
+  barDebug(c.dim("Updated extensions.json"));
 
   cachePopulated = true;
 }
