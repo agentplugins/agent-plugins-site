@@ -50,6 +50,16 @@ Tools MUST discover MCP server configurations in:
 2. Inline in the manifest's `mcpServers` field
 3. Any additional paths declared in the manifest
 
+## Tool Namespacing
+
+MCP tools provided by a plugin MUST be namespaced to prevent collisions. The tool identifier surfaced to the model MUST include both the plugin name and the server name.
+
+The RECOMMENDED format is: `mcp__plugin_{plugin-name}_{server-name}__{tool-name}`
+
+For example, a plugin named `deploy-tools` with a server named `database` exposing a `query` tool produces `mcp__plugin_deploy-tools_database__query`.
+
+See [Component Namespacing](/plugin-builders/specification#mcp-tool-namespacing) for the full specification.
+
 ## Compatibility
 
 This spec does not redefine the MCP protocol. Plugin MCP servers MUST implement the [Model Context Protocol](https://modelcontextprotocol.io/) as specified by that project.

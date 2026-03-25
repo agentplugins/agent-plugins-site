@@ -189,6 +189,22 @@ All components provided by a plugin MUST be namespaced: `{plugin-name}:{componen
 
 For example, a plugin named `deploy-tools` with a command `status` produces `/deploy-tools:status`.
 
+### MCP Tool Namespacing
+
+MCP servers expose tools with their own names. To prevent collisions across plugins, tools MUST include the plugin name and server name in the tool identifier surfaced to the model.
+
+The RECOMMENDED format is: `mcp__plugin_{plugin-name}_{server-name}__{tool-name}`
+
+| Plugin Name | Server Name | Tool Name | Surfaced Identifier |
+|---|---|---|---|
+| `deploy-tools` | `database` | `query` | `mcp__plugin_deploy-tools_database__query` |
+| `deploy-tools` | `api` | `list_endpoints` | `mcp__plugin_deploy-tools_api__list_endpoints` |
+| `code-review` | `analyzer` | `scan` | `mcp__plugin_code-review_analyzer__scan` |
+
+This format uses underscores and double underscores as separators, avoiding colons to maintain compatibility with tools that restrict colon usage in tool identifiers.
+
+Tools that already use a different MCP tool naming convention MAY adapt this pattern to their existing format, provided the plugin name and server name are both present in the identifier.
+
 ## Environment Variables
 
 Tools MUST provide `PLUGIN_ROOT` (or a vendor-prefixed equivalent) as an environment variable and expand `${PLUGIN_ROOT}` in configuration files at load time.
