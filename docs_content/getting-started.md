@@ -1,6 +1,6 @@
 # Getting Started
 
-> This is a non-normative guide. For the formal specification, see [spec/specification.md](../spec/specification.md).
+> This is a non-normative guide. For the formal specification, see [Open Plugin Specification v1](../spec/open-plugins-v1.md).
 
 This guide walks you through creating a plugin and testing it.
 
@@ -183,6 +183,5 @@ my-plugin/
 
 ## Next steps
 
-- [Specification](../spec/specification.md) — Full spec for all fields and behaviors
-- [Component specs](../spec/specification.md#component-specifications) — Deep dive into each component type
+- [Specification](../spec/open-plugins-v1.md) — Full spec for all fields and behaviors
 - [Examples](../examples/) — Working example plugins

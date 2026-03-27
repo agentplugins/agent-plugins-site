@@ -1,6 +1,6 @@
 # Marketplaces
 
-A marketplace is a named collection of one or more plugins. The `marketplace.json` format is defined in the [Marketplace specification](../spec/marketplace.md).
+A marketplace is a named collection of one or more plugins. The `marketplace.json` format is defined in the [Marketplace specification](../spec/open-plugins-v1.md#13-marketplace-index).
 
 ## How it works
 

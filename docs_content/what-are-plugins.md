@@ -1,6 +1,6 @@
 # What Are Plugins?
 
-> This is a non-normative guide. For the formal specification, see [spec/specification.md](../spec/specification.md).
+> This is a non-normative guide. For the formal specification, see [Open Plugin Specification v1](../spec/open-plugins-v1.md).
 
 A plugin is a directory that bundles multiple agent extension types into a single installable package. Instead of configuring skills, hooks, and servers individually, authors package them together and users install them in one step.
 
@@ -61,5 +61,5 @@ Think of it this way: Agent Skills defines the skill format. Open Plugin defines
 ## Next steps
 
 - [Getting started](getting-started.md) — Create your first plugin
-- [Specification](../spec/specification.md) — The formal spec
+- [Specification](../spec/open-plugins-v1.md) — The formal spec
 - [Integrate plugins](integrate-plugins.md) — Add plugin support to your tool

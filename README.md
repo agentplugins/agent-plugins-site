@@ -84,16 +84,7 @@ claude --plugin-dir ./examples/minimal-plugin
 
 ## Specification
 
-The full spec lives in [`spec/`](spec/):
-
-- [Core specification](spec/specification.md) — Manifest schema, directory structure, naming, discovery
-- [Skills](spec/components/skills.md) — Agent Skills and slash commands
-- [Agents](spec/components/agents.md) — Sub-agent definitions
-- [Rules](spec/components/rules.md) — Persistent AI guidance
-- [Hooks](spec/components/hooks.md) — Event-driven automation
-- [MCP Servers](spec/components/mcp-servers.md) — External tool integration
-- [LSP Servers](spec/components/lsp-servers.md) — Code intelligence
-- [Installation](spec/installation.md) — Scopes, caching, resolution
+The full spec is a single canonical document: **[spec/open-plugins-v1.md](spec/open-plugins-v1.md)**
 
 Guides for plugin authors and tool implementers are in [`docs/`](docs/).
 

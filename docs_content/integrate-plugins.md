@@ -1,6 +1,6 @@
 # Integrate Plugins Into Your Tool
 
-> This is a non-normative guide. For the formal specification, see [spec/specification.md](../spec/specification.md).
+> This is a non-normative guide. For the formal specification, see [Open Plugin Specification v1](../spec/open-plugins-v1.md).
 
 This guide explains how to add Open Plugin support to an AI agent or development tool.
 
