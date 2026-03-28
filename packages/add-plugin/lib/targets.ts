@@ -34,6 +34,12 @@ const TARGET_DEFS: Omit<Target, "detected">[] = [
     description: "AI-powered code editor",
     configPath: join(HOME, ".cursor"),
   },
+  {
+    id: "codex",
+    name: "Codex",
+    description: "OpenAI's coding agent",
+    configPath: join(HOME, ".codex"),
+  },
   // Future targets can be added here:
   // {
   //   id: "opencode",
@@ -66,6 +72,8 @@ function detectTarget(def: Omit<Target, "detected">): boolean {
       // The claude CLI is preferred but not required — we can write directly
       // to the cache directory when it's unavailable.
       return detectBinary("cursor");
+    case "codex":
+      return detectBinary("codex");
     default:
       return false;
   }
