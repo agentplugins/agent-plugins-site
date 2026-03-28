@@ -1,0 +1,34 @@
+{
+  "name": "devtools",
+  "version": "2.0.0",
+  "description": "Full-featured development toolkit with code review, linting, security scanning, and database tools.",
+  "author": {
+    "name": "Open Plugin Examples",
+    "url": "https://github.com/anthropics/open-plugin"
+  },
+  "homepage": "https://github.com/anthropics/open-plugin/tree/main/examples/full-plugin",
+  "repository": "https://github.com/anthropics/open-plugin",
+  "license": "Apache-2.0",
+  "keywords": [
+    "devtools",
+    "code-review",
+    "linting",
+    "security"
+  ],
+  "logo": "assets/logo.svg",
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Devtools",
+    "shortDescription": "Full-featured development toolkit with code review, linting, security scanning, and database tools.",
+    "developerName": "Open Plugin Examples",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/anthropics/open-plugin/tree/main/examples/full-plugin",
+    "logo": "./assets/logo.svg",
+    "composerIcon": "./assets/logo.svg"
+  }
+}
