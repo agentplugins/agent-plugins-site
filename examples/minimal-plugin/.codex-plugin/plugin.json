@@ -1,0 +1,16 @@
+{
+  "name": "minimal-plugin",
+  "description": "The simplest possible plugin — one skill, nothing else.",
+  "version": "1.0.0",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Minimal-plugin",
+    "shortDescription": "The simplest possible plugin — one skill, nothing else.",
+    "developerName": "Unknown",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ]
+  }
+}

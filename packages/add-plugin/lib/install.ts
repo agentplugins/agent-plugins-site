@@ -43,6 +43,9 @@ export async function installPlugins(
     case "cursor":
       await installToCursor(plugins, scope, repoPath, source);
       break;
+    case "codex":
+      await installToCodex(plugins, scope, repoPath, source);
+      break;
     default:
       throw new Error(`Unsupported target: ${target.id}`);
   }
@@ -376,6 +379,243 @@ async function installToCursorExtensions(
   cachePopulated = true;
 }
 
+// ---------------------------------------------------------------------------
+// Codex installer (direct file-based — no CLI equivalent)
+// ---------------------------------------------------------------------------
+//
+// Codex discovers plugins through marketplace JSON files and stores installed
+// plugin data in a cache directory. Three things must happen for a plugin to
+// appear in the Codex UI:
+//
+// 1. Plugin files are copied to ~/.codex/plugins/cache/<marketplace>/<plugin>/<git-sha>/
+//    with a .codex-plugin/plugin.json manifest (richer than .claude-plugin).
+// 2. A personal marketplace at ~/.agents/plugins/marketplace.json references
+//    the cached plugin via a relative source.path entry.
+// 3. The plugin is enabled in ~/.codex/config.toml under [plugins."name@marketplace"].
+//
+// The .codex-plugin/plugin.json is a superset of the open-plugin manifest,
+// adding explicit component paths (skills, mcpServers, apps) and an interface
+// block for marketplace presentation. We generate these from the base manifest
+// when converting from .plugin/ or .claude-plugin/.
+
+async function installToCodex(
+  plugins: DiscoveredPlugin[],
+  scope: string,
+  repoPath: string,
+  source: string,
+): Promise<void> {
+  const marketplaceName = plugins[0]?.marketplace ?? deriveMarketplaceName(source);
+  const home = homedir();
+  const cacheDir = join(home, ".codex", "plugins", "cache");
+  const configPath = join(home, ".codex", "config.toml");
+  // Personal marketplace: ~/.agents/plugins/marketplace.json
+  // Codex resolves source.path relative to the grandparent of the marketplace
+  // file — i.e. the directory that contains .agents/. For the personal
+  // marketplace that is $HOME.
+  const marketplaceDir = join(home, ".agents", "plugins");
+  const marketplacePath = join(marketplaceDir, "marketplace.json");
+  const marketplaceRoot = home;
+
+  // 1. Prepare plugin directories for Codex format
+  step("Preparing plugins for Codex...");
+  barEmpty();
+
+  for (const plugin of plugins) {
+    await preparePluginDirForVendor(plugin, ".codex-plugin", "CODEX_PLUGIN_ROOT");
+    await enrichForCodex(plugin);
+  }
+
+  // 2. Get git commit SHA for cache key
+  let gitSha: string | undefined;
+  try {
+    gitSha = execSync("git rev-parse HEAD", { cwd: repoPath, encoding: "utf-8", stdio: "pipe" }).trim();
+  } catch {
+    // not a git repo — use "local" as version key (matches Codex convention for local installs)
+  }
+  const versionKey = gitSha ?? "local";
+
+  // 3. Copy each plugin into the cache
+  const pluginPaths: Record<string, string> = {};
+  for (const plugin of plugins) {
+    const pluginRef = `${plugin.name}@${marketplaceName}`;
+    step(`Installing ${c.bold(pluginRef)}...`);
+
+    const cacheDest = join(cacheDir, marketplaceName, plugin.name, versionKey);
+    await mkdir(cacheDest, { recursive: true });
+    await cp(plugin.path, cacheDest, { recursive: true });
+    pluginPaths[plugin.name] = cacheDest;
+    barDebug(c.dim(`Cached to ${cacheDest}`));
+
+    stepDone(`Installed ${c.cyan(pluginRef)}`);
+  }
+
+  // 4. Register in the personal marketplace (~/.agents/plugins/marketplace.json)
+  step("Updating marketplace...");
+  await mkdir(marketplaceDir, { recursive: true });
+
+  interface CodexMarketplaceEntry {
+    name: string;
+    source: { source: string; path: string };
+    policy: { installation: string; authentication: string };
+    category: string;
+  }
+  interface CodexMarketplace {
+    name: string;
+    interface?: { displayName: string };
+    plugins: CodexMarketplaceEntry[];
+  }
+
+  let marketplace: CodexMarketplace = {
+    name: "plugins-cli",
+    interface: { displayName: "Plugins CLI" },
+    plugins: [],
+  };
+
+  if (existsSync(marketplacePath)) {
+    try {
+      const existing = JSON.parse(await readFile(marketplacePath, "utf-8"));
+      if (existing && typeof existing === "object" && Array.isArray(existing.plugins)) {
+        marketplace = existing as CodexMarketplace;
+      }
+    } catch {
+      // corrupted — start fresh
+    }
+  }
+
+  for (const plugin of plugins) {
+    const cacheDest = pluginPaths[plugin.name]!;
+    // source.path is relative to the marketplace root ($HOME)
+    const relPath = relative(marketplaceRoot, cacheDest);
+
+    // Remove any existing entry for this plugin
+    marketplace.plugins = marketplace.plugins.filter(
+      (e: CodexMarketplaceEntry) => e.name !== plugin.name,
+    );
+
+    marketplace.plugins.push({
+      name: plugin.name,
+      source: {
+        source: "local",
+        path: `./${relPath}`,
+      },
+      policy: {
+        installation: "AVAILABLE",
+        authentication: "ON_INSTALL",
+      },
+      category: "Coding",
+    });
+  }
+
+  await writeFile(marketplacePath, JSON.stringify(marketplace, null, 2));
+  stepDone("Marketplace updated");
+
+  // 5. Enable plugins in ~/.codex/config.toml
+  step("Updating config.toml...");
+  await mkdir(join(home, ".codex"), { recursive: true });
+
+  let configContent = "";
+  if (existsSync(configPath)) {
+    configContent = await readFile(configPath, "utf-8");
+  }
+
+  let configChanged = false;
+  for (const plugin of plugins) {
+    const pluginKey = `${plugin.name}@plugins-cli`;
+    const tomlSection = `[plugins."${pluginKey}"]`;
+
+    if (configContent.includes(tomlSection)) {
+      barDebug(c.dim(`${pluginKey} already in config.toml`));
+      continue;
+    }
+
+    // Append the plugin entry
+    const entry = `\n${tomlSection}\nenabled = true\n`;
+    configContent += entry;
+    configChanged = true;
+    barDebug(c.dim(`Added ${pluginKey} to config.toml`));
+  }
+
+  if (configChanged) {
+    await writeFile(configPath, configContent);
+  }
+
+  stepDone("Config updated");
+}
+
+/**
+ * Enrich a .codex-plugin/plugin.json with Codex-specific fields.
+ *
+ * If the plugin already ships a handcrafted .codex-plugin/plugin.json with an
+ * `interface` block, this is a no-op. Otherwise we generate the Codex-specific
+ * fields (component paths + minimal interface block) from the base manifest
+ * and discovered plugin metadata.
+ */
+async function enrichForCodex(plugin: DiscoveredPlugin): Promise<void> {
+  const codexManifestPath = join(plugin.path, ".codex-plugin", "plugin.json");
+  if (!existsSync(codexManifestPath)) return;
+
+  let manifest: Record<string, unknown>;
+  try {
+    manifest = JSON.parse(await readFile(codexManifestPath, "utf-8"));
+  } catch {
+    return;
+  }
+
+  // If already has an interface block, the plugin author crafted it — leave it alone
+  if (manifest.interface) return;
+
+  let changed = false;
+
+  // Add explicit component paths that Codex expects
+  if (!manifest.skills && existsSync(join(plugin.path, "skills"))) {
+    manifest.skills = "./skills/";
+    changed = true;
+  }
+  if (!manifest.mcpServers && existsSync(join(plugin.path, ".mcp.json"))) {
+    manifest.mcpServers = "./.mcp.json";
+    changed = true;
+  }
+  if (!manifest.apps && existsSync(join(plugin.path, ".app.json"))) {
+    manifest.apps = "./.app.json";
+    changed = true;
+  }
+
+  // Generate a minimal interface block from existing metadata
+  const name = (manifest.name as string) ?? plugin.name;
+  const description = (manifest.description as string) ?? plugin.description ?? "";
+  const author = manifest.author as Record<string, string> | undefined;
+
+  const iface: Record<string, unknown> = {
+    displayName: name.charAt(0).toUpperCase() + name.slice(1),
+    shortDescription: description,
+    developerName: author?.name ?? "Unknown",
+    category: "Coding",
+    capabilities: ["Interactive", "Write"],
+  };
+
+  // Carry over homepage/repository as websiteURL if available
+  if (manifest.homepage) iface.websiteURL = manifest.homepage;
+  else if (manifest.repository) iface.websiteURL = manifest.repository;
+
+  // Check for logo/icon assets
+  const assetCandidates = ["assets/app-icon.png", "assets/icon.png", "assets/logo.png", "assets/logo.svg"];
+  for (const candidate of assetCandidates) {
+    if (existsSync(join(plugin.path, candidate))) {
+      iface.logo = `./${candidate}`;
+      iface.composerIcon = `./${candidate}`;
+      break;
+    }
+  }
+
+  manifest.interface = iface;
+  changed = true;
+
+  if (changed) {
+    await writeFile(codexManifestPath, JSON.stringify(manifest, null, 2));
+    barDebug(c.dim(`${plugin.name}: enriched .codex-plugin/plugin.json for Codex`));
+  }
+}
+
 async function prepareForClaudeCode(
   plugins: DiscoveredPlugin[],
   repoPath: string,
@@ -521,6 +761,7 @@ const KNOWN_PLUGIN_ROOT_VARS = [
   "PLUGIN_ROOT",
   "CLAUDE_PLUGIN_ROOT",
   "CURSOR_PLUGIN_ROOT",
+  "CODEX_PLUGIN_ROOT",
 ];
 
 async function translateEnvVars(

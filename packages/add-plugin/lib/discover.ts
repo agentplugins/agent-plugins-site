@@ -88,6 +88,7 @@ export async function discover(repoPath: string): Promise<DiscoverResult> {
     join(repoPath, ".plugin", "marketplace.json"),
     join(repoPath, ".claude-plugin", "marketplace.json"),
     join(repoPath, ".cursor-plugin", "marketplace.json"),
+    join(repoPath, ".codex-plugin", "marketplace.json"),
   ];
 
   for (const mp of marketplacePaths) {
@@ -181,7 +182,7 @@ async function discoverFromMarketplace(
 
     // Try to load plugin manifest from the source dir
     let manifest: Record<string, unknown> | null = null;
-    for (const manifestDir of [".plugin", ".claude-plugin", ".cursor-plugin"]) {
+    for (const manifestDir of [".plugin", ".claude-plugin", ".cursor-plugin", ".codex-plugin"]) {
       const manifestPath = join(sourcePath, manifestDir, "plugin.json");
       if (await fileExists(manifestPath)) {
         manifest = await readJson(manifestPath);
@@ -231,6 +232,7 @@ async function isPluginDir(dirPath: string): Promise<boolean> {
     join(dirPath, ".plugin", "plugin.json"),
     join(dirPath, ".claude-plugin", "plugin.json"),
     join(dirPath, ".cursor-plugin", "plugin.json"),
+    join(dirPath, ".codex-plugin", "plugin.json"),
     join(dirPath, "skills"),
     join(dirPath, "commands"),
     join(dirPath, "agents"),
@@ -248,7 +250,7 @@ async function isPluginDir(dirPath: string): Promise<boolean> {
  */
 async function inspectPlugin(pluginPath: string): Promise<DiscoveredPlugin | null> {
   let manifest: Record<string, unknown> | null = null;
-  for (const manifestDir of [".plugin", ".claude-plugin", ".cursor-plugin"]) {
+  for (const manifestDir of [".plugin", ".claude-plugin", ".cursor-plugin", ".codex-plugin"]) {
     const manifestPath = join(pluginPath, manifestDir, "plugin.json");
     if (await fileExists(manifestPath)) {
       manifest = await readJson(manifestPath);

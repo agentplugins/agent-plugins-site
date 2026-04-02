@@ -191,7 +191,7 @@ async function cmdInstall(source: string | undefined, opts: typeof values) {
   } else if (detectedTargets.length === 0) {
     barEmpty();
     stepError("No supported targets detected.");
-    barLine(c.dim("Neither 'claude' nor 'cursor' binaries were found on PATH."));
+    barLine(c.dim("Neither 'claude', 'cursor', nor 'codex' binaries were found on PATH."));
     barLine(c.dim("Use --target to specify one manually."));
     footer();
     process.exit(1);
