@@ -2,6 +2,7 @@ import { parseArgs } from "util";
 import { resolve, join } from "path";
 import { execSync } from "child_process";
 import { existsSync, rmSync, mkdirSync } from "fs";
+import { homedir } from "os";
 import { createInterface } from "readline";
 import { discover, type DiscoveredPlugin, type RemotePlugin } from "./lib/discover.js";
 import { getTargets, type Target } from "./lib/targets.js";
@@ -355,7 +356,7 @@ function resolveSource(source: string): string {
   // GitHub URL - clone to temp dir
   if (source.startsWith("https://") || source.startsWith("git@") || source.match(/^[\w-]+\/[\w.-]+$/)) {
     const url = source.match(/^[\w-]+\/[\w.-]+$/) ? `https://github.com/${source}` : source;
-    const cacheDir = join(process.env.HOME ?? "~", ".cache", "plugins");
+    const cacheDir = join(homedir(), ".cache", "plugins");
     mkdirSync(cacheDir, { recursive: true });
     const slug = url
       .replace(/^https?:\/\//, "")
@@ -373,7 +374,7 @@ function resolveSource(source: string): string {
     barEmpty();
 
     try {
-      execSync(`git clone --depth 1 -q ${url} ${tmpDir}`, { stdio: "pipe" });
+      execSync(`git clone --depth 1 -q "${url}" "${tmpDir}"`, { stdio: "pipe" });
     } catch (err: any) {
       const stderr = err.stderr?.toString() ?? "";
 
@@ -384,7 +385,7 @@ function resolveSource(source: string): string {
           step(`Source: ${c.dim(httpsUrl)}`);
           barEmpty();
           try {
-            execSync(`git clone --depth 1 -q ${httpsUrl} ${tmpDir}`, { stdio: "inherit" });
+            execSync(`git clone --depth 1 -q "${httpsUrl}" "${tmpDir}"`, { stdio: "inherit" });
             stepDone("Repository cloned");
             barEmpty();
             return tmpDir;
