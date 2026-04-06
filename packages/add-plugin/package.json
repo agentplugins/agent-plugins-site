@@ -11,9 +11,11 @@
   ],
   "scripts": {
     "build": "tsup",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "test": "tsx --test test/**/*.test.ts"
   },
   "devDependencies": {
+    "tsx": "^4.20.6",
     "tsup": "^8",
     "typescript": "^5"
   }
