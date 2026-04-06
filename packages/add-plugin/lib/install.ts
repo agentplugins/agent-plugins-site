@@ -10,10 +10,11 @@
  */
 
 import { join, relative } from "path";
-import { mkdir, cp, readFile, writeFile } from "fs/promises";
+import { mkdir, cp, readFile, writeFile, rm } from "fs/promises";
 import { existsSync } from "fs";
 import { execSync } from "child_process";
 import { homedir } from "os";
+import { createHash } from "crypto";
 import type { DiscoveredPlugin } from "./discover.js";
 import type { Target } from "./targets.js";
 import { c, step, stepDone, stepError, barLine, barEmpty, barDebug } from "./ui.js";
@@ -37,18 +38,58 @@ export async function installPlugins(
   source: string,
 ): Promise<void> {
   switch (target.id) {
-    case "claude-code":
-      await installToClaudeCode(plugins, scope, repoPath, source);
+    case "claude-code": {
+      const workspace = await stageInstallWorkspace(plugins, repoPath, target.id);
+      await installToClaudeCode(workspace.plugins, scope, workspace.repoPath, source);
       break;
-    case "cursor":
-      await installToCursor(plugins, scope, repoPath, source);
+    }
+    case "cursor": {
+      if (cachePopulated) return;
+      const workspace = await stageInstallWorkspace(plugins, repoPath, target.id);
+      await installToCursor(workspace.plugins, scope, workspace.repoPath, source);
       break;
-    case "codex":
-      await installToCodex(plugins, scope, repoPath, source);
+    }
+    case "codex": {
+      const workspace = await stageInstallWorkspace(plugins, repoPath, target.id);
+      await installToCodex(workspace.plugins, scope, workspace.repoPath, source);
       break;
+    }
     default:
       throw new Error(`Unsupported target: ${target.id}`);
   }
+}
+
+interface InstallWorkspace {
+  repoPath: string;
+  plugins: DiscoveredPlugin[];
+}
+
+export async function stageInstallWorkspace(
+  plugins: DiscoveredPlugin[],
+  repoPath: string,
+  targetId: string,
+  stagingBaseDir = join(homedir(), ".cache", "plugins", ".install-staging"),
+): Promise<InstallWorkspace> {
+  const stageKey = createHash("sha1").update(repoPath).digest("hex");
+  const stageRoot = join(stagingBaseDir, stageKey, targetId);
+  const stagedRepoPath = join(stageRoot, "repo");
+
+  await mkdir(stageRoot, { recursive: true });
+  await rm(stagedRepoPath, { recursive: true, force: true });
+  await cp(repoPath, stagedRepoPath, { recursive: true });
+
+  const stagedPlugins = plugins.map((plugin) => {
+    const relPath = relative(repoPath, plugin.path);
+    return {
+      ...plugin,
+      path: relPath === "" ? stagedRepoPath : join(stagedRepoPath, relPath),
+    };
+  });
+
+  return {
+    repoPath: stagedRepoPath,
+    plugins: stagedPlugins,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -706,7 +747,7 @@ function findClaude(): string {
  * - Generate <vendorDir>/plugin.json if neither .plugin/ nor vendor dir exist
  * - Translate ${PLUGIN_ROOT} -> ${<VENDOR_ENV_VAR>} in config files
  */
-async function preparePluginDirForVendor(
+export async function preparePluginDirForVendor(
   plugin: DiscoveredPlugin,
   vendorDir: string,
   envVar: string,
