@@ -1,6 +1,6 @@
 {
   "name": "plugins",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "description": "Install open-plugin format plugins into agent tools",
   "type": "module",
   "bin": {

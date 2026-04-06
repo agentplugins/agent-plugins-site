@@ -10,7 +10,7 @@ import { installPlugins } from "./lib/install.js";
 import { c, S, banner, header, footer, step, stepDone, stepActive, stepError, barLine, barEmpty, barDebug, error, multiSelect, setDebug, type MultiSelectOption } from "./lib/ui.js";
 import { setVersion, track } from "./lib/telemetry.js";
 
-setVersion("1.0.1");
+setVersion("1.2.8");
 
 const { values, positionals } = parseArgs({
   args: process.argv.slice(2),
