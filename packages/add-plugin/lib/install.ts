@@ -294,10 +294,13 @@ async function installToPluginCache(
   for (const plugin of plugins) {
     const pluginRef = `${plugin.name}@${marketplaceName}`;
     const version = plugin.version ?? "0.0.0";
+    // Use truncated git SHA for cache path (matches official Claude installer),
+    // falling back to semver for non-git sources.
+    const versionKey = gitSha ? gitSha.slice(0, 12) : version;
     step(`Installing ${c.bold(pluginRef)}...`);
 
     // Copy plugin directory to cache
-    const cacheDest = join(cacheDir, marketplaceName, plugin.name, version);
+    const cacheDest = join(cacheDir, marketplaceName, plugin.name, versionKey);
     await mkdir(cacheDest, { recursive: true });
     await cp(plugin.path, cacheDest, { recursive: true });
     barDebug(c.dim(`Cached to ${cacheDest}`));
@@ -380,7 +383,10 @@ async function installToCursorExtensions(
   for (const plugin of plugins) {
     const pluginRef = `${plugin.name}@${marketplaceName}`;
     const version = plugin.version ?? "0.0.0";
-    const folderName = `${marketplaceName}.${plugin.name}-${version}`;
+    // Use git SHA in folder name to match official installer conventions,
+    // falling back to semver for non-git sources.
+    const versionKey = gitSha ? gitSha.slice(0, 12) : version;
+    const folderName = `${marketplaceName}.${plugin.name}-${versionKey}`;
     const destDir = join(extensionsDir, folderName);
 
     step(`Installing ${c.bold(pluginRef)}...`);
