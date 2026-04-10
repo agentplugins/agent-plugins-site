@@ -17,7 +17,7 @@ import { homedir } from "os";
 import { createHash } from "crypto";
 import type { DiscoveredPlugin } from "./discover.js";
 import type { Target } from "./targets.js";
-import { c, step, stepDone, stepError, barLine, barEmpty, barDebug } from "./ui.js";
+import { c, step, stepDone, stepError, barLine, barEmpty, barDebug, warn } from "./ui.js";
 
 /**
  * Track whether the plugin cache has already been populated (by the Claude Code
@@ -285,23 +285,29 @@ async function installToPluginCache(
   //    in "Discover" but not in "Installed".
   const settingsPath = join(home, ".claude", "settings.json");
   let settings: Record<string, unknown> = {};
+  let settingsCorrupted = false;
   if (existsSync(settingsPath)) {
     try {
       settings = JSON.parse(await readFile(settingsPath, "utf-8"));
     } catch {
-      // corrupted — start fresh
+      settingsCorrupted = true;
     }
   }
 
-  const enabled = (settings.enabledPlugins ?? {}) as Record<string, boolean>;
-  for (const plugin of plugins) {
-    const pluginKey = `${plugin.name}@${marketplaceName}`;
-    enabled[pluginKey] = true;
-  }
-  settings.enabledPlugins = enabled;
+  if (settingsCorrupted) {
+    warn("Could not parse ~/.claude/settings.json — skipping enabledPlugins update to avoid overwriting existing settings.");
+    barLine(c.dim("You may need to manually enable the plugins in Claude Code settings."));
+  } else {
+    const enabled = (settings.enabledPlugins ?? {}) as Record<string, boolean>;
+    for (const plugin of plugins) {
+      const pluginKey = `${plugin.name}@${marketplaceName}`;
+      enabled[pluginKey] = true;
+    }
+    settings.enabledPlugins = enabled;
 
-  await writeFile(settingsPath, JSON.stringify(settings, null, 2));
-  barDebug(c.dim("Updated settings.json enabledPlugins"));
+    await writeFile(settingsPath, JSON.stringify(settings, null, 2));
+    barDebug(c.dim("Updated settings.json enabledPlugins"));
+  }
 
   cachePopulated = true;
 }
