@@ -1,6 +1,6 @@
 {
   "name": "plugins",
-  "version": "1.2.9",
+  "version": "1.2.10-canary.5",
   "description": "Install open-plugin format plugins into agent tools",
   "type": "module",
   "bin": {

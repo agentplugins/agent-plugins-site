@@ -17,7 +17,7 @@ import { homedir } from "os";
 import { createHash } from "crypto";
 import type { DiscoveredPlugin } from "./discover.js";
 import type { Target } from "./targets.js";
-import { c, step, stepDone, stepError, barLine, barEmpty, barDebug } from "./ui.js";
+import { c, step, stepDone, stepError, barLine, barEmpty, barDebug, warn } from "./ui.js";
 
 /**
  * Track whether the plugin cache has already been populated (by the Claude Code
@@ -112,80 +112,10 @@ async function installToClaudeCode(
   repoPath: string,
   source: string,
 ): Promise<void> {
-  const marketplaceName = plugins[0]?.marketplace ?? deriveMarketplaceName(source);
-
-  // 1. Prepare the repo directory for Claude Code
-  step("Preparing plugins for Claude Code...");
-  barEmpty();
-  await prepareForClaudeCode(plugins, repoPath, marketplaceName);
-
-  // 2. Add the marketplace
-  // For official Anthropic marketplaces, pass the GitHub URL directly so the
-  // claude CLI recognises the source as coming from the 'anthropics' org.
-  // Otherwise it rejects the reserved marketplace name.
-  const marketplaceSource = isAnthropicSource(source) ? normalizeGitUrl(source) : repoPath;
-
-  const claudePath = findClaude();
-  step("Adding marketplace");
-  barDebug(c.dim(`Binary: ${claudePath}`));
-  try {
-    const version = execSync(`${claudePath} --version`, { encoding: "utf-8", stdio: "pipe" }).trim();
-    barDebug(c.dim(`Version: ${version}`));
-  } catch {
-    barDebug(c.dim(`Warning: could not get claude version`));
-  }
-
-  try {
-    const result = execSync(`${claudePath} plugin marketplace add ${marketplaceSource}`, {
-      encoding: "utf-8",
-      stdio: "pipe",
-    });
-    if (result.trim()) barDebug(c.dim(result.trim()));
-    stepDone("Marketplace added");
-  } catch (err: any) {
-    const stderr = err.stderr?.toString().trim() ?? "";
-    const stdout = err.stdout?.toString().trim() ?? "";
-    if (stderr.includes("already") || stdout.includes("already")) {
-      stepDone(`Marketplace ${c.dim("'"+marketplaceName+"'")} already on disk`);
-    } else {
-      stepError("Failed to add marketplace.");
-      barLine(c.dim(`Command: ${claudePath} plugin marketplace add ${marketplaceSource}`));
-      if (stdout) barLine(c.dim(`stdout: ${stdout}`));
-      if (stderr) barLine(c.dim(`stderr: ${stderr}`));
-      barLine(c.dim(`exit code: ${err.status}`));
-      process.exit(1);
-    }
-  }
-
-  barEmpty();
-
-  // 3. Install each plugin
-  for (const plugin of plugins) {
-    const pluginRef = `${plugin.name}@${marketplaceName}`;
-    step(`Installing ${c.bold(pluginRef)}...`);
-
-    try {
-      execSync(`${claudePath} plugin install ${pluginRef} --scope ${scope}`, {
-        encoding: "utf-8",
-        stdio: "pipe",
-      });
-      stepDone(`Installed ${c.cyan(pluginRef)}`);
-    } catch (err: any) {
-      const stderr = err.stderr?.toString().trim() ?? "";
-      const stdout = err.stdout?.toString().trim() ?? "";
-      if (stderr.includes("already") || stdout.includes("already")) {
-        stepDone(`${c.cyan(pluginRef)} ${c.dim("already installed")}`);
-      } else {
-        stepError(`Failed to install ${pluginRef}`);
-        barLine(c.dim(`Command: ${claudePath} plugin install ${pluginRef} --scope ${scope}`));
-        if (stdout) barLine(c.dim(`stdout: ${stdout}`));
-        if (stderr) barLine(c.dim(`stderr: ${stderr}`));
-        barLine(c.dim(`exit code: ${err.status}`));
-      }
-    }
-  }
-
-  cachePopulated = true;
+  // Install directly to the plugin cache using git SHA-based paths (matches
+  // the official Claude installer convention). We no longer shell out to the
+  // `claude` CLI because it uses semver-based paths instead of commit hashes.
+  await installToPluginCache(plugins, scope, repoPath, source);
 }
 
 // ---------------------------------------------------------------------------
@@ -193,10 +123,8 @@ async function installToClaudeCode(
 // ---------------------------------------------------------------------------
 //
 // Cursor reads "Imported" plugins from the Claude Code plugin cache directory
-// (~/.claude/plugins/). When the `claude` CLI is available, we use it (same as
-// Claude Code). When it's not available, we write directly to the cache
-// directory, registering the marketplace and plugins in the JSON manifests
-// that Cursor reads.
+// (~/.claude/plugins/). We write directly to the cache using git SHA-based
+// paths. On Windows, Cursor reads from ~/.cursor/extensions/ instead.
 
 async function installToCursor(
   plugins: DiscoveredPlugin[],
@@ -208,16 +136,14 @@ async function installToCursor(
   // populated and Cursor will pick it up — nothing more to do.
   if (cachePopulated) return;
 
-  const claudePath = findClaudeOrNull();
-
-  if (claudePath) {
-    // Claude CLI available — use it (same mechanism as Claude Code target).
-    await installToClaudeCode(plugins, scope, repoPath, source);
+  if (process.platform === "win32") {
+    // Windows: Cursor reads from ~/.cursor/extensions/
+    await installToCursorExtensions(plugins, scope, repoPath, source);
     return;
   }
 
-  // No claude CLI — install directly to Cursor's extensions directory.
-  await installToCursorExtensions(plugins, scope, repoPath, source);
+  // macOS/Linux: write directly to ~/.claude/plugins/ cache with git SHA paths.
+  await installToPluginCache(plugins, scope, repoPath, source);
 }
 
 // ---------------------------------------------------------------------------
@@ -258,12 +184,39 @@ async function installToPluginCache(
     }
   }
 
+  // Determine the marketplace source format to match what the official
+  // Claude installer writes:
+  //   - GitHub repos  → { source: "github", repo: "owner/repo" }
+  //   - Other git URLs → { source: "git", url: "https://..." }
+  //   - Local paths    → { source: "directory", path: "/abs/path" }
+  const githubRepo = extractGitHubRepo(source);
+  const marketplacesDir = join(pluginsDir, "marketplaces");
+  const marketplaceInstallLocation = join(marketplacesDir, marketplaceName);
+
+  // Copy the repo to the marketplaces directory so Claude Code can find
+  // plugins when validating against the marketplace.
+  await mkdir(marketplacesDir, { recursive: true });
+  if (existsSync(marketplaceInstallLocation)) {
+    await rm(marketplaceInstallLocation, { recursive: true });
+  }
+  await cp(repoPath, marketplaceInstallLocation, { recursive: true });
+  barDebug(c.dim(`Marketplace copied to ${marketplaceInstallLocation}`));
+
   if (knownMarketplaces[marketplaceName]) {
     stepDone(`Marketplace ${c.dim("'" + marketplaceName + "'")} already registered`);
   } else {
+    let marketplaceSource: Record<string, string>;
+    if (githubRepo) {
+      marketplaceSource = { source: "github", repo: githubRepo };
+    } else if (isRemoteSource(source)) {
+      const gitUrl = normalizeGitUrl(source);
+      marketplaceSource = { source: "git", url: gitUrl.endsWith(".git") ? gitUrl : gitUrl + ".git" };
+    } else {
+      marketplaceSource = { source: "directory", path: repoPath };
+    }
     knownMarketplaces[marketplaceName] = {
-      source: { source: "directory", path: repoPath },
-      installLocation: repoPath,
+      source: marketplaceSource,
+      installLocation: marketplaceInstallLocation,
       lastUpdated: new Date().toISOString(),
     };
     await writeFile(knownPath, JSON.stringify(knownMarketplaces, null, 2));
@@ -294,10 +247,13 @@ async function installToPluginCache(
   for (const plugin of plugins) {
     const pluginRef = `${plugin.name}@${marketplaceName}`;
     const version = plugin.version ?? "0.0.0";
+    // Use truncated git SHA for cache path (matches official Claude installer),
+    // falling back to semver for non-git sources.
+    const versionKey = gitSha ? gitSha.slice(0, 12) : version;
     step(`Installing ${c.bold(pluginRef)}...`);
 
     // Copy plugin directory to cache
-    const cacheDest = join(cacheDir, marketplaceName, plugin.name, version);
+    const cacheDest = join(cacheDir, marketplaceName, plugin.name, versionKey);
     await mkdir(cacheDest, { recursive: true });
     await cp(plugin.path, cacheDest, { recursive: true });
     barDebug(c.dim(`Cached to ${cacheDest}`));
@@ -323,6 +279,36 @@ async function installToPluginCache(
   await writeFile(installedPath, JSON.stringify(installedData, null, 2));
   barDebug(c.dim("Updated installed_plugins.json"));
 
+  // 4. Enable plugins in ~/.claude/settings.json
+  //    Claude Code uses the `enabledPlugins` map in settings.json to determine
+  //    which installed plugins are actually active. Without this, plugins show
+  //    in "Discover" but not in "Installed".
+  const settingsPath = join(home, ".claude", "settings.json");
+  let settings: Record<string, unknown> = {};
+  let settingsCorrupted = false;
+  if (existsSync(settingsPath)) {
+    try {
+      settings = JSON.parse(await readFile(settingsPath, "utf-8"));
+    } catch {
+      settingsCorrupted = true;
+    }
+  }
+
+  if (settingsCorrupted) {
+    warn("Could not parse ~/.claude/settings.json — skipping enabledPlugins update to avoid overwriting existing settings.");
+    barLine(c.dim("You may need to manually enable the plugins in Claude Code settings."));
+  } else {
+    const enabled = (settings.enabledPlugins ?? {}) as Record<string, boolean>;
+    for (const plugin of plugins) {
+      const pluginKey = `${plugin.name}@${marketplaceName}`;
+      enabled[pluginKey] = true;
+    }
+    settings.enabledPlugins = enabled;
+
+    await writeFile(settingsPath, JSON.stringify(settings, null, 2));
+    barDebug(c.dim("Updated settings.json enabledPlugins"));
+  }
+
   cachePopulated = true;
 }
 
@@ -340,12 +326,6 @@ async function installToCursorExtensions(
   repoPath: string,
   source: string,
 ): Promise<void> {
-  if (process.platform !== "win32") {
-    // macOS/Linux: use the Claude plugin cache (Cursor reads from there)
-    await installToPluginCache(plugins, scope, repoPath, source);
-    return;
-  }
-
   // Windows: install to ~/.cursor/extensions/
   const marketplaceName = plugins[0]?.marketplace ?? deriveMarketplaceName(source);
   const home = homedir();
@@ -380,7 +360,10 @@ async function installToCursorExtensions(
   for (const plugin of plugins) {
     const pluginRef = `${plugin.name}@${marketplaceName}`;
     const version = plugin.version ?? "0.0.0";
-    const folderName = `${marketplaceName}.${plugin.name}-${version}`;
+    // Use git SHA in folder name to match official installer conventions,
+    // falling back to semver for non-git sources.
+    const versionKey = gitSha ? gitSha.slice(0, 12) : version;
+    const folderName = `${marketplaceName}.${plugin.name}-${versionKey}`;
     const destDir = join(extensionsDir, folderName);
 
     step(`Installing ${c.bold(pluginRef)}...`);
@@ -876,6 +859,37 @@ function deriveMarketplaceName(source: string): string {
   // Local path: use basename
   const parts = source.replace(/\/$/, "").split("/");
   return parts[parts.length - 1] ?? "plugins";
+}
+
+/**
+ * Extract a GitHub "owner/repo" string from a source, or null if the source
+ * is not a GitHub reference.
+ */
+function extractGitHubRepo(source: string): string | null {
+  // Shorthand: owner/repo
+  const shorthand = source.match(/^([\w-]+\/[\w.-]+)$/);
+  if (shorthand) return shorthand[1]!;
+  // HTTPS: https://github.com/owner/repo[.git]
+  const httpsMatch = source.match(/^https?:\/\/github\.com\/([\w.-]+\/[\w.-]+?)(?:\.git)?$/);
+  if (httpsMatch) return httpsMatch[1]!;
+  // SSH: git@github.com:owner/repo[.git]
+  const sshMatch = source.match(/^git@github\.com:([\w.-]+\/[\w.-]+?)(?:\.git)?$/);
+  if (sshMatch) return sshMatch[1]!;
+  return null;
+}
+
+/**
+ * Check if a source string is a remote git source (URL or owner/repo shorthand)
+ * rather than a local file path.
+ */
+function isRemoteSource(source: string): boolean {
+  // GitHub shorthand: owner/repo
+  if (source.match(/^[\w-]+\/[\w.-]+$/)) return true;
+  // SSH URL
+  if (source.startsWith("git@")) return true;
+  // HTTPS/HTTP URL
+  if (source.startsWith("https://") || source.startsWith("http://")) return true;
+  return false;
 }
 
 /**
