@@ -7,16 +7,18 @@
 
 # Node
 node_modules/
+next-env.d.ts
 dist/
 *.tgz
 
 # Build output
 .next/
 .source/
+.vercel/
 
-# Lock files (managed per-package, not committed)
+# Lock files from other package managers
 package-lock.json
-pnpm-lock.yaml
+yarn.lock
 
 # Environment
 .env
