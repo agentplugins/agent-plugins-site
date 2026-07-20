@@ -38,7 +38,7 @@ export const GET = async (
     <div style={{ fontFamily: "Geist" }} tw="flex h-full w-full bg-black">
       {/** biome-ignore lint/performance/noImgElement: "Required for Satori" */}
       <img
-        alt="Open Plugins OpenGraph Background"
+        alt="Agent Plugins OpenGraph background"
         height={628}
         src={backgroundImageData as never}
         width={1200}

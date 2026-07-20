@@ -1,0 +1,34 @@
+---
+title: Skills
+description: Package Agent Skills under the fixed skills directory.
+---
+
+Agent Plugins uses the [Agent Skills specification](https://agentskills.io/specification) without redefining the skill format. Agent Plugins defines only where skills are discovered inside a plugin and how failures are isolated.
+
+## Directory layout
+
+Place each skill in an immediate child directory of `skills/`:
+
+```text
+skills/
+└── deploy/
+    ├── SKILL.md
+    ├── scripts/
+    │   └── rollback.sh
+    ├── references/
+    │   └── runbook.md
+    ├── assets/
+    └── examples/
+```
+
+An immediate child is a discovered skill when its path named exactly `SKILL.md` resolves to a regular file. Clients do not recursively search deeper descendants for additional skills.
+
+## Skill format
+
+`SKILL.md` frontmatter and instructions follow the Agent Skills specification. A skill may contain any additional files and directories it needs. `scripts/`, `references/`, and `assets/` are common conventions described by Agent Skills, not an exhaustive allowlist. The Agent Skills specification is the source of truth for skill validity.
+
+## Failure isolation
+
+If one discovered skill is invalid, the client skips that skill, reports it when practical, and continues loading other skills and component types.
+
+If `skills/` is missing, the plugin is still valid. If the path exists but is not a directory, the skills component type is invalid without invalidating independent components such as MCP servers.

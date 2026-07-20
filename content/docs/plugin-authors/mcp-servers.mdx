@@ -1,0 +1,71 @@
+---
+title: MCP servers
+description: Configure portable stdio, Streamable HTTP, and legacy HTTP+SSE MCP connections.
+---
+
+Agent Plugins defines a closed `mcp.json` format that clients map to their native MCP configuration. The [Model Context Protocol specification](https://modelcontextprotocol.io/specification) remains authoritative for MCP wire behavior and lifecycle.
+
+## Configuration document
+
+`mcp.json` lives at the plugin root and contains only `$schema` and `mcpServers` as its top-level fields:
+
+```json title="mcp.json"
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "validator": {
+      "type": "stdio",
+      "command": "./bin/validator",
+      "args": ["--data", "${PLUGIN_DATA}/validator"],
+      "env": {
+        "CONFIG": "${PLUGIN_ROOT}/config.json"
+      },
+      "cwd": "${PLUGIN_ROOT}"
+    },
+    "deployment-api": {
+      "type": "streamable-http",
+      "url": "https://deploy.example.com/mcp",
+      "headers": {
+        "X-Tenant": "public-tenant"
+      }
+    }
+  }
+}
+```
+
+## Transports
+
+| Type | Required fields | Notes |
+| --- | --- | --- |
+| `stdio` | `type`, `command` | Optional `args`, `env`, and `cwd`. |
+| `streamable-http` | `type`, `url` | Current remote MCP transport; optional literal `headers`. |
+| `sse` | `type`, `url` | Deprecated HTTP+SSE transport; client support is optional. |
+
+An MCP-capable conformant client supports at least one of `stdio` and `streamable-http` and should support both. Support for `sse` is optional. A client uses the declared transport for its initial connection attempt. Agent Plugins does not define fallback behavior if that attempt fails.
+
+## stdio commands and paths
+
+`command` is one executable token, not a shell command. It is either a bare executable name resolved by platform search rules or a plugin-relative path beginning with `./`. Placeholder expansion does not apply to `command`.
+
+When omitted, `cwd` is the plugin root. An explicit `cwd` is plugin-relative, rooted at `${PLUGIN_ROOT}`, or rooted at `${PLUGIN_DATA}`, and must stay within the corresponding directory.
+
+## Plugin variables
+
+Clients provide two environment variables to stdio subprocesses:
+
+- `PLUGIN_ROOT`: the absolute, filesystem-resolved plugin root.
+- `PLUGIN_DATA`: a dedicated writable data directory that persists across plugin updates.
+
+Clients expand both placeholders in `args`, `env` values, and `cwd`. Expansion is textual, single-pass, and non-recursive. It does not apply to environment keys, `command`, remote URLs, or HTTP headers. A plugin cannot override the reserved environment variables.
+
+## Remote connections
+
+Remote URLs are absolute HTTP or HTTPS URLs without user information or fragments. Non-loopback endpoints use HTTPS. Configured headers are literal, visible package data and must not contain credentials or secrets.
+
+Agent Plugins 1.0.0 defines no portable OAuth or credential-reference fields. Authentication remains client-managed.
+
+## Failure isolation
+
+An invalid top-level `mcp.json` disables MCP for the plugin. An invalid or unavailable individual server disables only that entry. Other servers, skills, and client extensions continue loading.
+
+Download [`mcp.schema.json`](/schemas/1.0.0/mcp.schema.json).

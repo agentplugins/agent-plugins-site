@@ -1,10 +1,12 @@
 {
   "pages": [
     "index",
-    "supported-agents",
-    "---For Plugin Builders---",
-    "plugin-builders",
-    "---For Agent Builders---",
-    "agent-builders"
+    "---For Plugin Authors---",
+    "...plugin-authors",
+    "---For Client Implementers---",
+    "...client-implementers",
+    "---Reference---",
+    "specification",
+    "schemas"
   ]
 }

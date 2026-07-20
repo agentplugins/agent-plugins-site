@@ -1,30 +1,27 @@
 export const Logo = () => (
-  <p className="font-semibold text-xl tracking-tight">Open Plugins</p>
+  <p className="font-semibold text-xl tracking-tight">Agent Plugins</p>
 );
 
 export const github = {
-  owner: "vercel-labs",
-  repo: "open-plugin",
+  owner: "agentplugins",
+  repo: "agent-plugins-site",
 };
 
 export const nav = [
   {
-    label: "Source",
-    href: `https://github.com/${github.owner}/${github.repo}/`,
+    label: "Specification",
+    href: "https://github.com/agentplugins/agent-plugins-spec",
   },
 ];
 
 export const suggestions = [
-  "What is Open Plugins?",
-  "How do I create a plugin?",
-  "What component types can a plugin contain?",
-  "How do I integrate plugins into my AI agent?",
+  "What is an Agent Plugin?",
+  "How do I create a minimal plugin?",
+  "How are skills and MCP servers discovered?",
+  "What does a conformant client need to implement?",
 ];
 
-export const title = "Open Plugins Documentation";
-
-export const prompt =
-  "You are a helpful assistant specializing in answering questions about Open Plugins, a standard for packaging AI coding agent extensions into distributable plugins. The specification covers skills, agents, rules, hooks, MCP servers, and LSP servers.";
+export const title = "Agent Plugins Documentation";
 
 export const translations = {
   en: {
@@ -33,9 +30,3 @@ export const translations = {
 };
 
 export const basePath: string | undefined = undefined;
-
-/**
- * Unique identifier for this site, used in markdown request tracking analytics.
- * Each site using geistdocs should set this to a unique value (e.g. "ai-sdk-docs", "next-docs").
- */
-export const siteId: string | undefined = "open-plugins-docs";

@@ -1,0 +1,39 @@
+---
+title: Client conformance checklist
+description: Review the minimum behavior required for an Agent Plugins 1.0.0 client.
+---
+
+This checklist is non-normative. The [complete specification](/specification) governs when wording differs.
+
+## Plugin loader
+
+- [ ] Load a plugin from a directory and enforce the filesystem-resolved package boundary.
+- [ ] Select locally supported manifest rules from `$schema`; do not retrieve a schema during loading.
+- [ ] Validate the closed `plugin.json` schema and required `$schema` and `name` fields.
+- [ ] Report and ignore unknown top-level fields.
+- [ ] Ignore a non-object `extensions` field and unimplemented extension namespaces.
+- [ ] Reject other fatal manifest violations before component discovery.
+
+## Discovery and isolation
+
+- [ ] Discover supported component types only from their fixed locations.
+- [ ] Treat missing component locations as valid absence.
+- [ ] Isolate invalid component types, skills, and MCP entries at their specified boundaries.
+- [ ] Ignore unsupported component types and support at least one of skills or MCP servers.
+
+## MCP support
+
+- [ ] If MCP is implemented, support at least one of stdio and Streamable HTTP; support for both is recommended.
+- [ ] Use each server entry's declared transport for the initial connection attempt.
+- [ ] Validate the closed top-level document and each server entry independently.
+- [ ] Resolve stdio commands as single executable tokens.
+- [ ] Provide `PLUGIN_ROOT` and a dedicated persistent `PLUGIN_DATA` directory.
+- [ ] Expand only the two defined placeholders and only in `args`, `env` values, and `cwd`.
+- [ ] Enforce working-directory containment and remote URL/header requirements.
+- [ ] Continue loading after an independent MCP server fails.
+
+## Versioning
+
+- [ ] Require matching Agent Plugins versions in `plugin.json` and `mcp.json`.
+- [ ] Never reassign a published canonical schema identifier to different contents.
+- [ ] Allow plugins to continue targeting older versions according to locally supported compatibility policy.

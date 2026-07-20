@@ -1,0 +1,13 @@
+---
+title: JSON Schemas
+description: Canonical machine-readable schemas for Agent Plugins manifests and MCP configuration.
+---
+
+Agent Plugins publishes separate JSON Schemas for the plugin manifest and MCP server configuration. Clients use each canonical `$schema` identifier to select locally supported validation and interpretation rules; they do not retrieve schemas while loading a plugin.
+
+<Cards>
+  <Card title="Plugin manifest schema" href="/schemas/1.0.0/plugin.schema.json" description="Validate the root plugin.json manifest." />
+  <Card title="MCP configuration schema" href="/schemas/1.0.0/mcp.schema.json" description="Validate the root mcp.json document and individual server entries." />
+</Cards>
+
+The [specification](/specification) is authoritative if its requirements conflict with a machine-readable schema.

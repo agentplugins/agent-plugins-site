@@ -1,0 +1,67 @@
+---
+title: MCP runtime
+description: Map portable MCP configuration into native connections and isolate server failures.
+---
+
+Agent Plugins defines how `mcp.json` selects a transport and supplies runtime configuration. MCP defines message framing, initialization, capability negotiation, authorization, and lifecycle.
+
+An MCP-capable Agent Plugins client must support at least one of stdio and Streamable HTTP and should support both. Legacy HTTP+SSE support is optional.
+
+## Configuration model
+
+`mcp.json` contains an `mcpServers` object whose members are independently configured servers. Each entry declares a `type` and only the fields allowed for that transport:
+
+```json title="mcp.json"
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "local-tools": {
+      "type": "stdio",
+      "command": "./bin/server",
+      "args": ["--data", "${PLUGIN_DATA}"]
+    },
+    "remote-tools": {
+      "type": "streamable-http",
+      "url": "https://tools.example.com/mcp"
+    }
+  }
+}
+```
+
+See the [MCP server reference for plugin authors](/plugin-authors/mcp-servers) for every field and constraint.
+
+## Select the declared transport
+
+The `type` field selects the transport for the initial connection attempt; it is not a transport-neutral URL hint. Instantiate the corresponding MCP transport after reading `type`. Agent Plugins does not define fallback behavior if that attempt fails. Clients that implement fallback can follow MCP's [backwards-compatibility guidance](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports#backwards-compatibility).
+
+SSE responses and streams used within Streamable HTTP remain part of `streamable-http`; they are distinct from the deprecated HTTP+SSE transport. Redirects remain subject to the selected transport and the header-forwarding rules below.
+
+## Validate in two stages
+
+First validate the top-level `mcp.json`: valid JSON, matching supported `$schema`, matching plugin specification version, required `mcpServers`, and no unknown top-level fields. A top-level failure disables MCP for that plugin.
+
+Then validate each server entry using the requirements for its declared `type`. An unknown transport, an unknown field, or a missing or invalid transport field makes only that entry invalid. Skip it without disabling valid siblings or other component types. The canonical schema exposes `#/$defs/server` for this purpose.
+
+## Launch stdio servers
+
+- Treat `command` as one executable token and pass `args` separately.
+- Resolve a bare command through platform executable search rules.
+- Resolve a `./` command against the plugin root and enforce containment. Arguments and environment values remain opaque strings even when they resemble paths.
+- Default `cwd` to the plugin root.
+- Create a dedicated writable `PLUGIN_DATA` directory before launch and preserve it across plugin updates.
+- Overlay configured `env` on the client-selected base environment, then set client-controlled `PLUGIN_ROOT` and `PLUGIN_DATA` last.
+- Expand plugin variables only in `args`, `env` values, and `cwd`.
+
+The client may inherit, omit, or sanitize ambient environment variables. Portable plugins cannot depend on unspecified ambient variables or on configured `PATH` affecting bare-command resolution.
+
+After launch, follow the MCP [stdio transport](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports#stdio) and [lifecycle](https://modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle) requirements.
+
+## Connect remote servers
+
+Validate the URL and literal headers before connecting. Never forward configured headers to a different origin through redirects or legacy SSE endpoint events without explicit user authorization.
+
+Follow the MCP [Streamable HTTP transport](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports#streamable-http), [lifecycle](https://modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle), and [authorization](https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization) requirements. Agent Plugins defines no portable OAuth or credential-reference fields; authorization discovery, credential storage, and user interaction are client-managed. Authentication failure is a connection failure, not invalid package configuration.
+
+## Runtime failures
+
+If one server fails to start, connect, authenticate, or complete the MCP handshake, continue loading other servers and components. Report the failure when practical.

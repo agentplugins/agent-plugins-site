@@ -8,7 +8,7 @@ interface FooterProps {
 }
 
 export const Footer = ({
-  copyright = `Copyright Open Plugins ${new Date().getFullYear()}. All rights reserved.`,
+  copyright = `Agent Plugins documentation contributors, ${new Date().getFullYear()}. CC BY 4.0.`,
 }: FooterProps) => (
   <footer className="border-t px-4 py-5 md:px-6">
     <div className="mx-auto flex flex-col items-center justify-between gap-4 sm:flex-row">
