@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 interface CodeBlockProps {
-  children: ReactNode;
+  children?: ReactNode;
   className?: string;
   "data-line-highlighting"?: string;
   "data-line-numbers"?: string;
