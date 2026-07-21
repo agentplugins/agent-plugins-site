@@ -1,0 +1,48 @@
+---
+title: Loading and discovery
+description: Validate the manifest, discover supported components, and apply narrow failure boundaries.
+---
+
+## Establish the package boundary
+
+The plugin root is a single filesystem location. Every package file a client discovers, reads, or executes must remain inside the filesystem-resolved root after resolving symlinks, junctions, reparse points, and equivalent mechanisms.
+
+## Load the manifest first
+
+Clients check for `plugin.json` at the plugin root and load it before discovering components or applying client behavior. The closed JSON object has two required fields: `$schema` selects the Agent Plugins version and validation contract, while `name` identifies the plugin. Other permitted fields provide optional metadata or [client-extension data](/plugin-authors/client-extensions). See the [manifest reference](/plugin-authors/manifest) for the complete field set.
+
+Select locally supported validation and interpretation rules from `$schema`; do not retrieve a schema while loading the plugin. A missing or unsupported `$schema` rejects the plugin.
+
+The following two manifest schema violations are non-fatal:
+
+- Report and ignore each unknown top-level field, then continue if the manifest is otherwise valid.
+- Report and ignore a non-object `extensions` field, then continue loading components.
+
+Any other manifest schema violation rejects the complete plugin.
+
+When `extensions` is an object, each member is owned by the client identified by its reverse-domain namespace. Ignore namespaces the client does not implement without validating their values.
+
+## Discover supported components
+
+Agent Plugins assigns each component type a fixed location:
+
+| Component type | Fixed location | Discovery rule |
+| --- | --- | --- |
+| [Skills](/plugin-authors/skills) | `skills/` | Immediate child directories containing a regular `SKILL.md`. |
+| [MCP servers](/plugin-authors/mcp-servers) | `mcp.json` | One root JSON configuration document. |
+
+A missing fixed location is not an error. If a location exists with the wrong filesystem kind, mark only that component type invalid and continue with other supported types.
+
+If a discovered skill does not conform to the Agent Skills specification, skip that skill and continue loading its siblings. Do not recursively search nested descendants for additional skills.
+
+A client ignores component types it does not implement. Lack of support is not itself a plugin error; a conformant client implements at least one of skills or MCP servers. How a client presents a valid skill to users or models remains client policy.
+
+## Path failure boundaries
+
+Apply the narrowest relevant boundary:
+
+1. Reject the plugin if `plugin.json` resolves outside the plugin root.
+2. Disable one component type when its fixed location has the wrong filesystem kind or escapes the root.
+3. Skip one skill when its `SKILL.md` escapes the root.
+4. Skip one MCP entry when a configured package path escapes its permitted root.
+5. Deny access for other escaping package paths.

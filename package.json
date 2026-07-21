@@ -1,6 +1,6 @@
 {
-  "name": "open-plugins-docs",
-  "description": "Documentation site for Open Plugins — a standard for packaging AI coding agent extensions into distributable plugins.",
+  "name": "agent-plugins-site",
+  "description": "Documentation site for the Agent Plugins specification.",
   "version": "0.0.0",
   "private": true,
   "packageManager": "pnpm@10.34.0",

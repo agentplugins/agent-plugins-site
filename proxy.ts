@@ -6,7 +6,6 @@ import {
   NextResponse,
 } from "next/server";
 import { i18n } from "@/lib/geistdocs/i18n";
-import { trackMdRequest } from "@/lib/geistdocs/md-tracking";
 
 const { rewrite: rewriteLLM } = rewritePath(
   "/*path",
@@ -14,25 +13,49 @@ const { rewrite: rewriteLLM } = rewritePath(
 );
 
 const MDX_EXTENSION_PATTERN = /\.mdx?$/;
+const INTERNAL_I18N_REWRITE_HEADER = "x-agent-plugins-i18n-rewrite";
 
 const internationalizer = createI18nMiddleware(i18n);
 
-const proxy = (request: NextRequest, context: NextFetchEvent) => {
-  const pathname = request.nextUrl.pathname;
+const rewriteInternally = (
+  request: NextRequest,
+  destination: string | URL,
+  responseHeaders?: Headers,
+) => {
+  const headers = new Headers(request.headers);
+  const url = new URL(destination);
 
-  // Track llms.txt requests
-  if (pathname === "/llms.txt") {
-    context.waitUntil(
-      trackMdRequest({
-        path: "/llms.txt",
-        userAgent: request.headers.get("user-agent"),
-        referer: request.headers.get("referer"),
-        acceptHeader: request.headers.get("accept"),
-      }),
-    );
+  headers.set(INTERNAL_I18N_REWRITE_HEADER, "1");
+
+  // Avoid Next.js canonicalizing an internal `/en/` rewrite to public `/en`,
+  // which the locale middleware correctly redirects back to `/`.
+  if (url.pathname.length > 1 && url.pathname.endsWith("/")) {
+    url.pathname = url.pathname.slice(0, -1);
   }
 
-  // Handle .md/.mdx URL requests before i18n runs
+  return NextResponse.rewrite(url, {
+    headers: responseHeaders,
+    request: { headers },
+  });
+};
+
+const proxy = async (request: NextRequest, context: NextFetchEvent) => {
+  const pathname = request.nextUrl.pathname;
+
+  // `next start` runs the proxy again for an internal locale rewrite. Let that
+  // rewritten request reach the localized App Router route instead of sending
+  // it back through locale canonicalization.
+  if (
+    request.headers.get(INTERNAL_I18N_REWRITE_HEADER) === "1" &&
+    i18n.languages.some(
+      (language) =>
+        pathname === `/${language}` || pathname.startsWith(`/${language}/`),
+    )
+  ) {
+    return NextResponse.next();
+  }
+
+  // Handle .md/.mdx URL requests before i18n runs.
   if (
     (pathname === "/docs.md" ||
       pathname === "/docs.mdx" ||
@@ -45,43 +68,40 @@ const proxy = (request: NextRequest, context: NextFetchEvent) => {
         ? `/${i18n.defaultLanguage}/llms.mdx`
         : rewriteLLM(stripped);
     if (result) {
-      context.waitUntil(
-        trackMdRequest({
-          path: pathname,
-          userAgent: request.headers.get("user-agent"),
-          referer: request.headers.get("referer"),
-          acceptHeader: request.headers.get("accept"),
-        }),
-      );
-      return NextResponse.rewrite(new URL(result, request.nextUrl));
+      return rewriteInternally(request, new URL(result, request.nextUrl));
     }
   }
 
-  // Handle Accept header content negotiation and track the request
+  // Handle Accept header content negotiation.
   if (isMarkdownPreferred(request)) {
     const result = rewriteLLM(pathname);
     if (result) {
-      context.waitUntil(
-        trackMdRequest({
-          path: pathname,
-          userAgent: request.headers.get("user-agent"),
-          referer: request.headers.get("referer"),
-          acceptHeader: request.headers.get("accept"),
-          requestType: "header-negotiated",
-        }),
-      );
-      return NextResponse.rewrite(new URL(result, request.nextUrl));
+      return rewriteInternally(request, new URL(result, request.nextUrl));
     }
   }
 
-  // Fallback to i18n middleware
-  return internationalizer(request, context);
+  // Fallback to i18n middleware. Mark internal rewrites so production does not
+  // canonicalize their locale-prefixed target as though it were a public URL.
+  const response = await internationalizer(request, context);
+
+  if (!response) {
+    return NextResponse.next();
+  }
+
+  const rewrite = response.headers.get("x-middleware-rewrite");
+
+  if (rewrite) {
+    return rewriteInternally(request, rewrite, response.headers);
+  }
+
+  return response;
 };
 
 export const config = {
-  // Matcher ignoring `/_next/`, `/api/`, static assets, favicon, sitemap, robots, etc.
+  // Matcher ignoring `/_next/`, `/api/`, canonical schemas, static assets,
+  // favicon, sitemap, robots, etc.
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
+    "/((?!api|_next/static|_next/image|schemas/|favicon.ico|sitemap.xml|robots.txt).*)",
   ],
 };
 

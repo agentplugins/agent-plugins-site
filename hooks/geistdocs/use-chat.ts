@@ -6,7 +6,7 @@ export const chatPromptAtom = atom<string>("");
 
 // Export the open state atom for controlling chat visibility
 export const chatOpenAtom = atomWithStorage<boolean>(
-  "open-plugins:chat-open",
+  "agent-plugins:chat-open",
   false
 );
 

@@ -1,0 +1,51 @@
+---
+title: Build an Agent Plugin
+description: Create the smallest portable package and add components in fixed locations.
+---
+
+An Agent Plugin is a self-contained directory. Every plugin has a root `plugin.json`; skills and MCP configuration are optional.
+
+## Create a minimal plugin
+
+```text
+hello-plugin/
+├── plugin.json
+└── skills/
+    └── greet/
+        └── SKILL.md
+```
+
+Create `plugin.json`:
+
+```json title="plugin.json"
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "hello-plugin"
+}
+```
+
+Create the skill:
+
+```markdown title="skills/greet/SKILL.md"
+---
+name: greet
+description: Greet the user and offer help.
+---
+
+Greet the user and offer help.
+```
+
+A skills-capable client loads `plugin.json`, discovers the immediate children of `skills/`, and validates each `SKILL.md` against the Agent Skills specification. To add MCP servers, place `mcp.json` at the plugin root using the same Agent Plugins schema version.
+
+## Package boundaries
+
+Files supplied by the package must resolve within the plugin root. Configuration fields defined as plugin-relative paths begin with `./`; symlinks and equivalent filesystem mechanisms must not be used to escape the package.
+
+Client-managed installation, distribution, enablement, updates, and user interface are outside the portable specification.
+
+## Next steps
+
+- **[Manifest](/plugin-authors/manifest)** — Define the plugin identity, metadata, and target specification version.
+- **[Skills](/plugin-authors/skills)** — Package Agent Skills under the fixed `skills/` directory.
+- **[MCP servers](/plugin-authors/mcp-servers)** — Configure local and remote MCP connections in `mcp.json`.
+- **[Client extensions](/plugin-authors/client-extensions)** — Add namespaced behavior for particular clients without changing the portable contract.

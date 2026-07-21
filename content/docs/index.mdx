@@ -1,63 +1,43 @@
 ---
-title: Open Plugins
-description: A standard for packaging agent extensions into distributable plugins.
+title: Agent Plugins
+description: A portable package format for reusable components that extend AI agents.
 ---
 
-Open Plugins is a standard for packaging agent extensions into distributable plugins that any conformant tool can install and run.
+Agent Plugins is an open, vendor-neutral specification for packaging reusable components that extend AI agents into distributable plugins. Its portable contract builds on two existing standards: [Agent Skills](https://agentskills.io/specification) and the [Model Context Protocol](https://modelcontextprotocol.io/specification).
 
-## What are plugins?
+## The portable package
 
-AI coding agents are extensible through skills, hooks, and tool servers — but each is configured separately, with no standard way to package, share, or version them together.
+An Agent Plugin is a directory with a required manifest and optional components in fixed locations:
 
-A plugin is a directory that bundles related extensions into a single installable unit:
-
-```
+```text
 my-plugin/
-├── .plugin/
-│   └── plugin.json       # Manifest: name, version, metadata
-├── skills/                # Agent Skills (SKILL.md format)
-├── agents/                # Specialized sub-agents
-├── hooks/                 # Event-driven automation
-├── rules/                 # Coding standards (.mdc files)
-├── .mcp.json              # MCP tool servers
-└── .lsp.json              # Language server configs
+├── plugin.json
+├── skills/
+│   └── summarize/
+│       ├── SKILL.md
+│       ├── scripts/
+│       └── references/
+├── mcp.json
+└── com.example.client/
+    └── hooks/
 ```
 
-A single plugin can include any combination of these components:
+- `plugin.json` identifies the plugin and the Agent Plugins version it targets.
+- `skills/` contains Agent Skills in the format defined by the Agent Skills specification.
+- `mcp.json` describes stdio, Streamable HTTP, or legacy HTTP+SSE MCP servers.
+- Reverse-domain extension namespaces let individual clients add behavior without changing the portable core.
 
-A single plugin can include any combination of these components:
+Agent Plugins intentionally leaves distribution, marketplaces, installation workflows, permissions, and client UX outside the portable contract.
 
-**[Skills](/agent-builders/components/skills)** give agents new capabilities — from processing PDFs to reviewing code. Skills follow the [Agent Skills](https://agentskills.io) format and are loaded on demand based on task context.
-
-**[Agents](/agent-builders/components/agents)** are specialized sub-agents with focused expertise. A security reviewer, a performance tester, a documentation writer. The host tool can invoke them automatically or users can call them directly.
-
-**[Hooks](/agent-builders/components/hooks)** automate responses to events. Format code after every edit. Run a linter when files are written. Enforce policies before commits.
-
-**[MCP Servers](/agent-builders/components/mcp-servers)** connect agents to external tools and data via the [Model Context Protocol](https://modelcontextprotocol.io/).
-
-**[LSP Servers](/agent-builders/components/lsp-servers)** provide real-time code intelligence — diagnostics, go-to-definition, find references.
-
-## How plugins work
-
-1. **Install**: A user installs a plugin or loads it from a directory.
-2. **Discover**: The host tool scans the plugin directory, discovers components in their default locations, and registers them.
-3. **Namespace**: All components are prefixed with the plugin name (e.g., `/deploy-tools:status`) to prevent conflicts.
-4. **Activate**: Skills become available, hooks start listening, servers start running.
-
-## When to use plugins
-
-- **Share functionality** with teammates or the community
-- **Reuse the same extensions** across multiple projects
-- **Distribute versioned releases** that can be updated
-- **Bundle related components** that work together (e.g., a skill + hook + MCP server)
-
-For personal, project-specific customizations that don't need sharing, you can configure skills and hooks directly in your project without a plugin.
-
-## Get started
+## Choose your path
 
 <Cards>
-  <Card title="Supported Agents" href="/supported-agents" />
-  <Card title="Build a Plugin" href="/plugin-builders" />
-  <Card title="Add Plugin Support to Your Tool" href="/agent-builders" />
-  <Card title="Specification" href="/plugin-builders/specification" />
+  <Card title="Build a plugin" href="/plugin-authors" description="Create a portable package with skills and MCP servers." />
+  <Card title="Implement a client" href="/client-implementers" description="Load, validate, and run Agent Plugins safely." />
+  <Card title="Read the specification" href="/specification" description="Consult the complete normative specification." />
+  <Card title="Browse the schemas" href="/schemas" description="Use the canonical plugin and MCP JSON Schemas." />
 </Cards>
+
+## Source and governance
+
+The versioned specification is authoritative. Project governance, contribution guidance, schemas, and release history live in the [Agent Plugins specification repository](https://github.com/agentplugins/agent-plugins-spec).

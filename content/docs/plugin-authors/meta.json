@@ -1,0 +1,12 @@
+{
+  "title": "For Plugin Authors",
+  "collapsible": false,
+  "defaultOpen": true,
+  "pages": [
+    "index",
+    "manifest",
+    "skills",
+    "mcp-servers",
+    "client-extensions"
+  ]
+}

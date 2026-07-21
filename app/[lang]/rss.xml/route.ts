@@ -18,7 +18,7 @@ export const GET = async (
     id: baseUrl,
     link: baseUrl,
     language: lang,
-    copyright: `All rights reserved ${new Date().getFullYear()}, Open Plugins`,
+    copyright: `Agent Plugins documentation contributors, ${new Date().getFullYear()}. CC BY 4.0.`,
   });
 
   for (const page of source.getPages(lang)) {
@@ -30,7 +30,7 @@ export const GET = async (
       date: new Date(page.data.lastModified ?? new Date()),
       author: [
         {
-          name: "Open Plugins",
+          name: "Agent Plugins",
         },
       ],
     });

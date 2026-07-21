@@ -1,0 +1,41 @@
+---
+title: Client extensions
+description: Add client-owned behavior without expanding the portable Agent Plugins core.
+---
+
+Client extensions let a particular client define additional manifest data, files, and behavior. Agent Plugins reserves no central registry; namespaces use reverse-domain identifiers to avoid collisions.
+
+## Manifest data
+
+Put client-specific data under `extensions` in `plugin.json`:
+
+```json title="plugin.json"
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "example-plugin",
+  "extensions": {
+    "com.example.client": {
+      "setting": true
+    }
+  }
+}
+```
+
+Each extension value is an object. A client ignores namespaces it does not implement without validating their contents.
+
+## Extension directories
+
+Client-owned files live in a top-level directory whose name exactly matches the namespace:
+
+```text
+example-plugin/
+├── plugin.json
+├── skills/
+└── com.example.client/
+    └── hooks/
+        └── hooks.json
+```
+
+A client can use manifest data, an extension directory, or both. The namespace owner defines their contents, validation, relationships, and failure behavior.
+
+Client extensions are not portable Agent Plugins components. Other clients can ignore them without affecting conformance.

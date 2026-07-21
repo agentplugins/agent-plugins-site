@@ -19,7 +19,7 @@ const createSearchServer = (lang: string) => {
 };
 
 const log = (message: string) => {
-  console.log(`🤖 [Open Plugins] ${message}`);
+  console.log(`[Agent Plugins] ${message}`);
 };
 
 const search_docs = (writer: UIMessageStreamWriter) =>
@@ -147,7 +147,7 @@ const search_docs = (writer: UIMessageStreamWriter) =>
 
 const get_doc_page = tool({
   description:
-    'Get the full content of a specific documentation page or guide by slug. Use the exact URL path from search results (e.g., "/plugin-builders/specification" or "/agent-builders/components/skills")',
+    'Get the full content of a specific documentation page or guide by slug. Use the exact URL path from search results (for example, "/plugin-authors/manifest" or "/client-implementers/conformance")',
   inputSchema: z.object({
     slug: z
       .string()
