@@ -1,10 +1,7 @@
 import { Feed } from "feed";
 import type { NextRequest } from "next/server";
-import { title } from "@/geistdocs";
+import { siteUrl, title } from "@/geistdocs";
 import { source } from "@/lib/geistdocs/source";
-
-const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
-const baseUrl = `${protocol}://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`;
 
 export const revalidate = false;
 
@@ -15,8 +12,8 @@ export const GET = async (
   const { lang } = await params;
   const feed = new Feed({
     title,
-    id: baseUrl,
-    link: baseUrl,
+    id: siteUrl,
+    link: siteUrl,
     language: lang,
     copyright: `Agent Plugins documentation contributors, ${new Date().getFullYear()}. CC BY 4.0.`,
   });
@@ -26,7 +23,7 @@ export const GET = async (
       id: page.url,
       title: page.data.title,
       description: page.data.description,
-      link: `${baseUrl}${page.url}`,
+      link: new URL(page.url, siteUrl).toString(),
       date: new Date(page.data.lastModified ?? new Date()),
       author: [
         {

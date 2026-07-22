@@ -1,6 +1,7 @@
 "use client";
 
 import { MessageCircleIcon } from "lucide-react";
+import { siteUrl } from "@/geistdocs";
 import { useChatContext } from "@/hooks/geistdocs/use-chat";
 
 interface AskAIProps {
@@ -10,11 +11,7 @@ interface AskAIProps {
 export const AskAI = ({ href }: AskAIProps) => {
   const { setIsOpen, setPrompt } = useChatContext();
 
-  const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
-  const url = new URL(
-    href,
-    `${protocol}://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`
-  ).toString();
+  const url = new URL(href, siteUrl).toString();
   const query = `Read this page, I want to ask questions about it. ${url}`;
 
   return (
