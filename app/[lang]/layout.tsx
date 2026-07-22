@@ -5,6 +5,7 @@ import { GeistdocsProvider } from "@/components/geistdocs/provider";
 import { basePath, siteUrl } from "@/geistdocs";
 import { mono, sans } from "@/lib/geistdocs/fonts";
 import { cn } from "@/lib/utils";
+import { SidebarProvider } from "fumadocs-ui/layouts/docs/slots/sidebar";
 import type { Metadata } from "next";
 
 const description =
@@ -30,8 +31,10 @@ const Layout = async ({ children, params }: LayoutProps<"/[lang]">) => {
     >
       <body>
         <GeistdocsProvider basePath={basePath} lang={lang}>
-          <Navbar />
-          {children}
+          <SidebarProvider>
+            <Navbar />
+            {children}
+          </SidebarProvider>
           <Footer />
         </GeistdocsProvider>
       </body>

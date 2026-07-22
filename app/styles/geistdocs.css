@@ -178,18 +178,3 @@
   --fd-layout-width: 100%;
   --fd-page-width: 100%;
 }
-
-/* Overlay should sit below the navbar */
-#nd-docs-layout > div[data-state] {
-  @apply top-16;
-}
-
-/* Fix mobile sidebar offset */
-#nd-sidebar-mobile {
-  @apply mt-16;
-}
-
-/* Hide the collapsible trigger in the mobile navbar */
-#nd-sidebar-mobile > div:first-child > div:first-child {
-  @apply hidden;
-}

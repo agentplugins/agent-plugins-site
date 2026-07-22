@@ -1,9 +1,11 @@
 import { DocsLayout as FumadocsDocsLayout } from "fumadocs-ui/layouts/docs";
+import {
+  SidebarTrigger,
+  useSidebar,
+} from "fumadocs-ui/layouts/docs/slots/sidebar";
 import type { ComponentProps, CSSProperties, ReactNode } from "react";
 import {
-  Folder,
-  Item,
-  Separator,
+  InheritedSidebarProvider,
   Sidebar,
 } from "@/components/geistdocs/sidebar";
 import { i18nConfig } from "@/lib/geistdocs/i18n";
@@ -27,13 +29,12 @@ export const DocsLayout = ({ tree, children }: DocsLayoutProps) => (
     searchToggle={{
       enabled: false,
     }}
-    sidebar={{
-      collapsible: false,
-      component: <Sidebar />,
-      components: {
-        Folder,
-        Item,
-        Separator,
+    slots={{
+      sidebar: {
+        provider: InheritedSidebarProvider,
+        root: Sidebar,
+        trigger: SidebarTrigger,
+        useSidebar,
       },
     }}
     tabMode="auto"
