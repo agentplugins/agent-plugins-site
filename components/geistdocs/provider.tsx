@@ -17,10 +17,7 @@ import {
 } from "next/navigation";
 import { type ComponentProps, useCallback } from "react";
 import { Toaster } from "@/components/ui/sonner";
-import { useChatContext } from "@/hooks/geistdocs/use-chat";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { i18n, i18nProvider } from "@/lib/geistdocs/i18n";
-import { cn } from "@/lib/utils";
 import { TooltipProvider } from "../ui/tooltip";
 import { SearchDialog } from "./search";
 
@@ -55,23 +52,13 @@ export const GeistdocsProvider = ({
   lang = i18n.defaultLanguage,
   ...props
 }: GeistdocsProviderProps) => {
-  const { isOpen } = useChatContext();
-  const isMobile = useIsMobile();
-  const isSidebarVisible = isOpen && !isMobile;
-
   const SearchDialogComponent = useCallback(
     (sdProps: SharedProps) => <SearchDialog basePath={basePath} {...sdProps} />,
     [basePath]
   );
 
   return (
-    <div
-      className={cn(
-        "transition-all",
-        isSidebarVisible ? "pr-96!" : null,
-        className
-      )}
-    >
+    <div className={className}>
       <TooltipProvider>
         <FrameworkProvider
           Image={FrameworkImage}
