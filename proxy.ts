@@ -12,6 +12,11 @@ const { rewrite: rewriteLLM } = rewritePath(
   `/${i18n.defaultLanguage}/llms.mdx/*path`,
 );
 
+const rewriteMarkdownPath = (pathname: string) =>
+  pathname === "/" || pathname === "/docs"
+    ? `/${i18n.defaultLanguage}/llms.mdx`
+    : rewriteLLM(pathname);
+
 const MDX_EXTENSION_PATTERN = /\.mdx?$/;
 const INTERNAL_I18N_REWRITE_HEADER = "x-agent-plugins-i18n-rewrite";
 
@@ -69,10 +74,7 @@ const proxy = async (request: NextRequest, context: NextFetchEvent) => {
     (pathname.endsWith(".md") || pathname.endsWith(".mdx"))
   ) {
     const stripped = pathname.replace(MDX_EXTENSION_PATTERN, "");
-    const result =
-      stripped === "/" || stripped === "/docs"
-        ? `/${i18n.defaultLanguage}/llms.mdx`
-        : rewriteLLM(stripped);
+    const result = rewriteMarkdownPath(stripped);
     if (result) {
       return rewriteInternally(request, new URL(result, request.nextUrl));
     }
@@ -80,7 +82,7 @@ const proxy = async (request: NextRequest, context: NextFetchEvent) => {
 
   // Handle Accept header content negotiation.
   if (isMarkdownPreferred(request)) {
-    const result = rewriteLLM(pathname);
+    const result = rewriteMarkdownPath(pathname);
     if (result) {
       return rewriteInternally(request, new URL(result, request.nextUrl));
     }
