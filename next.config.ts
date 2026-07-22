@@ -3,6 +3,18 @@ import type { NextConfig } from "next";
 
 const withMDX = createMDX();
 
+const publishedSchemaPaths = [
+  "/schemas/1.0.0/plugin.schema.json",
+  "/schemas/1.0.0/mcp.schema.json",
+] as const;
+
+const immutableSchemaHeaders = [
+  {
+    key: "Cache-Control",
+    value: "public, max-age=31536000, immutable",
+  },
+];
+
 const redirectHosts = [
   "open-plugins.com",
   "www.open-plugins.com",
@@ -47,6 +59,13 @@ const config: NextConfig = {
 
   images: {
     formats: ["image/avif", "image/webp"],
+  },
+
+  async headers() {
+    return publishedSchemaPaths.map((source) => ({
+      source,
+      headers: immutableSchemaHeaders,
+    }));
   },
 
   async redirects() {
