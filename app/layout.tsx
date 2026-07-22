@@ -23,6 +23,7 @@ export const metadata: Metadata = {
 const Layout = ({ children }: LayoutProps<"/">) => (
   <html
     className={cn(sans.variable, mono.variable, "scroll-smooth antialiased")}
+    data-scroll-behavior="smooth"
     lang="en"
     suppressHydrationWarning
   >
