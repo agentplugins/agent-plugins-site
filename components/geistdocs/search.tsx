@@ -12,7 +12,6 @@ import {
   SearchDialogOverlay,
   type SharedProps,
 } from "fumadocs-ui/components/dialog/search";
-import { useI18n } from "fumadocs-ui/contexts/i18n";
 import { useSearchContext } from "fumadocs-ui/contexts/search";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
@@ -27,10 +26,8 @@ export const SearchDialog = ({
   basePath,
   ...props
 }: SharedProps & { basePath: string | undefined }) => {
-  const { locale } = useI18n();
   const { search, setSearch, query } = useDocsSearch({
     type: "fetch",
-    locale,
     api: basePath ? `${basePath}/api/search` : "/api/search",
   });
 

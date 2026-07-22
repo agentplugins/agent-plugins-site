@@ -1,4 +1,3 @@
-import type { NextRequest } from "next/server";
 import { source } from "@/lib/geistdocs/source";
 
 export const revalidate = false;
@@ -162,12 +161,8 @@ function renderNode(
   return lines.join("\n");
 }
 
-export const GET = async (
-  _req: NextRequest,
-  { params }: RouteContext<"/[lang]/sitemap.md">
-) => {
-  const { lang } = await params;
-  const pages = source.getPages(lang);
+export const GET = async () => {
+  const pages = source.getPages();
 
   const tree = buildTree(pages);
 

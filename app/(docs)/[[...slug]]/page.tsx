@@ -15,9 +15,9 @@ import { ScrollTop } from "@/components/geistdocs/scroll-top";
 import { Separator } from "@/components/ui/separator";
 import { getLLMText, getPageImage, source } from "@/lib/geistdocs/source";
 
-const Page = async ({ params }: PageProps<"/[lang]/[[...slug]]">) => {
-  const { slug, lang } = await params;
-  const page = source.getPage(slug, lang);
+const Page = async ({ params }: PageProps<"/[[...slug]]">) => {
+  const { slug } = await params;
+  const page = source.getPage(slug);
 
   if (!page) {
     notFound();
@@ -62,9 +62,9 @@ export const generateStaticParams = () => source.generateParams();
 
 export const generateMetadata = async ({
   params,
-}: PageProps<"/[lang]/[[...slug]]">) => {
-  const { slug, lang } = await params;
-  const page = source.getPage(slug, lang);
+}: PageProps<"/[[...slug]]">) => {
+  const { slug } = await params;
+  const page = source.getPage(slug);
 
   if (!page) {
     notFound();

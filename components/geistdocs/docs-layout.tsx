@@ -8,7 +8,6 @@ import {
   InheritedSidebarProvider,
   Sidebar,
 } from "@/components/geistdocs/sidebar";
-import { i18nConfig } from "@/lib/geistdocs/i18n";
 
 interface DocsLayoutProps {
   children: ReactNode;
@@ -22,7 +21,6 @@ export const DocsLayout = ({ tree, children }: DocsLayoutProps) => (
         "--fd-docs-row-1": "4rem",
       } as CSSProperties,
     }}
-    i18n={i18nConfig}
     nav={{
       enabled: false,
     }}

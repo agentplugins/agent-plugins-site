@@ -1,5 +1,4 @@
 import { GitHubButton } from "./github-button";
-import { LanguageSelector } from "./language-selector";
 import { ThemeToggle } from "./theme-toggle";
 
 interface FooterProps {
@@ -17,7 +16,6 @@ export const Footer = ({
         </p>
       </div>
       <div className="flex items-center gap-2">
-        <LanguageSelector />
         <GitHubButton />
         <ThemeToggle />
       </div>
