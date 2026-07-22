@@ -81,7 +81,7 @@ const proxy = async (request: NextRequest, context: NextFetchEvent) => {
   }
 
   // Handle Accept header content negotiation.
-  if (isMarkdownPreferred(request)) {
+  if (!isSemanticSitemap && isMarkdownPreferred(request)) {
     const result = rewriteMarkdownPath(pathname);
     if (result) {
       return rewriteInternally(request, new URL(result, request.nextUrl));
