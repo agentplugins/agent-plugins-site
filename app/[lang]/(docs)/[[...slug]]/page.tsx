@@ -72,16 +72,35 @@ export const generateMetadata = async ({
     notFound();
   }
 
+  const title = page.data.title;
+  const description = page.data.description;
+  const image = {
+    alt: title,
+    url: getPageImage(page).url,
+  };
+
   const metadata: Metadata = {
-    title: page.data.title,
-    description: page.data.description,
-    openGraph: {
-      images: getPageImage(page).url,
-    },
+    title: page.url === "/" ? { absolute: title } : title,
+    description,
     alternates: {
+      canonical: page.url,
       types: {
-        "text/markdown": slug ? `/docs/${slug}.md` : "/docs.md",
+        "text/markdown": page.url === "/" ? "/docs.md" : `${page.url}.md`,
       },
+    },
+    openGraph: {
+      type: "website",
+      url: page.url,
+      siteName: "Agent Plugins",
+      title,
+      description,
+      images: [image],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
     },
   };
 

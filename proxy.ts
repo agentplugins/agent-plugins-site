@@ -64,7 +64,7 @@ const proxy = async (request: NextRequest, context: NextFetchEvent) => {
   ) {
     const stripped = pathname.replace(MDX_EXTENSION_PATTERN, "");
     const result =
-      stripped === "/"
+      stripped === "/" || stripped === "/docs"
         ? `/${i18n.defaultLanguage}/llms.mdx`
         : rewriteLLM(stripped);
     if (result) {

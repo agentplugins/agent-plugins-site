@@ -23,6 +23,8 @@ export const suggestions = [
 
 export const title = "Agent Plugins Documentation";
 
+export const siteUrl = "https://agent-plugins.org";
+
 export const translations = {
   en: {
     displayName: "English",

@@ -11,17 +11,14 @@ import {
   OpenInTrigger,
   OpenInv0,
 } from "@/components/ai-elements/open-in-chat";
+import { siteUrl } from "@/geistdocs";
 
 interface OpenInChatProps {
   href: string;
 }
 
 export const OpenInChat = ({ href }: OpenInChatProps) => {
-  const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
-  const url = new URL(
-    href,
-    `${protocol}://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`
-  ).toString();
+  const url = new URL(href, siteUrl).toString();
   const query = `Read this page, I want to ask questions about it. ${url}`;
 
   return (
