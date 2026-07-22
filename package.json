@@ -28,7 +28,6 @@
     "cmdk": "^1.1.1",
     "dexie": "^4.2.1",
     "dexie-react-hooks": "^4.2.0",
-    "feed": "^5.1.0",
     "fumadocs-core": "16.11.5",
     "fumadocs-mdx": "15.2.0",
     "fumadocs-ui": "16.11.5",

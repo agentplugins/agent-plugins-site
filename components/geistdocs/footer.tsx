@@ -1,6 +1,5 @@
 import { GitHubButton } from "./github-button";
 import { LanguageSelector } from "./language-selector";
-import { RSSButton } from "./rss-button";
 import { ThemeToggle } from "./theme-toggle";
 
 interface FooterProps {
@@ -19,7 +18,6 @@ export const Footer = ({
       </div>
       <div className="flex items-center gap-2">
         <LanguageSelector />
-        <RSSButton />
         <GitHubButton />
         <ThemeToggle />
       </div>
