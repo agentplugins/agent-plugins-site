@@ -1,4 +1,4 @@
-import "../global.css";
+import "./global.css";
 import { Footer } from "@/components/geistdocs/footer";
 import { Navbar } from "@/components/geistdocs/navbar";
 import { GeistdocsProvider } from "@/components/geistdocs/provider";
@@ -20,26 +20,22 @@ export const metadata: Metadata = {
   description,
 };
 
-const Layout = async ({ children, params }: LayoutProps<"/[lang]">) => {
-  const { lang } = await params;
-
-  return (
-    <html
-      className={cn(sans.variable, mono.variable, "scroll-smooth antialiased")}
-      lang={lang}
-      suppressHydrationWarning
-    >
-      <body>
-        <GeistdocsProvider basePath={basePath} lang={lang}>
-          <SidebarProvider>
-            <Navbar />
-            {children}
-          </SidebarProvider>
-          <Footer />
-        </GeistdocsProvider>
-      </body>
-    </html>
-  );
-};
+const Layout = ({ children }: LayoutProps<"/">) => (
+  <html
+    className={cn(sans.variable, mono.variable, "scroll-smooth antialiased")}
+    lang="en"
+    suppressHydrationWarning
+  >
+    <body>
+      <GeistdocsProvider basePath={basePath}>
+        <SidebarProvider>
+          <Navbar />
+          {children}
+        </SidebarProvider>
+        <Footer />
+      </GeistdocsProvider>
+    </body>
+  </html>
+);
 
 export default Layout;

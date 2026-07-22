@@ -29,7 +29,7 @@ export const getMDXComponents = (
     href?.startsWith("/") ? (
       <DynamicLink
         className="font-normal text-primary no-underline"
-        href={`/[lang]${href}`}
+        href={href}
         {...props}
       />
     ) : (

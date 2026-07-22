@@ -39,7 +39,7 @@ export const DesktopMenu = ({ items, className }: DesktopMenuProps) => {
                   <ExternalLinkIcon className="size-3.5" />
                 </a>
               ) : (
-                <DynamicLink href={`/[lang]${item.href}`}>
+                <DynamicLink href={item.href}>
                   {item.label}
                 </DynamicLink>
               )}

@@ -10,46 +10,24 @@ import type { SharedProps } from "fumadocs-ui/contexts/search";
 import { RootProvider } from "fumadocs-ui/provider/base";
 import NextImage from "next/image";
 import NextLink from "next/link";
-import {
-  useParams,
-  usePathname as useNextPathname,
-  useRouter,
-} from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { type ComponentProps, useCallback } from "react";
 import { Toaster } from "@/components/ui/sonner";
-import { i18n, i18nProvider } from "@/lib/geistdocs/i18n";
 import { TooltipProvider } from "../ui/tooltip";
 import { SearchDialog } from "./search";
 
 type GeistdocsProviderProps = ComponentProps<typeof RootProvider> & {
   basePath: string | undefined;
   className?: string;
-  lang?: string;
 };
 
 const FrameworkImage = NextImage as NonNullable<Framework["Image"]>;
 const FrameworkLink = NextLink as NonNullable<Framework["Link"]>;
 
-const usePublicPathname = () => {
-  const pathname = useNextPathname();
-  const defaultLanguagePrefix = `/${i18n.defaultLanguage}`;
-
-  if (pathname === defaultLanguagePrefix) {
-    return "/";
-  }
-
-  if (pathname.startsWith(`${defaultLanguagePrefix}/`)) {
-    return pathname.slice(defaultLanguagePrefix.length);
-  }
-
-  return pathname;
-};
-
 export const GeistdocsProvider = ({
   basePath,
   search,
   className,
-  lang = i18n.defaultLanguage,
   ...props
 }: GeistdocsProviderProps) => {
   const SearchDialogComponent = useCallback(
@@ -64,11 +42,10 @@ export const GeistdocsProvider = ({
           Image={FrameworkImage}
           Link={FrameworkLink}
           useParams={useParams}
-          usePathname={usePublicPathname}
+          usePathname={usePathname}
           useRouter={useRouter}
         >
           <RootProvider
-            i18n={i18nProvider(lang)}
             search={{
               SearchDialog: SearchDialogComponent,
               ...search,

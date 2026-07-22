@@ -15,9 +15,6 @@ importers:
       '@icons-pack/react-simple-icons':
         specifier: ^13.8.0
         version: 13.13.0(react@19.2.7)
-      '@orama/tokenizers':
-        specifier: ^3.1.16
-        version: 3.1.18
       '@vercel/analytics':
         specifier: ^2.0.1
         version: 2.0.1(next@16.2.10(@opentelemetry/api@1.9.0)(@types/node@24.13.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
@@ -599,10 +596,6 @@ packages:
 
   '@orama/orama@3.1.18':
     resolution: {integrity: sha512-a61ljmRVVyG5MC/698C8/FfFDw5a8LOIvyOLW5fztgUXqUpc1jOfQzOitSCbge657OgXXThmY3Tk8fpiDb4UcA==}
-    engines: {node: '>= 20.0.0'}
-
-  '@orama/tokenizers@3.1.18':
-    resolution: {integrity: sha512-Ra4dFddWZ7hCGPAehnd/6QZjlzQvczYSt1y1Fq4HteJqRu2yvfR6fXvxiUnKi+HIgJYPxKhebJEjvJdF8LYQWg==}
     engines: {node: '>= 20.0.0'}
 
   '@radix-ui/number@1.1.2':
@@ -3489,10 +3482,6 @@ snapshots:
     optional: true
 
   '@orama/orama@3.1.18': {}
-
-  '@orama/tokenizers@3.1.18':
-    dependencies:
-      '@orama/orama': 3.1.18
 
   '@radix-ui/number@1.1.2': {}
 
