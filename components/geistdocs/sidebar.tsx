@@ -11,8 +11,11 @@ import {
 } from "fumadocs-ui/components/sidebar/base";
 import type { SidebarPageTreeComponents } from "fumadocs-ui/components/sidebar/page-tree";
 import { useTreeContext, useTreePath } from "fumadocs-ui/contexts/tree";
-import { usePathname } from "next/navigation";
-import { Fragment, useEffect, useRef } from "react";
+import {
+  type SidebarProviderProps,
+  useSidebar,
+} from "fumadocs-ui/layouts/docs/slots/sidebar";
+import { Fragment } from "react";
 import {
   Sheet,
   SheetContent,
@@ -20,21 +23,15 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { useSidebarContext } from "@/hooks/geistdocs/use-sidebar";
 import { SearchButton } from "./search";
+
+export const InheritedSidebarProvider = ({
+  children,
+}: SidebarProviderProps) => <>{children}</>;
 
 export const Sidebar = () => {
   const { root } = useTreeContext();
-  const { isOpen, setIsOpen } = useSidebarContext();
-  const pathname = usePathname();
-  const previousPathname = useRef(pathname);
-
-  useEffect(() => {
-    if (pathname !== previousPathname.current) {
-      setIsOpen(false);
-      previousPathname.current = pathname;
-    }
-  }, [pathname, setIsOpen]);
+  const { mode, open, setOpen } = useSidebar();
 
   const renderSidebarList = (items: Node[]) =>
     items.map((item) => {
@@ -43,10 +40,9 @@ export const Sidebar = () => {
       }
 
       if (item.type === "folder") {
-        const children = renderSidebarList(item.children);
         return (
           <Folder item={item} key={item.$id}>
-            {children}
+            {renderSidebarList(item.children)}
           </Folder>
         );
       }
@@ -55,28 +51,45 @@ export const Sidebar = () => {
     });
 
   return (
-    <div
-      className="pointer-events-none sticky top-(--fd-docs-row-1) z-20 h-[calc(var(--fd-docs-height)-var(--fd-docs-row-1))] [grid-area:sidebar] *:pointer-events-auto max-md:hidden md:layout:[--fd-sidebar-width:268px]"
-      data-sidebar-placeholder
-    >
-      <div className="h-full overflow-y-auto px-4 pt-12 pb-4">
-        <Fragment key={root.$id}>{renderSidebarList(root.children)}</Fragment>
+    <>
+      <div
+        className="pointer-events-none sticky top-(--fd-docs-row-1) z-20 h-[calc(var(--fd-docs-height)-var(--fd-docs-row-1))] [grid-area:sidebar] *:pointer-events-auto max-md:hidden md:layout:[--fd-sidebar-width:268px]"
+        data-sidebar-placeholder
+      >
+        <div className="h-full overflow-y-auto px-4 pt-12 pb-4">
+          <Fragment key={root.$id}>
+            {renderSidebarList(root.children)}
+          </Fragment>
+        </div>
       </div>
-      <Sheet onOpenChange={setIsOpen} open={isOpen}>
-        <SheetContent className="gap-0">
+      <Sheet onOpenChange={setOpen} open={mode === "drawer" && open}>
+        <SheetContent
+          className="gap-0"
+          id="nd-sidebar-mobile"
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            document
+              .querySelector<HTMLButtonElement>(
+                '[aria-controls="nd-sidebar-mobile"]',
+              )
+              ?.focus();
+          }}
+          overlayClassName="top-16"
+          style={{ bottom: 0, height: "auto", top: "4rem" }}
+        >
           <SheetHeader className="mt-8">
             <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
             <SheetDescription className="sr-only">
               Navigation for the documentation.
             </SheetDescription>
-            <SearchButton onClick={() => setIsOpen(false)} />
+            <SearchButton onClick={() => setOpen(false)} />
           </SheetHeader>
           <div className="flex-1 overflow-y-auto px-4 pb-4">
             {renderSidebarList(root.children)}
           </div>
         </SheetContent>
       </Sheet>
-    </div>
+    </>
   );
 };
 
