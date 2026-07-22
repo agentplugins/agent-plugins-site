@@ -12,6 +12,11 @@ const { rewrite: rewriteLLM } = rewritePath(
   `/${i18n.defaultLanguage}/llms.mdx/*path`,
 );
 
+const rewriteMarkdownPath = (pathname: string) =>
+  pathname === "/" || pathname === "/docs"
+    ? `/${i18n.defaultLanguage}/llms.mdx`
+    : rewriteLLM(pathname);
+
 const MDX_EXTENSION_PATTERN = /\.mdx?$/;
 const INTERNAL_I18N_REWRITE_HEADER = "x-agent-plugins-i18n-rewrite";
 
@@ -41,6 +46,11 @@ const rewriteInternally = (
 
 const proxy = async (request: NextRequest, context: NextFetchEvent) => {
   const pathname = request.nextUrl.pathname;
+  const isSemanticSitemap =
+    pathname === "/sitemap.md" ||
+    i18n.languages.some(
+      (language) => pathname === `/${language}/sitemap.md`,
+    );
 
   // `next start` runs the proxy again for an internal locale rewrite. Let that
   // rewritten request reach the localized App Router route instead of sending
@@ -57,24 +67,22 @@ const proxy = async (request: NextRequest, context: NextFetchEvent) => {
 
   // Handle .md/.mdx URL requests before i18n runs.
   if (
+    !isSemanticSitemap &&
     (pathname === "/docs.md" ||
       pathname === "/docs.mdx" ||
       pathname.startsWith("/")) &&
     (pathname.endsWith(".md") || pathname.endsWith(".mdx"))
   ) {
     const stripped = pathname.replace(MDX_EXTENSION_PATTERN, "");
-    const result =
-      stripped === "/" || stripped === "/docs"
-        ? `/${i18n.defaultLanguage}/llms.mdx`
-        : rewriteLLM(stripped);
+    const result = rewriteMarkdownPath(stripped);
     if (result) {
       return rewriteInternally(request, new URL(result, request.nextUrl));
     }
   }
 
   // Handle Accept header content negotiation.
-  if (isMarkdownPreferred(request)) {
-    const result = rewriteLLM(pathname);
+  if (!isSemanticSitemap && isMarkdownPreferred(request)) {
+    const result = rewriteMarkdownPath(pathname);
     if (result) {
       return rewriteInternally(request, new URL(result, request.nextUrl));
     }
