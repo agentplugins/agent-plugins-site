@@ -1,7 +1,6 @@
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { AskAI } from "@/components/geistdocs/ask-ai";
 import { CopyPage } from "@/components/geistdocs/copy-page";
 import {
   DocsBody,
@@ -38,7 +37,6 @@ const Page = async ({ params }: PageProps<"/[lang]/[[...slug]]">) => {
             <EditSource path={page.path} />
             <ScrollTop />
             <CopyPage text={markdown} />
-            <AskAI href={page.url} />
             <OpenInChat href={page.url} />
           </div>
         ),

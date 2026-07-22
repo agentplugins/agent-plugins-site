@@ -1,7 +1,5 @@
-import { PlugIcon } from "lucide-react";
 import { DynamicLink } from "fumadocs-core/dynamic-link";
-import { basePath, Logo, nav, suggestions } from "@/geistdocs";
-import { Chat } from "./chat";
+import { Logo, nav } from "@/geistdocs";
 import { DesktopMenu } from "./desktop-menu";
 import { MobileMenu } from "./mobile-menu";
 import { SearchButton } from "./search";
@@ -17,7 +15,6 @@ export const Navbar = () => (
       <DesktopMenu className="hidden xl:flex" items={nav} />
       <div className="ml-auto flex flex-1 items-center justify-end gap-2">
         <SearchButton className="hidden xl:flex" />
-        <Chat basePath={basePath} suggestions={suggestions} />
         <MobileMenu />
       </div>
     </div>
