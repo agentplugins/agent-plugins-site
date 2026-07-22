@@ -15,9 +15,17 @@ const rewriteInternally = (request: NextRequest, destination: string) =>
 
 const proxy = (request: NextRequest) => {
   const pathname = request.nextUrl.pathname;
-  const isSemanticSitemap = pathname === "/sitemap.md";
+  const isGeneratedMarkdownRoute =
+    pathname === "/llms.txt" ||
+    pathname === "/llms.mdx" ||
+    pathname.startsWith("/llms.mdx/") ||
+    pathname === "/sitemap.md";
 
-  if (!isSemanticSitemap && MDX_EXTENSION_PATTERN.test(pathname)) {
+  if (isGeneratedMarkdownRoute) {
+    return NextResponse.next();
+  }
+
+  if (MDX_EXTENSION_PATTERN.test(pathname)) {
     const stripped = pathname.replace(MDX_EXTENSION_PATTERN, "");
     const result = rewriteMarkdownPath(stripped);
     if (result) {
@@ -25,7 +33,7 @@ const proxy = (request: NextRequest) => {
     }
   }
 
-  if (!isSemanticSitemap && isMarkdownPreferred(request)) {
+  if (isMarkdownPreferred(request)) {
     const result = rewriteMarkdownPath(pathname);
     if (result) {
       return rewriteInternally(request, result);
