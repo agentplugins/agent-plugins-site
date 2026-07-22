@@ -7,6 +7,12 @@
   "engines": {
     "node": "24.x"
   },
+  "pnpm": {
+    "overrides": {
+      "postcss@<8.5.10": "8.5.22",
+      "sharp@<0.35.0": "0.35.3"
+    }
+  },
   "scripts": {
     "build": "next build",
     "dev": "next dev",
@@ -15,27 +21,18 @@
     "translate": "npx @vercel/geistdocs translate"
   },
   "dependencies": {
-    "@ai-sdk/react": "^2.0.115",
     "@icons-pack/react-simple-icons": "^13.8.0",
     "@orama/tokenizers": "^3.1.16",
-    "@streamdown/cjk": "^1.0.1",
-    "@streamdown/code": "^1.0.1",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^1.3.1",
-    "ai": "^5.0.106",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
-    "dexie": "^4.2.1",
-    "dexie-react-hooks": "^4.2.0",
     "fumadocs-core": "16.11.5",
     "fumadocs-mdx": "15.2.0",
     "fumadocs-ui": "16.11.5",
-    "jotai": "^2.15.2",
     "lucide-react": "^0.555.0",
     "mermaid": "^11.12.2",
-    "motion": "^12.23.25",
-    "nanoid": "^5.1.6",
     "next": "16.2.10",
     "next-themes": "^0.4.6",
     "radix-ui": "latest",
@@ -44,11 +41,9 @@
     "react-player": "^3.4.0",
     "shiki": "^3.22.0",
     "sonner": "^2.0.7",
-    "streamdown": "^2.1.0",
     "tailwind-merge": "^3.4.0",
-    "use-stick-to-bottom": "^1.1.1",
     "vaul": "^1.1.2",
-    "zod": "^4.1.13"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.17",
