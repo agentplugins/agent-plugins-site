@@ -41,6 +41,11 @@ const rewriteInternally = (
 
 const proxy = async (request: NextRequest, context: NextFetchEvent) => {
   const pathname = request.nextUrl.pathname;
+  const isSemanticSitemap =
+    pathname === "/sitemap.md" ||
+    i18n.languages.some(
+      (language) => pathname === `/${language}/sitemap.md`,
+    );
 
   // `next start` runs the proxy again for an internal locale rewrite. Let that
   // rewritten request reach the localized App Router route instead of sending
@@ -57,6 +62,7 @@ const proxy = async (request: NextRequest, context: NextFetchEvent) => {
 
   // Handle .md/.mdx URL requests before i18n runs.
   if (
+    !isSemanticSitemap &&
     (pathname === "/docs.md" ||
       pathname === "/docs.mdx" ||
       pathname.startsWith("/")) &&
