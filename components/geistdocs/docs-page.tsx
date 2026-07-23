@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 type PageProps = ComponentProps<typeof FumadocsDocsPage>;
 
 export const DocsPage = ({ ...props }: PageProps) => (
-  <FumadocsDocsPage {...props} />
+  <FumadocsDocsPage {...props} role="main" tabIndex={-1} />
 );
 
 export const DocsTitle = ({
