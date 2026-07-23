@@ -104,6 +104,9 @@ export const Folder: SidebarPageTreeComponents["Folder"] = ({
   const path = useTreePath();
   const pathname = usePathname();
   const defaultOpen = item.defaultOpen ?? path.includes(item);
+  const indexActive = item.index
+    ? isActive(item.index.url, pathname)
+    : false;
 
   return (
     <SidebarFolder
@@ -113,8 +116,9 @@ export const Folder: SidebarPageTreeComponents["Folder"] = ({
     >
       {item.index ? (
         <SidebarFolderLink
-          active={isActive(item.index.url, pathname)}
-          className="flex items-center gap-2 text-pretty py-1.5 text-muted-foreground text-sm transition-colors hover:text-foreground data-[active=true]:text-foreground [&_svg]:size-3.5"
+          active={indexActive}
+          aria-current={indexActive ? "page" : undefined}
+          className="flex items-center gap-2 text-pretty py-1.5 text-muted-foreground text-sm transition-colors hover:text-foreground data-[active=true]:font-medium data-[active=true]:text-foreground [&_svg]:size-3.5"
           external={item.index.external}
           href={item.index.url}
         >
@@ -134,11 +138,13 @@ export const Folder: SidebarPageTreeComponents["Folder"] = ({
 
 export const Item: SidebarPageTreeComponents["Item"] = ({ item }) => {
   const pathname = usePathname();
+  const active = isActive(item.url, pathname);
 
   return (
     <SidebarItem
-      active={isActive(item.url, pathname)}
-      className="block w-full truncate text-pretty py-1.5 text-muted-foreground text-sm transition-colors hover:text-foreground data-[active=true]:text-foreground"
+      active={active}
+      aria-current={active ? "page" : undefined}
+      className="block w-full truncate text-pretty py-1.5 text-muted-foreground text-sm transition-colors hover:text-foreground data-[active=true]:font-medium data-[active=true]:text-foreground"
       external={item.external}
       href={item.url}
       icon={item.icon}
