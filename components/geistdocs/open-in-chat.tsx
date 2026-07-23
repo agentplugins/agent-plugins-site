@@ -6,7 +6,6 @@ import {
   OpenInContent,
   OpenInCursor,
   OpenInScira,
-  OpenInSeparator,
   OpenInT3,
   OpenInTrigger,
   OpenInv0,
@@ -33,13 +32,12 @@ export const OpenInChat = ({ href }: OpenInChatProps) => {
         </button>
       </OpenInTrigger>
       <OpenInContent align="start" side="top">
-        <OpenInv0 />
-        <OpenInSeparator />
         <OpenInChatGPT />
         <OpenInClaude />
-        <OpenInT3 />
-        <OpenInScira />
         <OpenInCursor />
+        <OpenInScira />
+        <OpenInT3 />
+        <OpenInv0 />
       </OpenInContent>
     </OpenIn>
   );
