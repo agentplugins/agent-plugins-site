@@ -187,7 +187,7 @@ It is not intended to replace individual docs.
 
   return new Response(header + body, {
     headers: {
-      "Content-Type": "text/markdown",
+      "Content-Type": "text/markdown; charset=utf-8",
     },
   });
 };
