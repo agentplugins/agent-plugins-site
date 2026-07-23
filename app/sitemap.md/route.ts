@@ -69,22 +69,6 @@ function buildTree(
   return root;
 }
 
-function inferDocType(url: string, explicitType?: string): string {
-  if (explicitType) {
-    return explicitType.charAt(0).toUpperCase() + explicitType.slice(1);
-  }
-  if (url.includes("/getting-started")) {
-    return "Guide";
-  }
-  if (url.includes("/reference")) {
-    return "Reference";
-  }
-  if (url.includes("/guides/")) {
-    return "Guide";
-  }
-  return "Conceptual";
-}
-
 function extractTopics(url: string, product?: string): string[] {
   const topics: string[] = [];
   if (product) {
@@ -125,7 +109,10 @@ function renderNode(
   const lines: string[] = [];
 
   const segments: string[] = [];
-  segments.push(`Type: ${inferDocType(node.url, node.type)}`);
+  if (node.type) {
+    const type = node.type.charAt(0).toUpperCase() + node.type.slice(1);
+    segments.push(`Type: ${type}`);
+  }
 
   if (node.lastmod) {
     segments.push(`Lastmod: ${node.lastmod}`);
