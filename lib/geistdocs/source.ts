@@ -21,7 +21,16 @@ export const getPageImage = (page: InferPageType<typeof source>) => {
   };
 };
 
-export const getLLMText = async (page: InferPageType<typeof source>) => {
+export const LLM_NAVIGATION_FOOTER = `---
+
+For a semantic overview of all documentation, see [/sitemap.md](/sitemap.md)
+
+For an index of all available documentation, see [/llms.txt](/llms.txt)`;
+
+export const getLLMText = async (
+  page: InferPageType<typeof source>,
+  { includeNavigationFooter = true } = {}
+) => {
   const processed = await page.data.getText("processed");
   const { title, description, product, type, summary, prerequisites, related } =
     page.data;
@@ -41,15 +50,15 @@ export const getLLMText = async (page: InferPageType<typeof source>) => {
     .filter(Boolean)
     .join("\n");
 
-  return `${frontmatter}
+  const body = `${frontmatter}
 
 # ${title}
 
-${processed}
+${processed}`;
 
----
+  return includeNavigationFooter
+    ? `${body}
 
-For a semantic overview of all documentation, see [/sitemap.md](/sitemap.md)
-
-For an index of all available documentation, see [/llms.txt](/llms.txt)`;
+${LLM_NAVIGATION_FOOTER}`
+    : body;
 };
