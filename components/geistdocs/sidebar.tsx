@@ -1,6 +1,7 @@
 "use client";
 
 import type { Node } from "fumadocs-core/page-tree";
+import { usePathname } from "fumadocs-core/framework";
 import {
   SidebarFolder,
   SidebarFolderContent,
@@ -24,6 +25,9 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { SearchButton } from "./search";
+
+const isActive = (href: string, pathname: string) =>
+  href.replace(/\/$/, "") === pathname.replace(/\/$/, "");
 
 export const InheritedSidebarProvider = ({
   children,
@@ -98,13 +102,23 @@ export const Folder: SidebarPageTreeComponents["Folder"] = ({
   item,
 }) => {
   const path = useTreePath();
+  const pathname = usePathname();
   const defaultOpen = item.defaultOpen ?? path.includes(item);
+  const indexActive = item.index
+    ? isActive(item.index.url, pathname)
+    : false;
 
   return (
-    <SidebarFolder collapsible={item.collapsible} defaultOpen={defaultOpen}>
+    <SidebarFolder
+      active={path.includes(item)}
+      collapsible={item.collapsible}
+      defaultOpen={defaultOpen}
+    >
       {item.index ? (
         <SidebarFolderLink
-          className="flex items-center gap-2 text-pretty py-1.5 text-muted-foreground text-sm transition-colors hover:text-foreground data-[active=true]:text-foreground [&_svg]:size-3.5"
+          active={indexActive}
+          aria-current={indexActive ? "page" : undefined}
+          className="flex items-center gap-2 text-pretty py-1.5 text-muted-foreground text-sm transition-colors hover:text-foreground data-[active=true]:font-medium data-[active=true]:text-foreground [&_svg]:size-3.5"
           external={item.index.external}
           href={item.index.url}
         >
@@ -122,16 +136,23 @@ export const Folder: SidebarPageTreeComponents["Folder"] = ({
   );
 };
 
-export const Item: SidebarPageTreeComponents["Item"] = ({ item }) => (
-  <SidebarItem
-    className="block w-full truncate text-pretty py-1.5 text-muted-foreground text-sm transition-colors hover:text-foreground data-[active=true]:text-foreground"
-    external={item.external}
-    href={item.url}
-    icon={item.icon}
-  >
-    {item.name}
-  </SidebarItem>
-);
+export const Item: SidebarPageTreeComponents["Item"] = ({ item }) => {
+  const pathname = usePathname();
+  const active = isActive(item.url, pathname);
+
+  return (
+    <SidebarItem
+      active={active}
+      aria-current={active ? "page" : undefined}
+      className="block w-full truncate text-pretty py-1.5 text-muted-foreground text-sm transition-colors hover:text-foreground data-[active=true]:font-medium data-[active=true]:text-foreground"
+      external={item.external}
+      href={item.url}
+      icon={item.icon}
+    >
+      {item.name}
+    </SidebarItem>
+  );
+};
 
 export const Separator: SidebarPageTreeComponents["Separator"] = ({ item }) => (
   <SidebarSeparator className="mt-4 mb-2 flex items-center gap-2 px-0 font-medium text-sm first-child:mt-0">

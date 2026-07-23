@@ -9,8 +9,13 @@ import { cn } from "@/lib/utils";
 
 type PageProps = ComponentProps<typeof FumadocsDocsPage>;
 
-export const DocsPage = ({ ...props }: PageProps) => (
-  <FumadocsDocsPage {...props} />
+export const DocsPage = ({ className, ...props }: PageProps) => (
+  <FumadocsDocsPage
+    {...props}
+    className={cn("scroll-mt-[var(--fd-docs-row-3)]", className)}
+    role="main"
+    tabIndex={-1}
+  />
 );
 
 export const DocsTitle = ({
