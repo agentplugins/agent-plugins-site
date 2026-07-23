@@ -155,7 +155,7 @@ export const Item: SidebarPageTreeComponents["Item"] = ({ item }) => {
 };
 
 export const Separator: SidebarPageTreeComponents["Separator"] = ({ item }) => (
-  <SidebarSeparator className="mt-4 mb-2 flex items-center gap-2 px-0 font-medium text-sm first-child:mt-0">
+  <SidebarSeparator className="mt-4 mb-2 flex items-center gap-2 px-0 font-semibold text-sm first-child:mt-0">
     {item.icon}
     {item.name}
   </SidebarSeparator>
