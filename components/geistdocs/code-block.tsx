@@ -89,6 +89,7 @@ export const CodeBlock = ({
           className={cn(lineNumbers ? "line-numbers" : "", className)}
         />
         <Button
+          aria-label="Copy code"
           className="absolute top-[5px] right-[5px] bg-background/80 backdrop-blur-sm"
           onClick={copyToClipboard}
           size="icon"
@@ -112,6 +113,7 @@ export const CodeBlock = ({
           {title}
         </CardTitle>
         <Button
+          aria-label="Copy code"
           className={cn("shrink-0", className)}
           onClick={copyToClipboard}
           size="icon"
