@@ -41,26 +41,37 @@ const shuffleClients = (clients: readonly CompatibleClient[]) => {
 const ClientLogo = ({ client }: { client: CompatibleClient }) => {
   if (client.logo) {
     const alt = client.logo.alt ?? client.name;
+    const requestedScale = client.logo.scale ?? 1;
+    const scale =
+      Number.isFinite(requestedScale) && requestedScale > 0
+        ? requestedScale
+        : 1;
+    const logoStyle = {
+      maxHeight: `${80 * Math.min(scale, 1)}px`,
+      width: `${192 * scale}px`,
+    };
 
     return (
       <a
         aria-label={`Visit ${client.name}`}
-        className="flex h-20 w-48 items-center justify-center"
+        className="flex h-20 w-full max-w-64 items-center justify-center"
         href={client.homepageUrl}
       >
         <img
           alt={alt}
           className={cn(
-            "max-h-full max-w-full object-contain",
+            "h-auto max-w-full object-contain",
             client.logo.darkSrc && "dark:hidden"
           )}
           src={client.logo.lightSrc}
+          style={logoStyle}
         />
         {client.logo.darkSrc ? (
           <img
             alt={alt}
-            className="hidden max-h-full max-w-full object-contain dark:block"
+            className="hidden h-auto max-w-full object-contain dark:block"
             src={client.logo.darkSrc}
+            style={logoStyle}
           />
         ) : null}
       </a>

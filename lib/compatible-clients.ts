@@ -20,6 +20,7 @@ export type CompatibleClient = {
     lightSrc: string;
     darkSrc?: string;
     alt?: string;
+    scale?: number;
   };
   supports: {
     skills?: true;
