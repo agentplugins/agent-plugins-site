@@ -28,4 +28,94 @@ export type CompatibleClient = {
   };
 };
 
-export const compatibleClients: readonly CompatibleClient[] = [];
+export const compatibleClients: readonly CompatibleClient[] = [
+  {
+    name: "VS Code",
+    description:
+      "Visual Studio Code combines the simplicity of a code editor with what developers need for their core edit-build-debug cycle.",
+    homepageUrl: "https://code.visualstudio.com/",
+    instructionsUrl:
+      "https://code.visualstudio.com/docs/agent-customization/agent-plugins",
+    sourceUrl: "https://github.com/microsoft/vscode",
+    logo: {
+      lightSrc: "/images/logos/vscode/light.svg",
+      darkSrc: "/images/logos/vscode/dark.svg",
+    },
+    supports: {
+      skills: true,
+      mcp: {
+        transports: ["stdio", "streamable-http", "sse"],
+      },
+    },
+  },
+  {
+    name: "Cursor",
+    description:
+      "Cursor is an AI editor and coding agent. Use it to understand your codebase, plan and build features, fix bugs, review changes, and work with the tools you already use.",
+    homepageUrl: "https://cursor.com/",
+    instructionsUrl: "https://cursor.com/docs/plugins",
+    logo: {
+      lightSrc: "/images/logos/cursor/light.svg",
+      darkSrc: "/images/logos/cursor/dark.svg",
+    },
+    supports: {
+      skills: true,
+      mcp: {
+        transports: ["stdio", "streamable-http", "sse"],
+      },
+    },
+  },
+  {
+    name: "GitHub Copilot",
+    description:
+      "GitHub Copilot is an AI coding assistant that helps developers build, understand, and ship software across editors, terminals, GitHub, and its desktop app.",
+    homepageUrl: "https://github.com/features/copilot",
+    instructionsUrl:
+      "https://docs.github.com/en/copilot/concepts/agents/about-plugins",
+    logo: {
+      lightSrc: "/images/logos/github/light.svg",
+      darkSrc: "/images/logos/github/dark.svg",
+    },
+    supports: {
+      skills: true,
+      mcp: {
+        transports: ["stdio", "streamable-http", "sse"],
+      },
+    },
+  },
+  {
+    name: "OpenAI Codex",
+    description:
+      "ChatGPT brings together agents for different kinds of work, including Codex for software development and ChatGPT Work for broader work. Use ChatGPT across desktop, web, and mobile, with Codex also available in your editor and terminal.",
+    homepageUrl: "https://chatgpt.com/codex/",
+    instructionsUrl: "https://developers.openai.com/plugins",
+    sourceUrl: "https://github.com/openai/codex",
+    logo: {
+      lightSrc: "/images/logos/codex/light.svg",
+      darkSrc: "/images/logos/codex/dark.svg",
+    },
+    supports: {
+      skills: true,
+      mcp: {
+        transports: ["stdio", "streamable-http"],
+      },
+    },
+  },
+  {
+    name: "Kiro",
+    description:
+      "Kiro helps you do your best work by bringing structure to AI coding with spec-driven development.",
+    homepageUrl: "https://kiro.dev/",
+    instructionsUrl: "https://kiro.dev/docs/powers/",
+    logo: {
+      lightSrc: "/images/logos/kiro/light.svg",
+      darkSrc: "/images/logos/kiro/dark.svg",
+    },
+    supports: {
+      skills: true,
+      mcp: {
+        transports: ["stdio", "streamable-http", "sse"],
+      },
+    },
+  },
+];
