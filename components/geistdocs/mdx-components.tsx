@@ -2,6 +2,7 @@ import { DynamicLink } from "fumadocs-core/dynamic-link";
 import { TypeTable } from "fumadocs-ui/components/type-table";
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import type { MDXComponents } from "mdx/types";
+import { CompatibleClients } from "@/components/compatible-clients";
 import {
   Callout,
   CalloutContainer,
@@ -55,6 +56,8 @@ export const getMDXComponents = (
   Mermaid,
 
   Video,
+
+  CompatibleClients,
 
   // User components last to allow overwriting defaults
   ...components,

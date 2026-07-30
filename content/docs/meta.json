@@ -1,6 +1,7 @@
 {
   "pages": [
     "index",
+    "compatible-clients",
     "---For Plugin Authors---",
     "...plugin-authors",
     "---For Client Implementers---",
