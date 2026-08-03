@@ -84,15 +84,16 @@ export const compatibleClients: readonly CompatibleClient[] = [
     },
   },
   {
-    name: "OpenAI Codex",
+    name: "ChatGPT & Codex",
     description:
       "ChatGPT brings together agents for different kinds of work, including Codex for software development and ChatGPT Work for broader work. Use ChatGPT across desktop, web, and mobile, with Codex also available in your editor and terminal.",
     homepageUrl: "https://chatgpt.com/codex/",
     instructionsUrl: "https://developers.openai.com/plugins",
     sourceUrl: "https://github.com/openai/codex",
     logo: {
-      lightSrc: "/images/logos/codex/light.svg",
-      darkSrc: "/images/logos/codex/dark.svg",
+      lightSrc: "/images/logos/chatgpt/light.svg",
+      darkSrc: "/images/logos/chatgpt/dark.svg",
+      alt: "ChatGPT",
     },
     supports: {
       skills: true,
