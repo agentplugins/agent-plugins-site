@@ -37,6 +37,8 @@ Greet the user and offer help.
 
 A skills-capable client loads `plugin.json`, discovers the immediate children of `skills/`, and validates each `SKILL.md` against the Agent Skills specification. To add MCP servers, place `mcp.json` at the plugin root using the same Agent Plugins schema version.
 
+For a copyable package with a complete manifest and a real skill, see the [Agent Plugins example](https://github.com/agentplugins/agent-plugins-example).
+
 ## Package boundaries
 
 Files supplied by the package must resolve within the plugin root. Configuration fields defined as plugin-relative paths begin with `./`; symlinks and equivalent filesystem mechanisms must not be used to escape the package.
