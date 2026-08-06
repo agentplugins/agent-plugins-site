@@ -1,6 +1,6 @@
 # Agent Plugins Site
 
-The documentation site for [Agent Plugins](https://github.com/agentplugins/agent-plugins-spec), an open, vendor-neutral specification for packaging reusable components that extend AI agents into distributable plugins.
+The documentation site for [Agent Plugins](https://github.com/agentplugins/agent-plugins-spec), an open, vendor-neutral standard for packaging reusable components that extend AI agents into distributable plugins.
 
 Documentation is published at [agent-plugins.org](https://agent-plugins.org).
 
