@@ -147,9 +147,9 @@ export const compatibleClients: readonly CompatibleClient[] = [
     instructionsUrl: "https://docs.openclaw.ai/plugins/bundles",
     sourceUrl: "https://github.com/openclaw/openclaw",
     logo: {
-      lightSrc: "/images/logos/openclaw/logo.svg",
+      lightSrc: "/images/logos/openclaw/light.png",
+      darkSrc: "/images/logos/openclaw/dark.png",
       alt: "OpenClaw",
-      scale: 0.8,
     },
     supports: {
       skills: true,
