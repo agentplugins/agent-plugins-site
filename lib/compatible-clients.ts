@@ -139,4 +139,23 @@ export const compatibleClients: readonly CompatibleClient[] = [
       },
     },
   },
+  {
+    name: "OpenClaw",
+    description:
+      "OpenClaw is an open-source personal AI assistant that runs locally and connects to the messaging platforms and tools you already use.",
+    homepageUrl: "https://openclaw.ai/",
+    instructionsUrl: "https://docs.openclaw.ai/plugins/bundles",
+    sourceUrl: "https://github.com/openclaw/openclaw",
+    logo: {
+      lightSrc: "/images/logos/openclaw/light.svg",
+      darkSrc: "/images/logos/openclaw/dark.svg",
+      alt: "OpenClaw",
+    },
+    supports: {
+      skills: true,
+      mcp: {
+        transports: ["stdio", "streamable-http", "sse"],
+      },
+    },
+  },
 ];
