@@ -119,4 +119,24 @@ export const compatibleClients: readonly CompatibleClient[] = [
       },
     },
   },
+  {
+    name: "Hermes Agent",
+    description:
+      "Hermes Agent is a personal AI agent that runs across a CLI, a desktop app, and messaging platforms. It learns across sessions, runs scheduled jobs, and drives a real terminal and browser.",
+    homepageUrl: "https://hermes-agent.nousresearch.com/",
+    instructionsUrl:
+      "https://hermes-agent.nousresearch.com/docs/developer-guide/plugins#portable-agent-plugins-v1-packages",
+    sourceUrl: "https://github.com/NousResearch/hermes-agent",
+    logo: {
+      lightSrc: "/images/logos/hermes/light.svg",
+      darkSrc: "/images/logos/hermes/dark.svg",
+      alt: "Hermes Agent",
+    },
+    supports: {
+      skills: true,
+      mcp: {
+        transports: ["stdio", "streamable-http"],
+      },
+    },
+  },
 ];
