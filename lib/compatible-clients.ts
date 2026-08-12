@@ -168,8 +168,6 @@ export const compatibleClients: readonly CompatibleClient[] = [
     logo: {
       lightSrc: "/images/logos/grok-bot/light.svg",
       darkSrc: "/images/logos/grok-bot/dark.svg",
-      alt: "Grok",
-      scale: 0.7,
     },
     supports: {
       skills: true,
