@@ -158,4 +158,22 @@ export const compatibleClients: readonly CompatibleClient[] = [
       },
     },
   },
+  {
+    name: "Grok Bot",
+    description:
+      "AI teammates you can give real work to. Bots can sign in to your tools, use them just like you do, and come back with finished work.",
+    homepageUrl: "https://x.ai/bot",
+    instructionsUrl:
+      "https://docs.x.ai/grok-bot/skills-routines-and-automations",
+    logo: {
+      lightSrc: "/images/logos/grok-bot/light.svg",
+      darkSrc: "/images/logos/grok-bot/dark.svg",
+    },
+    supports: {
+      skills: true,
+      mcp: {
+        transports: ["stdio", "streamable-http", "sse"],
+      },
+    },
+  },
 ];
