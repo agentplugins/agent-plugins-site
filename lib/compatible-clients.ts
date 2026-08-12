@@ -158,4 +158,24 @@ export const compatibleClients: readonly CompatibleClient[] = [
       },
     },
   },
+  {
+    name: "Grok Bot",
+    description:
+      "Grok Bot is xAI's team of always-on AI agents. Bots work on a persistent cloud computer, sign into apps and tools, and finish multi-step jobs end to end from desktop and iOS.",
+    homepageUrl: "https://x.ai/bot",
+    instructionsUrl:
+      "https://docs.x.ai/grok-bot/skills-routines-and-automations",
+    logo: {
+      lightSrc: "/images/logos/grok-bot/light.svg",
+      darkSrc: "/images/logos/grok-bot/dark.svg",
+      alt: "Grok",
+      scale: 0.7,
+    },
+    supports: {
+      skills: true,
+      mcp: {
+        transports: ["stdio", "streamable-http", "sse"],
+      },
+    },
+  },
 ];
