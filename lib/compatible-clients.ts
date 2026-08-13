@@ -176,4 +176,23 @@ export const compatibleClients: readonly CompatibleClient[] = [
       },
     },
   },
+  {
+    name: "NanoClaw",
+    description:
+      "NanoClaw is a lightweight personal AI assistant that runs each agent in an isolated container and connects to WhatsApp, Telegram, Slack, and other messaging apps.",
+    homepageUrl: "https://nanoclaw.dev/",
+    instructionsUrl:
+      "https://github.com/nanocoai/nanoclaw/blob/main/docs/templates.md",
+    sourceUrl: "https://github.com/nanocoai/nanoclaw",
+    logo: {
+      lightSrc: "/images/logos/nanoclaw/light.svg",
+      darkSrc: "/images/logos/nanoclaw/dark.svg",
+    },
+    supports: {
+      skills: true,
+      mcp: {
+        transports: ["stdio", "streamable-http"],
+      },
+    },
+  },
 ];
