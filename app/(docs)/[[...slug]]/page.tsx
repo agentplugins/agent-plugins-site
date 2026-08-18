@@ -34,10 +34,10 @@ const Page = async ({ params }: PageProps<"/[[...slug]]">) => {
         footer: (
           <div className="my-3 space-y-3">
             <Separator />
-            <EditSource path={page.path} />
             <ScrollTop />
-            <CopyPage text={markdown} />
             <OpenInChat href={page.url} />
+            <CopyPage text={markdown} />
+            <EditSource path={page.path} />
           </div>
         ),
       }}
