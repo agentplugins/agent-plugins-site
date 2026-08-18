@@ -31,16 +31,30 @@ const escapeRegex = (value: string) =>
 const redirectHostPattern = `(?:${redirectHosts.map(escapeRegex).join("|")})`;
 
 const legacyPageMapping = [
-  ["/agent-builders", "/client-implementers"],
+  [
+    "/agent-builders",
+    "/client-implementers/implement-an-agent-plugins-client",
+  ],
   [
     "/agent-builders/components/mcp-servers",
     "/client-implementers/mcp-runtime",
   ],
   ["/agent-builders/components/skills", "/plugin-authors/skills"],
-  ["/plugin-builders", "/plugin-authors"],
-  ["/plugin-builders/installation", "/plugin-authors"],
+  ["/plugin-builders", "/plugin-authors/build-an-agent-plugin"],
+  [
+    "/plugin-builders/installation",
+    "/plugin-authors/build-an-agent-plugin",
+  ],
   ["/plugin-builders/specification", "/specification"],
-  ["/supported-agents", "/client-implementers"],
+  [
+    "/supported-agents",
+    "/client-implementers/implement-an-agent-plugins-client",
+  ],
+  ["/plugin-authors", "/plugin-authors/build-an-agent-plugin"],
+  [
+    "/client-implementers",
+    "/client-implementers/implement-an-agent-plugins-client",
+  ],
 ] as const;
 
 const legacyPageRedirects = legacyPageMapping.flatMap(([source, destination]) => [

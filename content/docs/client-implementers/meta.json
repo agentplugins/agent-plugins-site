@@ -3,7 +3,7 @@
   "collapsible": false,
   "defaultOpen": true,
   "pages": [
-    "index",
+    "implement-an-agent-plugins-client",
     "loading-and-discovery",
     "mcp-runtime",
     "conformance"
