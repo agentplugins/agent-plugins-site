@@ -195,4 +195,23 @@ export const compatibleClients: readonly CompatibleClient[] = [
       },
     },
   },
+  {
+    name: "CompozyOS",
+    description:
+      "CompozyOS is the system around the agent, already built: it keeps AI agents working continuously, without the scripts, cron jobs, and glue code people otherwise assemble and maintain. It is an operating system for the agent CLIs people already use.",
+    homepageUrl: "https://compozy.com/",
+    instructionsUrl: "https://compozy.com/docs/extensions/agent-plugins",
+    sourceUrl: "https://github.com/compozy/compozy",
+    logo: {
+      lightSrc: "/images/logos/compozy/light.svg",
+      darkSrc: "/images/logos/compozy/dark.svg",
+      scale: 1.3,
+    },
+    supports: {
+      skills: true,
+      mcp: {
+        transports: ["stdio", "streamable-http"],
+      },
+    },
+  },
 ];
