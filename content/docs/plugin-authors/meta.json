@@ -3,7 +3,7 @@
   "collapsible": false,
   "defaultOpen": true,
   "pages": [
-    "index",
+    "build-an-agent-plugin",
     "manifest",
     "skills",
     "mcp-servers",
