@@ -52,7 +52,7 @@ export const SearchDialog = ({
 };
 
 export const SearchButton = ({ className, onClick }: SearchButtonProps) => {
-  const { setOpenSearch } = useSearchContext();
+  const { hotKey, setOpenSearch } = useSearchContext();
 
   return (
     <Button
@@ -69,7 +69,16 @@ export const SearchButton = ({ className, onClick }: SearchButtonProps) => {
       variant="outline"
     >
       <span>Search...</span>
-      <Kbd className="border bg-background font-medium">⌘K</Kbd>
+      <div className="inline-flex gap-0.5">
+        {hotKey.map(({ display }, index) => (
+          <Kbd
+            className="border bg-background font-medium"
+            key={index}
+          >
+            {display}
+          </Kbd>
+        ))}
+      </div>
     </Button>
   );
 };
