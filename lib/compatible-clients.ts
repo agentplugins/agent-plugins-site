@@ -195,4 +195,22 @@ export const compatibleClients: readonly CompatibleClient[] = [
       },
     },
   },
+  {
+    name: "ZeroTwo",
+    description:
+      "ZeroTwo is an AI agent that plans work, uses connected apps and files, and delivers finished results on the web and desktop.",
+    homepageUrl: "https://zerotwo.ai/",
+    instructionsUrl: "https://docs.zerotwo.ai/plugins",
+    logo: {
+      lightSrc: "/images/logos/zerotwo/light.svg",
+      darkSrc: "/images/logos/zerotwo/dark.svg",
+      alt: "ZeroTwo",
+    },
+    supports: {
+      skills: true,
+      mcp: {
+        transports: ["stdio", "streamable-http", "sse"],
+      },
+    },
+  },
 ];
