@@ -196,3 +196,35 @@ export const compatibleClients: readonly CompatibleClient[] = [
     },
   },
 ];
+
+const markdownMcpTransportLabels: Record<McpTransport, string> = {
+  stdio: "stdio",
+  "streamable-http": "Streamable HTTP",
+  sse: "legacy SSE",
+};
+
+export const renderCompatibleClientsMarkdown = (): string =>
+  compatibleClients
+    .map((client) => {
+      const lines = [
+        `## [${client.name}](${client.homepageUrl})`,
+        "",
+        client.description,
+        "",
+        client.supports.skills ? "- Agent Skills" : null,
+        client.supports.mcp
+          ? `- MCP: ${client.supports.mcp.transports
+              .map((transport) => markdownMcpTransportLabels[transport])
+              .join(", ")}`
+          : null,
+        client.instructionsUrl
+          ? `- [Setup instructions](${client.instructionsUrl})`
+          : null,
+        client.sourceUrl ? `- [Source code](${client.sourceUrl})` : null,
+      ];
+
+      return lines
+        .filter((line): line is string => line !== null)
+        .join("\n");
+    })
+    .join("\n\n");
