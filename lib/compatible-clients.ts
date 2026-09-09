@@ -195,4 +195,23 @@ export const compatibleClients: readonly CompatibleClient[] = [
       },
     },
   },
+  {
+    name: "Theia IDE",
+    description:
+      "The Theia IDE is an open-source, AI-native IDE and platform for building custom tools and IDEs, developed under the Eclipse Foundation.",
+    homepageUrl: "https://theia-ide.org/",
+    instructionsUrl:
+      "https://theia-ide.org/docs/user_ai/#installing-agent-plugins-from-the-registry",
+    sourceUrl: "https://github.com/eclipse-theia/theia",
+    logo: {
+      lightSrc: "/images/logos/theia/light.svg",
+      darkSrc: "/images/logos/theia/dark.svg",
+    },
+    supports: {
+      skills: true,
+      mcp: {
+        transports: ["stdio", "streamable-http"],
+      },
+    },
+  },
 ];
