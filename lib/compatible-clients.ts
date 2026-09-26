@@ -196,6 +196,24 @@ export const compatibleClients: readonly CompatibleClient[] = [
     },
   },
   {
+    name: "OpenHands",
+    description:
+      "OpenHands is an open-source platform for AI software development agents that write code, run commands, and use tools in a sandboxed workspace.",
+    homepageUrl: "https://openhands.dev/",
+    instructionsUrl: "https://docs.openhands.dev/overview/agent-plugins",
+    sourceUrl: "https://github.com/OpenHands/software-agent-sdk",
+    logo: {
+      lightSrc: "/images/logos/openhands/light.svg",
+      darkSrc: "/images/logos/openhands/dark.svg",
+    },
+    supports: {
+      skills: true,
+      mcp: {
+        transports: ["stdio", "streamable-http"],
+      },
+    },
+  },
+  {
     name: "Bub",
     description:
       "Bub is a lightweight, hook-first Python runtime for agents in the terminal and messaging platforms. It supports Agent Plugins through the bub-agent-plugins integration.",
