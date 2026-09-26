@@ -213,4 +213,22 @@ export const compatibleClients: readonly CompatibleClient[] = [
       },
     },
   },
+  {
+    name: "Bub",
+    description:
+      "Bub is a lightweight, hook-first Python runtime for agents in the terminal and messaging platforms. It supports Agent Plugins through the bub-agent-plugins integration.",
+    homepageUrl: "https://bub.build/",
+    instructionsUrl: "https://bub.build/docs/tutorials/agent-plugins/",
+    sourceUrl: "https://github.com/bubbuild/bub",
+    logo: {
+      lightSrc: "/images/logos/bub/light.svg",
+      darkSrc: "/images/logos/bub/dark.svg",
+    },
+    supports: {
+      skills: true,
+      mcp: {
+        transports: ["stdio", "streamable-http", "sse"],
+      },
+    },
+  },
 ];
