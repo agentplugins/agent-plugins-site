@@ -2,7 +2,7 @@ import { type InferPageType, loader } from "fumadocs-core/source";
 import { lucideIconsPlugin } from "fumadocs-core/source/lucide-icons";
 import { docs } from "@/.source/server";
 import { basePath } from "@/geistdocs";
-
+import { renderCompatibleClientsMarkdown } from "@/lib/compatible-clients";
 // See https://fumadocs.dev/docs/headless/source-api for more info
 export const source = loader({
   baseUrl: "/",
@@ -31,7 +31,10 @@ export const getLLMText = async (
   page: InferPageType<typeof source>,
   { includeNavigationFooter = true } = {}
 ) => {
-  const processed = await page.data.getText("processed");
+  const processed = (await page.data.getText("processed")).replace(
+  "<CompatibleClients />",
+  renderCompatibleClientsMarkdown()
+);
   const { title, description, product, type, summary, prerequisites, related } =
     page.data;
 
