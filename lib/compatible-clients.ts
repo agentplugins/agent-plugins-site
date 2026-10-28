@@ -108,8 +108,8 @@ export const compatibleClients: readonly CompatibleClient[] = [
     homepageUrl: "https://goose-docs.ai/",
     instructionsUrl: "https://goose-docs.ai/docs/guides/context-engineering/plugins/",
     logo: {
-      lightSrc: "/images/logos/goose/light.png",
-      darkSrc: "/images/logos/goose/dark.png",
+      lightSrc: "/images/logos/goose/black.png",
+      darkSrc: "/images/logos/goose/white.png",
     },
     supports: {
       skills: true,
