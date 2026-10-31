@@ -213,4 +213,23 @@ export const compatibleClients: readonly CompatibleClient[] = [
       },
     },
   },
+  {
+    name: "Perplexity Computer",
+    description:
+      "Perplexity Computer is an AI agent that researches, creates files, and uses connected tools to complete tasks.",
+    homepageUrl: "https://www.perplexity.ai/computer",
+    instructionsUrl:
+      "https://www.perplexity.ai/help-center/en/articles/2026100802-create-or-upload-a-custom-plugin",
+    logo: {
+      lightSrc: "/images/logos/perplexity/light.svg",
+      darkSrc: "/images/logos/perplexity/dark.svg",
+      alt: "Perplexity",
+    },
+    supports: {
+      skills: true,
+      mcp: {
+        transports: ["streamable-http", "sse"],
+      },
+    },
+  },
 ];
