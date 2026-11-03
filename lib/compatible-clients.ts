@@ -16,6 +16,7 @@ export type CompatibleClient = {
   homepageUrl: string;
   instructionsUrl?: string;
   sourceUrl?: string;
+  marketplaceUrl?: string;
   logo?: {
     lightSrc: string;
     darkSrc?: string;
@@ -37,6 +38,7 @@ export const compatibleClients: readonly CompatibleClient[] = [
     instructionsUrl:
       "https://code.visualstudio.com/docs/agent-customization/agent-plugins",
     sourceUrl: "https://github.com/microsoft/vscode",
+    marketplaceUrl: "https://awesome-copilot.github.com/plugins/",
     logo: {
       lightSrc: "/images/logos/vscode/light.svg",
       darkSrc: "/images/logos/vscode/dark.svg",
@@ -54,6 +56,7 @@ export const compatibleClients: readonly CompatibleClient[] = [
       "Cursor is an AI editor and coding agent. Use it to understand your codebase, plan and build features, fix bugs, review changes, and work with the tools you already use.",
     homepageUrl: "https://cursor.com/",
     instructionsUrl: "https://cursor.com/docs/plugins",
+    marketplaceUrl: "https://cursor.com/marketplace",
     logo: {
       lightSrc: "/images/logos/cursor/light.svg",
       darkSrc: "/images/logos/cursor/dark.svg",
@@ -72,6 +75,7 @@ export const compatibleClients: readonly CompatibleClient[] = [
     homepageUrl: "https://github.com/features/copilot",
     instructionsUrl:
       "https://docs.github.com/en/copilot/concepts/agents/about-plugins",
+    marketplaceUrl: "https://awesome-copilot.github.com/plugins/",
     logo: {
       lightSrc: "/images/logos/github/light.svg",
       darkSrc: "/images/logos/github/dark.svg",
@@ -90,6 +94,7 @@ export const compatibleClients: readonly CompatibleClient[] = [
     homepageUrl: "https://chatgpt.com/codex/",
     instructionsUrl: "https://developers.openai.com/plugins",
     sourceUrl: "https://github.com/openai/codex",
+    marketplaceUrl: "https://chatgpt.com/plugins",
     logo: {
       lightSrc: "/images/logos/chatgpt/light.svg",
       darkSrc: "/images/logos/chatgpt/dark.svg",
@@ -108,6 +113,7 @@ export const compatibleClients: readonly CompatibleClient[] = [
       "Kiro helps you do your best work by bringing structure to AI coding with spec-driven development.",
     homepageUrl: "https://kiro.dev/",
     instructionsUrl: "https://kiro.dev/docs/powers/",
+    marketplaceUrl: "https://kiro.dev/powers/",
     logo: {
       lightSrc: "/images/logos/kiro/light.svg",
       darkSrc: "/images/logos/kiro/dark.svg",
