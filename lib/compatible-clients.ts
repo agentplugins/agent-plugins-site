@@ -232,4 +232,22 @@ export const compatibleClients: readonly CompatibleClient[] = [
       },
     },
   },
+  {
+    name: "Google Antigravity",
+    description:
+      "Google Antigravity is an agentic development platform, allowing anyone to build in the agent-first era on a desktop app, IDE, and CLI.",
+    homepageUrl: "https://antigravity.google/",
+    instructionsUrl: "https://antigravity.google/docs/plugins",
+    logo: {
+      lightSrc: "/images/logos/antigravity/light.png",
+      darkSrc: "/images/logos/antigravity/dark.png",
+      alt: "Antigravity",
+    },
+    supports: {
+      skills: true,
+      mcp: {
+        transports: ["stdio", "streamable-http", "sse"],
+      },
+    },
+  },
 ];
