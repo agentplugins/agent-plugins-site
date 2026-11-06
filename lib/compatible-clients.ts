@@ -246,7 +246,7 @@ export const compatibleClients: readonly CompatibleClient[] = [
     supports: {
       skills: true,
       mcp: {
-        transports: ["stdio", "streamable-http", "sse"],
+        transports: ["stdio", "streamable-http"],
       },
     },
   },
