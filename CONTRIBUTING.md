@@ -18,6 +18,9 @@ beyond its authors, and relevant to the broader Agent Plugins ecosystem.
 
 ### Eligibility
 
+- New client listings and changes to a product's logo, description, or URLs
+  must come from a product maintainer or someone authorized to submit those
+  changes on the product's behalf.
 - Agent Plugins support must be available to users when the listing is
   published. Announced or planned support alone is not sufficient.
 - The claimed support must be verifiable. Public documentation is preferred,
@@ -38,11 +41,6 @@ Submit a focused pull request that:
 3. Describes the evidence for each claimed capability and MCP transport in the
    pull request.
 
-The pull request should identify the supported product surfaces and versions,
-link the product homepage and any available setup documentation or release
-notes, and provide the source or provenance of the logo assets. Maintainers may
-ask for a screenshot or demo to verify the implementation.
-
 Client records are type-checked. Follow the existing entries and use the
 capability and transport values accepted by `CompatibleClient`. Run the
 production build before submitting:
@@ -50,6 +48,16 @@ production build before submitting:
 ```sh
 pnpm build
 ```
+
+Submit simple client-listing or logo changes as one self-contained,
+cryptographically signed commit. Incorporate subsequent revisions into that
+commit.
+
+The pull request should state your relationship to the product, identify the
+supported product surfaces and versions, link the product homepage and any
+available setup documentation or release notes, and provide the source or
+provenance of the logo assets. Maintainers may ask for a screenshot or demo to
+verify the implementation.
 
 ### Client Data
 
@@ -65,12 +73,16 @@ pnpm build
 
 ### Logos
 
-- Use official SVG assets when available. Transparent raster assets are
-  acceptable when they have sufficient resolution.
+- Use current official logo assets for the listed product, preferably SVG.
+  Transparent raster assets are acceptable when they have sufficient
+  resolution.
 - Provide light and dark variants when a single asset does not work in both
   themes.
 - Use the optional positive `scale` value only when a logo needs optical size
   adjustment. The rendered logo remains constrained to a fixed maximum area.
+- Check the rendered client card on `/compatible-clients` in both light and
+  dark themes. Please include screenshots of the card in both themes in the
+  pull request when possible.
 
 Listings are informational, not endorsements. They may be corrected or removed
 when compatibility or product availability changes.
