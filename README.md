@@ -6,8 +6,6 @@ Documentation is published at [agent-plugins.org](https://agent-plugins.org).
 
 The versioned specification is authoritative. This repository presents that material as guides, reference documentation, canonical schemas, and machine-readable Markdown endpoints while preserving links to the source specification.
 
-[`specification-source.json`](specification-source.json) records the exact specification revision used for the current documentation rewrite. Before release, regenerate the embedded specification from the published `1.0.0` tag so its source revision and publication status are current.
-
 ## Development
 
 ```sh
@@ -22,6 +20,8 @@ pnpm build
 ```
 
 The site uses [Next.js](https://nextjs.org), [Fumadocs](https://fumadocs.dev), and the Vercel Geistdocs template. Documentation pages live in `content/docs/`; canonical schemas are published from `public/schemas/`.
+
+[`specification-source.json`](specification-source.json) records the exact upstream revision used for the embedded specification and schemas. Before publishing a specification release on the site, synchronize them with its published tag and update the record.
 
 ## Licensing
 

@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/agentplugins/agent-plugins-spec",
-  "version": "1.0.0",
-  "status": "published",
-  "commit": "bd383552095128f6effe895b9257cfd580a6d179"
+  "version": "1.1.0",
+  "status": "working-draft",
+  "commit": "6395e8906b30e2f333b792bfaa981d790993d56f"
 }
