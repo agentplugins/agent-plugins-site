@@ -94,16 +94,26 @@ const config: NextConfig = {
       },
       ...legacyPageRedirects,
       {
-        source:
-          "/agent-builders/components/:component(agents|hooks|lsp-servers|rules)",
-        destination: "/specification#why-only-agent-skills-and-mcp-in-v1",
+        source: "/agent-builders/components/hooks",
+        destination: "/specification#73-hooks",
+        permanent: false,
+      },
+      {
+        source: "/agent-builders/components/hooks.:extension(md|mdx)",
+        destination: "/specification.:extension#73-hooks",
         permanent: false,
       },
       {
         source:
-          "/agent-builders/components/:component(agents|hooks|lsp-servers|rules).:extension(md|mdx)",
+          "/agent-builders/components/:component(agents|lsp-servers|rules)",
+        destination: "/specification#why-these-component-types",
+        permanent: false,
+      },
+      {
+        source:
+          "/agent-builders/components/:component(agents|lsp-servers|rules).:extension(md|mdx)",
         destination:
-          "/specification.:extension#why-only-agent-skills-and-mcp-in-v1",
+          "/specification.:extension#why-these-component-types",
         permanent: false,
       },
       {
