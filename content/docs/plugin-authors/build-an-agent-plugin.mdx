@@ -19,7 +19,7 @@ Create `plugin.json`:
 
 ```json title="plugin.json"
 {
-  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "$schema": "https://agent-plugins.org/schemas/1.1.0/plugin.schema.json",
   "name": "hello-plugin"
 }
 ```
@@ -39,11 +39,17 @@ A skills-capable client loads `plugin.json`, discovers the immediate children of
 
 For a copyable package with a complete manifest and a real skill, see the [Agent Plugins example](https://github.com/agentplugins/agent-plugins-example).
 
+## Describe your plugin
+
+Give the plugin a readable name and explain what it provides by adding `displayName` and `description` to `plugin.json`. For this example, you could use `"displayName": "Hello Plugin"` and `"description": "A friendly greeting skill."`. Other [manifest fields](/plugin-authors/manifest) let you identify releases with `version`, credit an `author`, and provide project links and licensing information.
+
+To include an icon, save a PNG image as `assets/icon.png` in the plugin root. Start with a square 512×512 canvas; use simple shapes and padding, and check that it remains recognizable at about 16×16 pixels on light and dark backgrounds.
+
+You can also provide the same icon in other formats, using lowercase filenames such as `assets/icon.svg` or `assets/icon.webp`. Include PNG for broad support. Clients choose which supported representation to use and whether to display icons.
+
 ## Package boundaries
 
 Files supplied by the package must resolve within the plugin root. Configuration fields defined as plugin-relative paths begin with `./`; symlinks and equivalent filesystem mechanisms must not be used to escape the package.
-
-Client-managed installation, distribution, enablement, updates, and user interface are outside the portable specification.
 
 ## Next steps
 

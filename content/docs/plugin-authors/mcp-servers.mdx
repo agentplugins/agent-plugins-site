@@ -11,7 +11,7 @@ Agent Plugins defines a closed `mcp.json` format that clients map to their nativ
 
 ```json title="mcp.json"
 {
-  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "$schema": "https://agent-plugins.org/schemas/1.1.0/mcp.schema.json",
   "mcpServers": {
     "validator": {
       "type": "stdio",
@@ -62,10 +62,10 @@ Clients expand both placeholders in `args`, `env` values, and `cwd`. Expansion i
 
 Remote URLs are absolute HTTP or HTTPS URLs without user information or fragments. Non-loopback endpoints use HTTPS. Configured headers are literal, visible package data and must not contain credentials or secrets.
 
-Agent Plugins 1.0.0 defines no portable OAuth or credential-reference fields. Authentication remains client-managed.
+Agent Plugins defines no portable OAuth or credential-reference fields. Authentication remains client-managed.
 
 ## Failure isolation
 
 An invalid top-level `mcp.json` disables MCP for the plugin. An invalid or unavailable individual server disables only that entry. Other servers, skills, and client extensions continue loading.
 
-Download [`mcp.schema.json`](/schemas/1.0.0/mcp.schema.json).
+Download [`mcp.schema.json`](/schemas/1.1.0/mcp.schema.json).
