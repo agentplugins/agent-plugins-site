@@ -250,4 +250,22 @@ export const compatibleClients: readonly CompatibleClient[] = [
       },
     },
   },
+  {
+    name: "Devin",
+    description:
+      "Devin is an AI software engineer that plans, writes, tests, and reviews code. It works in the cloud, in the Devin CLI, and in Devin Desktop.",
+    homepageUrl: "https://devin.ai/",
+    instructionsUrl:
+      "https://docs.devin.ai/cli/extensibility/plugins/overview#compatible-formats",
+    logo: {
+      lightSrc: "/images/logos/devin/light.svg",
+      darkSrc: "/images/logos/devin/dark.svg",
+    },
+    supports: {
+      skills: true,
+      mcp: {
+        transports: ["stdio", "streamable-http", "sse"],
+      },
+    },
+  },
 ];
