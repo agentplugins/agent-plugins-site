@@ -9,7 +9,7 @@ Every Agent Plugin contains exactly one portable manifest at `plugin.json` in th
 
 ```json title="plugin.json"
 {
-  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "$schema": "https://agent-plugins.org/schemas/1.1.0/plugin.schema.json",
   "name": "deployment.tools"
 }
 ```
@@ -19,8 +19,9 @@ The manifest schema is closed. Portable top-level fields are limited to:
 | Field | Required | Purpose |
 | --- | :---: | --- |
 | `$schema` | Yes | Selects the complete Agent Plugins validation and interpretation contract. |
-| `name` | Yes | Human-readable plugin name and package identifier. |
+| `name` | Yes | Portable plugin name. |
 | `version` | No | Plugin version; Semantic Versioning is recommended. |
+| `displayName` | No | Human-readable plugin name for presentation. |
 | `description` | No | Short description of the plugin. |
 | `author` | No | Object containing optional `name`, `email`, and `url` strings. |
 | `homepage` | No | Documentation or homepage string. |
@@ -33,7 +34,7 @@ Metadata strings are not rejected merely because they fail URL, email, Semantic 
 
 ## Name constraints
 
-Plugin names are 1–64 characters and use only lowercase ASCII letters, digits, hyphens, and periods. They begin and end with an alphanumeric character and cannot contain `--` or `..`.
+The `name` value is 1–64 characters and uses only lowercase ASCII letters, digits, hyphens, and periods. It begins and ends with an alphanumeric character and cannot contain `--` or `..`.
 
 **Valid:** `my-plugin`, `acme.tools`, `lint3r`
 
@@ -47,4 +48,4 @@ Other manifest schema violations are fatal. A client rejects the plugin without 
 
 ## Canonical schema
 
-Download [`plugin.schema.json`](/schemas/1.0.0/plugin.schema.json). The normative specification text governs if it conflicts with the machine-readable schema.
+Download [`plugin.schema.json`](/schemas/1.1.0/plugin.schema.json). The normative specification text governs if it conflicts with the machine-readable schema.

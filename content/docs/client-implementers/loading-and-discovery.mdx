@@ -46,3 +46,11 @@ Apply the narrowest relevant boundary:
 3. Skip one skill when its `SKILL.md` escapes the root.
 4. Skip one MCP entry when a configured package path escapes its permitted root.
 5. Deny access for other escaping package paths.
+
+## Present plugin names and icons
+
+When presenting a human-readable plugin name, prefer `displayName` when present. You may use `name` instead when `displayName` is unsuitable for your interface, such as when it is empty or contains only whitespace.
+
+Displaying plugin icons is optional. Clients that display them must be able to render PNG images. Icon files are regular files directly in the plugin root's `assets/` directory, named `icon` with a lowercase extension for a supported image format—for example, `assets/icon.png` or `assets/icon.svg`. Ignore other contents.
+
+Choose any usable icon file. If an icon file cannot be safely read, decoded, or rendered, skip it and continue considering the others. If none is usable, present the plugin without a supplied icon. Icon discovery or rendering failures must not invalidate the plugin or affect component discovery, loading, or execution. When rendering SVG, prevent active content from executing and external resources from loading.
