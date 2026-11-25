@@ -2,6 +2,7 @@
 
 import {
   ArrowDownAZIcon,
+  BlocksIcon,
   BookOpenTextIcon,
   CheckIcon,
   Code2Icon,
@@ -104,7 +105,7 @@ const ClientLink = ({
   icon: ReactNode;
 }) => (
   <a
-    className="inline-flex items-center gap-1.5 text-sm text-muted-foreground no-underline transition-colors hover:text-foreground"
+    className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap text-sm text-muted-foreground no-underline transition-colors hover:text-foreground"
     href={href}
   >
     {icon}
@@ -155,13 +156,16 @@ const ClientCard = ({ client }: { client: CompatibleClient }) => (
           {client.description}
         </p>
 
-        {client.instructionsUrl || client.sourceUrl ? (
+        {client.instructionsUrl || client.sourceUrl || client.marketplaceUrl ? (
           <div className="mt-auto flex flex-wrap gap-x-5 gap-y-2 border-t pt-4">
             {client.instructionsUrl ? (
               <ClientLink
                 href={client.instructionsUrl}
                 icon={
-                  <BookOpenTextIcon aria-hidden="true" className="size-3.5" />
+                  <BookOpenTextIcon
+                    aria-hidden="true"
+                    className="size-3.5 shrink-0"
+                  />
                 }
               >
                 Setup instructions
@@ -170,9 +174,21 @@ const ClientCard = ({ client }: { client: CompatibleClient }) => (
             {client.sourceUrl ? (
               <ClientLink
                 href={client.sourceUrl}
-                icon={<Code2Icon aria-hidden="true" className="size-3.5" />}
+                icon={
+                  <Code2Icon aria-hidden="true" className="size-3.5 shrink-0" />
+                }
               >
                 Source code
+              </ClientLink>
+            ) : null}
+            {client.marketplaceUrl ? (
+              <ClientLink
+                href={client.marketplaceUrl}
+                icon={
+                  <BlocksIcon aria-hidden="true" className="size-3.5 shrink-0" />
+                }
+              >
+                Marketplace
               </ClientLink>
             ) : null}
           </div>
