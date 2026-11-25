@@ -1,0 +1,481 @@
+---
+title: Hooks
+description: Run commands at agent lifecycle boundaries and return portable context or decisions.
+---
+
+Hooks run your commands at defined points in a client's agent loop, such as when a session starts or before a tool runs. Each command receives a JSON event and can return the result defined for that event. A plugin can configure any combination of the events below; clients that support portable hooks implement all of them.
+
+## Add a hook
+
+In a plugin targeting Agent Plugins 1.1.0, create `hooks.json` at the plugin root. The `$schema` values in `hooks.json` and `plugin.json` must identify the same Agent Plugins version. This example adds a project-check reminder to requests containing the word "release", regardless of case. It requires Node.js to be available on the client.
+
+```json title="hooks.json"
+{
+  "$schema": "https://agent-plugins.org/schemas/1.1.0/hooks.schema.json",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "command": "node",
+        "args": ["${PLUGIN_ROOT}/release-context.mjs"]
+      }
+    ]
+  }
+}
+```
+
+Save this handler beside `hooks.json`:
+
+```js title="release-context.mjs"
+import { readFileSync } from 'node:fs';
+
+const { prompt } = JSON.parse(readFileSync(0, 'utf8'));
+
+if (/\brelease\b/i.test(prompt)) {
+  process.stdout.write(JSON.stringify({
+    additional_context: "Before publishing a release, run the project's documented checks.",
+  }));
+}
+```
+
+To test this handler without running an agent client, run the following command from the plugin root in a POSIX shell:
+
+```sh
+node release-context.mjs <<'JSON'
+{
+  "hook_event_name": "UserPromptSubmit",
+  "session_id": "session-123",
+  "cwd": "/workspace/app",
+  "prompt": "Prepare the next release."
+}
+JSON
+```
+
+The handler exits successfully and writes:
+
+```json
+{
+  "additional_context": "Before publishing a release, run the project's documented checks."
+}
+```
+
+The client adds the reminder to the receiving agent's context for this request. For requests without the word "release", the handler writes nothing, expressing no opinion. Adapt the handler using the event and profile references below.
+
+## Writing handlers
+
+In `hooks.json`, each property of the `hooks` object names an event and contains a nonempty array of handler configurations. You can register several handlers for one event. An empty `hooks` object is also valid.
+
+| Handler field | Type | Required | Meaning |
+| --- | --- | :---: | --- |
+| `command` | string | Yes | One executable token: a bare command name or a plugin-relative path beginning with `./`. |
+| `args` | array of strings | No | Separate arguments passed to the executable. |
+| `extensions` | object | No | Client-specific handler settings, keyed by [extension namespace](/plugin-authors/client-extensions). Each namespace value is an object; settings cannot override portable hook behavior. |
+
+No other fields are permitted in a handler configuration. The root configuration contains only `$schema` and `hooks`; handlers are not declared in `plugin.json`.
+
+A bare command such as `node` depends on an executable installed on the client's platform. If you bundle an executable, use its plugin-relative path as `command`. Commands are not shell command strings, and `${PLUGIN_ROOT}` and `${PLUGIN_DATA}` are expanded only in `args`, not in `command`. Expansion is textual, single-pass, and non-recursive; other placeholder-like text stays literal.
+
+Every invocation starts a fresh process in the plugin root. The process receives these environment variables:
+
+| Variable | Meaning |
+| --- | --- |
+| `PLUGIN_ROOT` | Absolute, filesystem-resolved plugin root. Use it to find bundled files. |
+| `PLUGIN_DATA` | Absolute path to a writable directory dedicated to this installed plugin instance. Its contents persist across plugin updates; the client may remove it on uninstall. |
+
+Do not depend on other ambient environment variables being available.
+
+The client sends one UTF-8 JSON object to standard input, then closes the stream. On exit status `0`, write either:
+
+- Nothing, or only JSON whitespace, to express no opinion.
+- One UTF-8 JSON object with the output fields permitted for that event. Leading and trailing JSON whitespace are allowed.
+
+The output alternatives below are exclusive, and returned objects cannot include extra fields. In particular, `{}` is not a no-opinion result. Send diagnostics to standard error rather than mixing them into standard output.
+
+A nonzero exit status, invalid output, inability to launch, or an exceeded client limit is an invocation failure. It produces no portable result; it does not substitute for a returned denial or continuation decision. The event entries below explain whether a failure can affect the pending work.
+
+Some handlers can contribute context for the receiving agent by returning `additional_context` values. Their message role, formatting, later persistence, and context management are client-defined, and supplying context does not guarantee that the agent follows it.
+
+For one event occurrence, the client sends the same input to handlers across all enabled plugins. They may run concurrently, and different event occurrences can overlap. Do not rely on handler execution order, the order of context contributions, or another handler's side effects for that occurrence. Process-local state does not survive the next invocation; use `PLUGIN_DATA` when you need persistent state.
+
+Clients may send event fields added by later specification versions. Ignore unfamiliar properties recursively in Agent Plugins-defined input objects. Do not reject such inputs merely because an older event-input schema disallows those properties. Native tool data retains its client-specific meaning.
+
+The [hooks JSON Schema](/schemas/1.1.0/hooks.schema.json) includes definitions for configuration, individual handlers, and event inputs and outputs. The [hooks contract](/specification#73-hooks) is the authoritative source for this guide.
+
+## Hook events
+
+Each entry below describes when the event runs, its input fields, and its permitted outputs.
+
+### `SessionStart`
+
+Runs once before the first model request in a new root agent session. It does not run for subagent sessions or for resuming the same `session_id`. Whether a client operation starts a new session depends on whether it creates a new root session identity.
+
+**Input:**
+
+| Field | Type | Required | Meaning |
+| --- | --- | :---: | --- |
+| `hook_event_name` | string | Yes | Always `"SessionStart"`. |
+| `session_id` | nonempty string | Yes | Opaque identifier for the root agent session. |
+| `cwd` | nonempty string | Yes | Absolute path of the agent's current working directory; the handler process runs in the plugin root. |
+
+**Output:** no opinion, or an object containing only `additional_context`, a nonempty string:
+
+```json
+{
+  "additional_context": "Follow the repository's release checklist."
+}
+```
+
+The client includes every successful context contribution in the context prepared for the first root-agent model request. A failed invocation contributes no context and does not by itself prevent the session or first model request from proceeding.
+
+### `UserPromptSubmit`
+
+Runs before a receiving agent processes a newly submitted external request, including follow-up and programmatic submissions. It also covers requests submitted directly to a subagent where the client controls delivery. Internally generated delegation, reports, and automatic continuations normally do not trigger it.
+
+**Input:**
+
+| Field | Type | Required | Meaning |
+| --- | --- | :---: | --- |
+| `hook_event_name` | string | Yes | Always `"UserPromptSubmit"`. |
+| `session_id` | nonempty string | Yes | Opaque identifier for the root agent session. |
+| `cwd` | nonempty string | Yes | Absolute path of the agent's current working directory; the handler process runs in the plugin root. |
+| `prompt` | string | Yes | The client's textual representation of the current request. It may be empty, for example for nontext content. There is no separate portable attachment field. |
+
+**Output:** no opinion, or exactly one of these objects:
+
+- `additional_context`, a nonempty string, to contribute context for this request:
+
+  ```json
+  { "additional_context": "Use the project's release checklist." }
+  ```
+
+- `decision: "deny"` and a nonempty string `reason`, to prevent the request:
+
+  ```json
+  { "decision": "deny", "reason": "Release requests require a target version." }
+  ```
+
+The client waits for the handlers before processing the request. Any successful denial prevents the whole submission, including attachments, and at least one denial reason is made available to its submitter. Denial does not require ending the session or asking the model to refuse.
+
+If the request proceeds, every successful context contribution is included for the agent receiving it. If the request is prevented, neither the submission nor context returned for that occurrence may be delivered automatically to any agent's model input, now or later. Display or audit retention is permitted; deliberate resubmission is a new request.
+
+A failed invocation returns no decision or context, but the client may prevent the request because a handler failed. A failure cannot override a successful denial.
+
+### `PreToolUse`
+
+Runs for root-agent and subagent tool calls the client can intercept, after the tool name and input are known but before execution or requests for discretionary permission that a hook result could satisfy. Operations the client cannot observe and prevent at that boundary are outside its coverage.
+
+**Input:**
+
+| Field | Type | Required | Meaning |
+| --- | --- | :---: | --- |
+| `hook_event_name` | string | Yes | Always `"PreToolUse"`. |
+| `session_id` | nonempty string | Yes | Opaque identifier for the root agent session. |
+| `cwd` | nonempty string | Yes | Absolute path of the agent's current working directory; the handler process runs in the plugin root. |
+| `tool_use_id` | nonempty string | Yes | Opaque tool-call identifier, unique within the session. |
+| `tool_name` | nonempty string | Yes | Client-native tool name. |
+| `tool_input` | any JSON value | Yes | Client-native input for the pending call. |
+| `tool_profile` | object | No | A [portable view](#tool-profiles) of the call, when available. |
+
+**Output:** no opinion, or exactly one of these objects:
+
+- `decision: "allow"`, to satisfy discretionary permission:
+
+  ```json
+  { "decision": "allow" }
+  ```
+
+- `decision: "deny"` and a nonempty string `reason`, to prevent the call:
+
+  ```json
+  { "decision": "deny", "reason": "This operation is not permitted." }
+  ```
+
+Decisions apply to the pending call as a whole. The client combines successful results in this order:
+
+1. Any `deny` prevents the call. At least one denial reason is made available to the requesting agent.
+2. Otherwise, any `allow` satisfies discretionary permission unless client or organization policy requires confirmation. It does not bypass other hook denials, security boundaries, or interaction intrinsic to the tool.
+3. With no decision, the client follows its normal permission flow.
+
+A failed invocation contributes no decision, but the client may deny the call because a handler failed. Failure handling cannot cause a successfully denied call to proceed.
+
+### `PostToolUse`
+
+Runs for root-agent and subagent tool calls where the client mediates the call and controls delivery of its completed result. A result reporting an unsuccessful operation also qualifies. It does not run for a call denied before execution, an intermediate exchange, or an invocation that ends without a completed result.
+
+**Input:**
+
+| Field | Type | Required | Meaning |
+| --- | --- | :---: | --- |
+| `hook_event_name` | string | Yes | Always `"PostToolUse"`. |
+| `session_id` | nonempty string | Yes | Opaque identifier for the root agent session. |
+| `cwd` | nonempty string | Yes | Absolute path of the agent's current working directory; the handler process runs in the plugin root. |
+| `tool_use_id` | nonempty string | Yes | Same identifier used by `PreToolUse` for this call. |
+| `tool_name` | nonempty string | Yes | Client-native name of the executed tool. |
+| `tool_input` | any JSON value | Yes | Native input actually used; it may differ from an earlier pending input if the call was amended. |
+| `tool_result` | any JSON value | Yes | Client-native completed result. |
+| `tool_profile` | object | No | A [portable view](#tool-profiles) of the completed call and result, when available. |
+
+**Output:** no opinion, or an object containing only `additional_context`, a nonempty string:
+
+```json
+{
+  "additional_context": "The unit tests failed. Address the failures before finishing."
+}
+```
+
+The client waits for every handler to finish or fail before the agent continues from that result, and includes every successful context contribution. For a subagent's tool call, the context goes to that subagent. This result cannot replace the tool result, retry the call, or request a separate agent turn.
+
+A failed invocation contributes no context and does not by itself prevent the agent from continuing. A failed tool operation can still have a completed result; that is distinct from a failed hook invocation.
+
+### `Stop`
+
+Runs when the root agent completes a response normally, has no immediate model or tool follow-up, and would yield control. It applies at response boundaries where the client implements continuation. It does not run for subagents or when cancellation, interruption, or failure prevents normal response completion. It also does not run while the agent is paused during an unfinished response.
+
+The response already exists and may have been streamed, displayed, or saved. This event does not indicate that the session or background work is finished, and its input does not include the response text. For completion checks, base your decision on state your handler can inspect, such as project files.
+
+**Input:**
+
+| Field | Type | Required | Meaning |
+| --- | --- | :---: | --- |
+| `hook_event_name` | string | Yes | Always `"Stop"`. |
+| `session_id` | nonempty string | Yes | Opaque identifier for the root agent session. |
+| `cwd` | nonempty string | Yes | Absolute path of the agent's current working directory; the handler process runs in the plugin root. |
+| `continuation_active` | boolean | Yes | `true` when the root agent did this work because an earlier `Stop` handler or equivalent client-specific hook asked it to continue; otherwise `false`. |
+
+During a `Stop` event, a handler can return `decision: "continue"` to ask for more work. If the client honors that decision, it continues the root agent. When that work reaches `Stop` again, the client sends `continuation_active: true` in the new event’s input.
+
+Equivalent client-specific hooks can also cause a continuation. The value stays `true` through further hook continuations, including when the client pauses and resumes the same work. It does not carry over to new user requests or separate background work.
+
+**Output:** no opinion, or an object containing `decision: "continue"` and a nonempty string `reason`:
+
+```json
+{
+  "decision": "continue",
+  "reason": "Run the project's documented checks before finishing."
+}
+```
+
+Any successful `continue` requests one root-agent continuation using all returned reasons. The client attempts it immediately unless user control, policy, another client-specific hook result, or resource limits prevent it. This does not retract the completed response or guarantee that the agent follows the reasons. Clients may limit consecutive continuations.
+
+Choose when your handler should stop requesting work. For a one-pass reminder, express no opinion when `continuation_active` is true. For a repeated check, use the check's current result to decide whether more work is needed. A failed invocation contributes no decision and cannot by itself cause continuation.
+
+## Tool profiles
+
+`PreToolUse` and `PostToolUse` always include native tool data. Clients may also provide one portable profile per event in `tool_profile`. A client determines profiles from the tool's actual operation, not just its name or similarly named fields. A profile can be absent at either event, independently.
+
+| Profile field | Type | Required | Meaning |
+| --- | --- | :---: | --- |
+| `name` | string | Yes | One of the profile names below. |
+| `input` | object | Yes | Portable view of the pending or executed input. |
+| `result` | object | For `PostToolUse` | Portable view of the completed result; absent in `PreToolUse`. |
+
+For example, a client might send this complete `PostToolUse` input after reading a file. The native tool name and fields are illustrative:
+
+```json
+{
+  "hook_event_name": "PostToolUse",
+  "session_id": "session-123",
+  "cwd": "/workspace/app",
+  "tool_use_id": "tool-1",
+  "tool_name": "read_file",
+  "tool_input": {
+    "file_path": "/workspace/app/notes.md"
+  },
+  "tool_result": {
+    "text": "# Project notes\n"
+  },
+  "tool_profile": {
+    "name": "file.read",
+    "input": {
+      "path": "/workspace/app/notes.md"
+    },
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "# Project notes\n"
+        }
+      ]
+    }
+  }
+}
+```
+
+Use the profile name before interpreting its fields. For an unfamiliar name, treat its `input` and `result` as opaque. For `file.read` or `web.fetch` content with an unfamiliar `type`, treat that content object as opaque too. Native fields remain available for client-specific logic, but have no uniform meaning across clients.
+
+Profiles are partial views of calls, not an inventory of all their effects. A file read through a non-MCP shell tool has the `shell` profile; an MCP tool remains `mcp` even when it reads files or searches the web. An absent profile does not establish that an operation has no relevant effects. The event's `cwd` is the agent's working directory and does not establish the tool's working directory.
+
+Each listed field is required unless marked optional.
+
+### `mcp`
+
+Applies to an MCP `tools/call` request. Its `input` contains:
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `name` | string | MCP tool name sent to the server. Names are scoped to a server; this profile does not identify that server. |
+| `arguments` | object | Arguments sent to the tool, or `{}` when the request omits arguments. Their meaning comes from that tool's input schema. |
+
+For `PostToolUse`, `result` is the MCP `CallToolResult` object itself, without its JSON-RPC response envelope. Its common result fields are:
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `content` | array of objects | Content blocks. Text blocks carry `type: "text"` and `text`; image and audio blocks carry base64 `data` and `mimeType`; resource links (`type: "resource_link"`) carry `uri`; embedded resources (`type: "resource"`) carry a `resource` object. |
+| `structuredContent` | any JSON value, optional | Structured data returned by the tool. |
+| `isError` | boolean, optional | `true` marks a tool execution error. |
+
+A result with `isError: true` is still a completed result and reaches this event. MCP protocol and transport failures are not represented by this profile. These fields and content types retain their [MCP meanings](https://modelcontextprotocol.io/specification/latest/schema#calltoolresult); they are not the `content` shapes used by the file and web profiles below.
+
+### `shell`
+
+Applies to a non-MCP tool that asks an operating-system shell to interpret a command string. Tools that launch a program directly with separate arguments do not qualify. Neither do tools that merely send data to an existing process without requesting shell interpretation.
+
+**Input:**
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `command` | string | Complete command source the shell would interpret. |
+
+The profile does not identify the shell, execution environment, or working directory. The command string's interpretation is not portable across shells.
+
+**Completed result:**
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `output` | string | Returned stdout and stderr combined; an empty string means empty returned output. Stream interleaving is client-defined. |
+| `exit_code` | integer | Exit status of the completed command, including nonzero statuses. |
+
+A nonzero command exit status uses this same result object. If the status is unavailable, the client omits the entire profile.
+
+### `file.read`
+
+Applies to a non-MCP tool that makes all or part of exactly one file available to the agent. Directory listings, metadata-only reads, and searches do not qualify.
+
+**Input:**
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `path` | nonempty string | Absolute target path. It is not necessarily canonical or symlink-resolved. |
+
+**Completed result:** exactly one of these objects:
+
+- An object containing only `content`, an array of content objects in returned order. The array can be empty.
+- An object containing only `error`, a string containing the failure diagnostic for the requested read operation. This does not represent client implementation or transport failures.
+
+Each content object has exactly one of these shapes, with all listed fields required:
+
+| `type` | Other fields | Meaning |
+| --- | --- | --- |
+| `"text"` | `text`: string | Returned text. |
+| `"binary"` | `media_type`: nonempty string; `data`: base64 string | Returned bytes and their media type. |
+
+For example, these are separate success and error results:
+
+```json
+{ "content": [{ "type": "text", "text": "# Project notes\n" }] }
+```
+
+```json
+{ "error": "File not found: /workspace/notes.md" }
+```
+
+Content may be partial, truncated, or transformed; it need not be the entire source file. For binary content, `media_type` describes the returned bytes.
+
+### `file.modify`
+
+Applies to a non-MCP tool that modifies one or more files using the operation kinds below. Directory operations, attribute-only changes, and general-purpose shell or code-execution tools do not qualify.
+
+**Input:** an object containing only `operations`, a nonempty array of objects. Each array entry has one of these shapes; all listed fields are required:
+
+| `kind` | Other fields | Meaning |
+| --- | --- | --- |
+| `"edit"` | `path`: nonempty string | Derive new contents from existing file contents. |
+| `"write"` | `path`: nonempty string | Set complete file contents, creating or replacing a file. |
+| `"delete"` | `path`: nonempty string | Remove a file. |
+| `"move"` | `from`, `to`: nonempty strings | Explicitly relocate or rename a file. |
+
+Paths are absolute and not necessarily canonical or symlink-resolved. The array includes each requested kind/path combination. A call that edits and moves a file includes both entries, with `edit.path` equal to `move.from`. Repeated entries are possible; order and multiplicity have no portable meaning.
+
+These are requested operations, not observations of the filesystem. A `write` stays a `write` whether the file exists or the contents are empty. Separate writes and deletes do not imply a `move`.
+
+Your decision applies to the whole call, not individual array entries. The profile does not promise atomic changes, physical ordering, file contents, patch data, or incidental effects such as creating parent directories. A modification that cannot be represented by these kinds makes the call ineligible for this profile.
+
+**Completed result:** `{}` for success, or an object containing only `error`, a string describing a failure of the requested modification. An error does not imply that nothing changed or that earlier changes were rolled back. This alternative does not represent client implementation or transport failures.
+
+```json
+{}
+```
+
+```json
+{ "error": "The edit target did not match the file." }
+```
+
+Here `{}` is data inside `tool_profile.result`; it is not a handler's no-opinion output.
+
+### `web.fetch`
+
+Applies to a non-MCP tool whose operation is only to retrieve content from one HTTP or HTTPS URL and make it available to the agent. Web search, browser navigation, general-purpose HTTP requests, and downloads not made available to the agent do not qualify.
+
+**Input:**
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `url` | nonempty string | Absolute initial HTTP or HTTPS target after client-side normalization or rewriting. |
+
+This identifies the initial target, not redirect destinations or embedded resources, and does not establish that the URL is canonical.
+
+**Completed result:**
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `status_code` | integer, 100–599 | HTTP status of the response whose content or diagnostic is returned. |
+| `content` | array of objects | Returned text or diagnostics, in order. Each object contains only `type: "text"` and `text`, a string; both are required. |
+
+```json
+{
+  "status_code": 404,
+  "content": [{ "type": "text", "text": "The requested page was not found." }]
+}
+```
+
+The content may be selected, processed, or limited. HTTP error statuses use the same representation; Agent Plugins does not classify statuses as tool success or failure. If the HTTP status is unavailable, the client omits the entire profile.
+
+### `web.search`
+
+Applies to a non-MCP tool whose operation is only to perform textual searches of the public web and return results to the agent. Image search, fetching, navigation, and other operations do not qualify.
+
+**Input:**
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `queries` | nonempty array of strings | Queries determined for this call, in order, including any remaining repetitions after client-side processing. |
+
+A decision covers the entire call. The queries do not establish how many searches will run, their execution order, or any additional queries generated during execution. Filters, locale, provider, search depth, and similar options are not represented.
+
+**Completed result:** exactly one of these objects:
+
+- An object containing only `items`, an array containing the sources returned to the agent, possibly empty. Each item has the fields below.
+- An object containing only `error`, a string describing failure of the requested search operation. This does not represent client implementation or transport failures.
+
+| Item field | Type | Required | Meaning |
+| --- | --- | :---: | --- |
+| `url` | nonempty string | Yes | Returned source URL. |
+| `title` | string | Yes | Returned source title. |
+| `snippet` | string | No | Source-associated text actually included in the result made available to the agent. |
+
+```json
+{
+  "items": [
+    {
+      "url": "https://example.com/docs",
+      "title": "Project documentation",
+      "snippet": "Instructions for configuring the project."
+    }
+  ]
+}
+```
+
+```json
+{ "error": "The search query was invalid." }
+```
+
+Partial search results use `items` rather than also reporting individual subrequest errors. A successful search with no returned sources has `"items": []`.

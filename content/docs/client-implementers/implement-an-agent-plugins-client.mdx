@@ -3,7 +3,7 @@ title: Implement an Agent Plugins client
 description: Add the portable Agent Plugins loading contract to an agent or development tool.
 ---
 
-A conformant client loads an Agent Plugin from a directory, validates `plugin.json`, and supports at least one component type: skills or MCP servers.
+A conformant client loads an Agent Plugin from a directory, validates `plugin.json`, and supports at least one component type: skills, MCP servers, or hooks.
 
 ## Loading sequence
 
@@ -18,11 +18,11 @@ Clients use canonical schema identifiers to select local validation and interpre
 
 ## Portable versus client-owned behavior
 
-Agent Plugins defines package structure, validation, discovery, MCP configuration, plugin variables, and failure isolation. It does not prescribe:
+Agent Plugins defines package structure, validation, discovery, MCP configuration, hook events and results, plugin variables, and failure isolation. It does not prescribe:
 
 - installation sources, registries, or marketplaces
 - enablement, update, or cache user experience
-- permission prompts, trust policy, or sandboxing
+- permission user interfaces, trust policy, or sandboxing
 - how skills are shown to users or models
 - internal client-extension behavior
 
@@ -30,4 +30,5 @@ Agent Plugins defines package structure, validation, discovery, MCP configuratio
 
 - **[Loading and discovery](/client-implementers/loading-and-discovery)** — Validate the manifest, discover supported components, and apply failure boundaries.
 - **[MCP runtime](/client-implementers/mcp-runtime)** — Map portable MCP configuration to stdio and HTTP connections.
+- **[Hooks](/plugin-authors/hooks)** — Review hook event behavior and handler inputs and outputs.
 - **[Conformance checklist](/client-implementers/conformance)** — Check the minimum portable client requirements.

@@ -30,12 +30,15 @@ Agent Plugins assigns each component type a fixed location:
 | --- | --- | --- |
 | [Skills](/plugin-authors/skills) | `skills/` | Immediate child directories containing a regular `SKILL.md`. |
 | [MCP servers](/plugin-authors/mcp-servers) | `mcp.json` | One root JSON configuration document. |
+| [Hooks](/plugin-authors/hooks) | `hooks.json` | One root JSON configuration document. |
 
 A missing fixed location is not an error. If a location exists with the wrong filesystem kind, mark only that component type invalid and continue with other supported types.
 
 If a discovered skill does not conform to the Agent Skills specification, skip that skill and continue loading its siblings. Do not recursively search nested descendants for additional skills.
 
-A client ignores component types it does not implement. Lack of support is not itself a plugin error; a conformant client implements at least one of skills or MCP servers. How a client presents a valid skill to users or models remains client policy.
+Invalid top-level configuration in `mcp.json` or `hooks.json` disables only that component type. Skip an MCP server entry if it is invalid or uses a transport the client does not support. In `hooks.json`, skip invalid event entries and individual handlers without disabling valid siblings.
+
+A client ignores component types it does not implement. Lack of support is not itself a plugin error; a conformant client implements at least one of skills, MCP servers, or hooks. How a client presents a valid skill to users or models remains client policy.
 
 ## Path failure boundaries
 
@@ -43,9 +46,10 @@ Apply the narrowest relevant boundary:
 
 1. Reject the plugin if `plugin.json` resolves outside the plugin root.
 2. Disable one component type when its fixed location has the wrong filesystem kind or escapes the root.
-3. Skip one skill when its `SKILL.md` escapes the root.
-4. Skip one MCP entry when a configured package path escapes its permitted root.
-5. Deny access for other escaping package paths.
+3. Skip one skill when its `SKILL.md` resolves outside the plugin root.
+4. Skip one MCP server entry when its plugin-relative `command` resolves outside the plugin root, or its `cwd` fails the [working-directory containment rules](/plugin-authors/mcp-servers#stdio-commands-and-paths).
+5. Skip one hook handler when its plugin-relative `command` resolves outside the plugin root.
+6. Deny access for other escaping package paths.
 
 ## Present plugin names and icons
 

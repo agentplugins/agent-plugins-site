@@ -95,12 +95,12 @@ const config: NextConfig = {
       ...legacyPageRedirects,
       {
         source: "/agent-builders/components/hooks",
-        destination: "/specification#73-hooks",
+        destination: "/plugin-authors/hooks",
         permanent: false,
       },
       {
         source: "/agent-builders/components/hooks.:extension(md|mdx)",
-        destination: "/specification.:extension#73-hooks",
+        destination: "/plugin-authors/hooks.:extension",
         permanent: false,
       },
       {
