@@ -3,7 +3,7 @@ title: Build an Agent Plugin
 description: Create the smallest portable package and add components in fixed locations.
 ---
 
-An Agent Plugin is a self-contained directory. Every plugin has a root `plugin.json`; skills and MCP configuration are optional.
+An Agent Plugin is a self-contained directory. Every plugin has a root `plugin.json`; skills, MCP servers, and hooks are optional.
 
 ## Create a minimal plugin
 
@@ -53,7 +53,6 @@ Files supplied by the package must resolve within the plugin root. Configuration
 
 ## Next steps
 
-- **[Manifest](/plugin-authors/manifest)** — Define the plugin identity, metadata, and target specification version.
 - **[Skills](/plugin-authors/skills)** — Package Agent Skills under the fixed `skills/` directory.
 - **[MCP servers](/plugin-authors/mcp-servers)** — Configure local and remote MCP connections in `mcp.json`.
-- **[Client extensions](/plugin-authors/client-extensions)** — Add namespaced behavior for particular clients without changing the portable contract.
+- **[Hooks](/plugin-authors/hooks)** — Run commands at defined points in the agent loop using `hooks.json`.
